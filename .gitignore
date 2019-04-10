@@ -1,0 +1,4 @@
+source/gen/
+.idea/
+tasks/
+venv/
