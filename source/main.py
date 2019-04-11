@@ -7,6 +7,8 @@
 
 import sys
 from antlr4 import *
+
+from source.AST import AST
 from source.gen.CLexer import CLexer
 from source.gen.CParser import CParser
 from source.CListenerExtend import CListenerExtend
@@ -22,6 +24,8 @@ def main(argv):
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
 
+    ast = AST()
+    ast.to_dot("test.dot")
 
 if __name__ == '__main__':
     main(sys.argv)

@@ -39,7 +39,7 @@ class SymbolTable:
 
             self.type_spec = type_spec
 
-    _container: Dict[string, Attributes]
+    #_container: Dict[string, Attributes]
 
     def __init__(self):
         self._container = dict()
