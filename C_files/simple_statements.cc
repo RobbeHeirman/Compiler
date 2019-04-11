@@ -1,1 +1,3 @@
-a
+
+int i;
+int i;

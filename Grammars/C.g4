@@ -6,14 +6,14 @@ statements
     :statement* EOF;
 
 statement
-    : decleration SEMICOLON
+    : declaration SEMICOLON
     ;
 
-decleration
-    : type ID
+declaration // specifier(optional)/base type/declarator/initializer(optional) (ref. C++ the programming language, p79)
+    : base_type ID (COMMA ID)*
     ;
 
-type
+base_type
     : CHAR
     | FLOAT
     | INT
@@ -31,6 +31,7 @@ EQ: '=';
 
 // Special Operators
 SEMICOLON: ';';
+COMMA: ',';
 //======================================================================================================================
 
 // types
