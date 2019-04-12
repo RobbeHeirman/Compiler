@@ -4,7 +4,7 @@
  Course: Compilers
  Academic Year: 2018-2019
 """
-
+import subprocess
 import sys
 from antlr4 import *
 
@@ -25,7 +25,9 @@ def main(argv):
     walker.walk(listener, tree)
 
     ast = AST()
-    ast.to_dot("test.dot")
+    dot_file = "AST.dot"
+    ast.to_dot(dot_file)
+    subprocess.call(["dot", "-Tpng", dot_file, "-o", "AST.png"])
 
 if __name__ == '__main__':
     main(sys.argv)

@@ -6,17 +6,34 @@ statements
     :statement* EOF;
 
 statement
-    : declaration SEMICOLON
+    : declaration
     ;
 
 declaration // specifier(optional)/base type/declarator/initializer(optional) (ref. C++ the programming language, p79)
-    : base_type ID (COMMA ID)*
+    : simple_declaration SEMICOLON // the simpelest form like: int a, int*a [];
+    ;
+
+simple_declaration
+    : base_type declarator
     ;
 
 base_type
     : CHAR
     | FLOAT
     | INT
+    ;
+
+declarator // optional prefix operator sequence + optional postfix operator
+    : prefix_operator* ID postfix_operator?
+    ;
+
+prefix_operator
+    : DEREFERENCE
+    | ADDRESS
+    ;
+
+postfix_operator
+    : ARRAY
     ;
 // =====================================================================================================================
 // =====================================================================================================================
@@ -25,6 +42,11 @@ base_type
 
 /** Operators */
 // ======================================================================================================================
+
+// Unary operators
+DEREFERENCE: '*';
+ADDRESS: '&';
+ARRAY: '[]';
 
 // Binary operators
 EQ: '=';
