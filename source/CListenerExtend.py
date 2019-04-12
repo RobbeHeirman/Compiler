@@ -5,9 +5,10 @@
  Academic Year: 2018-2019
 """
 from source.AST import AST
-from source.Nodes import AbstractNode
+from source.Nodes.AbstractNode import AbstractNode
 from source.Nodes.BaseTypeNode import BaseTypeNode
 from source.Nodes.DeclarationNode import DeclarationNode
+from source.Nodes.DeclaratorNode import DeclaratorNode
 from source.Nodes.RootNode import RootNode
 from source.Specifiers import TypeSpecifier
 from source.gen.CListener import CListener
@@ -58,4 +59,8 @@ class CListenerExtend(CListener):
 
         node = BaseTypeNode(self._parent_node, TypeSpecifier(ctx.getText()))
         self._parent_node.add_child(node)
-        print(ctx.getText())
+
+    def enterDeclarator(self, ctx:CParser.DeclaratorContext):
+
+        node = DeclaratorNode(self._parent_node, ctx.getText())
+        self._parent_node.add_child(node)

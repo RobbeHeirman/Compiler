@@ -3,6 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+from source.Nodes.ExpressionNode import ExpressionNode
 from source.Nodes.ScopedNode import ScopedNode
 
 
@@ -13,4 +14,4 @@ class RootNode(ScopedNode):
     label = "Root"
 
     def __init__(self):
-        super().__init__()
+        super(ScopedNode, self).__init__()

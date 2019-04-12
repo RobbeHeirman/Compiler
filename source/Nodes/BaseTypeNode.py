@@ -13,6 +13,6 @@ class BaseTypeNode(LeafNode):
         super().__init__(parent_node, value)
 
     @property
-    def label(self) ->str:
+    def label(self) -> str:
         return self._value.value
 
