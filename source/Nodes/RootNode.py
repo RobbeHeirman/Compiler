@@ -14,4 +14,8 @@ class RootNode(ScopedNode):
     label = "Root"
 
     def __init__(self):
-        super(ScopedNode, self).__init__()
+        super().__init__()
+
+    def resolve_expression(self):
+        """ Doesn't doe anything, root is special"""
+        pass

@@ -8,6 +8,7 @@ from source.Nodes.BaseTypeNode import BaseTypeNode
 from source.Nodes.DeclaratorNode import DeclaratorNode
 from source.Nodes.AbstractNode import AbstractNode
 from source.Nodes.ExpressionNode import ExpressionNode
+from source.SymbolTable import Attributes
 
 
 class DeclarationNode(ExpressionNode):
@@ -35,7 +36,7 @@ class DeclarationNode(ExpressionNode):
     def _add_declarator(self, child: DeclaratorNode):
         self._declarator_list.append(child)
 
-    add_overload_map = {
+    _add_overload_map = {
         BaseTypeNode: _add_base_type,
         DeclaratorNode: _add_declarator,
         AbstractNode: None
@@ -46,5 +47,16 @@ class DeclarationNode(ExpressionNode):
         extends add_child of abstractNode. To quick filter useful information for DeclarationNode
         :param child: An abstractNode
         """
-        DeclarationNode.add_overload_map[type(child)](self, child)
+        DeclarationNode._add_overload_map[type(child)](self, child)
         super().add_child(child)
+
+    def resolve_expression(self):
+        """
+        Adding to the symbol table in case of a declaration.
+        :return:
+        """
+        type_spec = self._base_type_node.value
+        for node in self._declarator_list:
+            lexeme = node.value
+            attribute = Attributes(type_spec)
+            self.add_to_scope_symbol_table(lexeme, attribute)

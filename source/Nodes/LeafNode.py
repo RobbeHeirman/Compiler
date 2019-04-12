@@ -16,3 +16,7 @@ class LeafNode(AbstractNode, ABC):
     def __init__(self, parent_node,  value):
         super().__init__(parent_node)
         self._value = value
+
+    @property
+    def value(self):
+        return self._value

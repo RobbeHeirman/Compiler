@@ -45,9 +45,9 @@ class SymbolTable:
         :param lexeme: The lexeme, the name of the identifier
         :return: True if this action is allowed, False if not.
         """
+        if lexeme in self._container.keys():
 
-        if lexeme in self._container:
-            print("Redeclaration, TODO: Compile info (line, spot...")
+            print("Redeclaration of {0}, TODO: Compile info (line, spot...".format(lexeme))
             return False
 
         self._container[lexeme] = attribute

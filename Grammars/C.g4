@@ -14,7 +14,7 @@ declaration // specifier(optional)/base type/declarator/initializer(optional) (r
     ;
 
 simple_declaration
-    : base_type declarator
+    : base_type declarator (COMMA declarator)*
     ;
 
 base_type

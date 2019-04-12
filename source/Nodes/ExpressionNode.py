@@ -3,7 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import List
 
 from source.Nodes.AbstractNode import AbstractNode
@@ -16,7 +16,7 @@ class ExpressionNode(AbstractNode, ABC):
     """
     _children: List["AbstractNode"]
 
-    def __init__(self, parent_node = None):
+    def __init__(self, parent_node=None):
         super().__init__(parent_node)
 
         self._children = list()
@@ -44,7 +44,7 @@ class ExpressionNode(AbstractNode, ABC):
 
         return ret
 
-    def add_to_scope_symbol_table(self, lexeme, attribute: Attributes)->bool:
+    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes)->bool:
         """
         Hook to add a lexeme to symbol table. Child classes may need to implement this.
         We will just call the parents add symbol to scope. Scoped nodes contain SymbolTables and will look
@@ -54,3 +54,10 @@ class ExpressionNode(AbstractNode, ABC):
         :return bool true if successfully added, false if not.
         """
         return self._parent_node.add_to_scope_symbol_table(lexeme, attribute)
+
+    @abstractmethod
+    def resolve_expression(self):
+        """
+        Resolves an expression node. Depending on the expression that needs to be resolved
+        """
+        pass

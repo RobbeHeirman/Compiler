@@ -5,7 +5,7 @@
  Academic Year: 2018-2019
 """
 from source.AST import AST
-from source.Nodes.AbstractNode import AbstractNode
+from source.Nodes.ExpressionNode import ExpressionNode
 from source.Nodes.BaseTypeNode import BaseTypeNode
 from source.Nodes.DeclarationNode import DeclarationNode
 from source.Nodes.DeclaratorNode import DeclaratorNode
@@ -20,7 +20,7 @@ class CListenerExtend(CListener):
     Extension the Generated Antlr CListener.
     Responsible for building the AST
     """
-    _parent_node: AbstractNode
+    _parent_node: ExpressionNode
 
     def __init__(self):
         # Some info about the traversing will be recorded
@@ -53,6 +53,7 @@ class CListenerExtend(CListener):
         self._parent_node = declaration_node
 
     def exitDeclaration(self, ctx: CParser.DeclarationContext):
+        self._parent_node.resolve_expression()
         self._parent_node = self._parent_node.parent_node
 
     def enterBase_type(self, ctx:CParser.Base_typeContext):
@@ -61,6 +62,5 @@ class CListenerExtend(CListener):
         self._parent_node.add_child(node)
 
     def enterDeclarator(self, ctx:CParser.DeclaratorContext):
-
         node = DeclaratorNode(self._parent_node, ctx.getText())
         self._parent_node.add_child(node)

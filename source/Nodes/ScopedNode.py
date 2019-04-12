@@ -4,7 +4,6 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from abc import ABC
-from source.Nodes.AbstractNode import AbstractNode
 from source.Nodes.ExpressionNode import ExpressionNode
 from source.SymbolTable import SymbolTable, Attributes
 
@@ -21,11 +20,12 @@ class ScopedNode(ExpressionNode, ABC):
         super().__init__()
         self._symbol_table = SymbolTable()
 
-    def add_to_scope_symbol_table(self, lexeme,  attribute: Attributes)->bool:
+    def add_to_scope_symbol_table(self, lexeme: str,  attribute: Attributes)->bool:
         """
         This is a ScopedNode with own symbolTable. We will attempt to add to the symbol table here.
+        :param lexeme: The lexeme (id name) of the variable we add
         :param attribute: set of attributes that describes the lexeme
         :return: boolean, true if successfully added, false if not.
         """
 
-        return self._symbol_table.add_id()
+        return self._symbol_table.add_id(lexeme, attribute)
