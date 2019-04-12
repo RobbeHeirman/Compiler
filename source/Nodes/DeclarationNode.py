@@ -12,10 +12,10 @@ class DeclarationNode(AbstractNode):
     Represents a Declaration in our abstract syntax tree.
     """
     _base_type_node: BaseTypeNode
-    _label = "Declaration"
+    label = "Declaration"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent_node):
+        super().__init__(parent_node)
 
         self._base_type_node = None
 

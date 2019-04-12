@@ -13,6 +13,6 @@ class LeafNode(AbstractNode, ABC):
     Represents all leaf nodes
     """
 
-    def __init__(self, value):
-        super().__init__()
+    def __init__(self, parent_node,  value):
+        super().__init__(parent_node)
         self._value = value

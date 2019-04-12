@@ -9,8 +9,10 @@ from source.Specifiers import TypeSpecifier
 
 class BaseTypeNode(LeafNode):
 
-    def __init__(self, value: TypeSpecifier):
-        super().__init__(value)
+    def __init__(self, parent_node, value: TypeSpecifier):
+        super().__init__(parent_node, value)
 
-    def _label(self):
+    @property
+    def label(self) ->str:
         return self._value.value
+

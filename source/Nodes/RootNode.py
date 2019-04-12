@@ -10,7 +10,7 @@ class RootNode(ScopedNode):
     """
     The root of our program. Root is a ScopedNode, the base scope of our C program.
     """
-    _label = "Root"
+    label = "Root"
 
     def __init__(self):
         super().__init__()
