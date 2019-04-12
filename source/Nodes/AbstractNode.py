@@ -41,12 +41,17 @@ class AbstractNode(ABC):
         :param child: a ASTNode that functions as a child
         """
 
+        self._children.append(child)
+
     def dot_string(self):
         """Generates the visual representation of the node in .dot"""
         ret = "{0}[label = {1}];\n".format(self._index, self._label)
         ret += "{0}--{{".format(self._index)
         for child in self._children:
             ret += "{0},".format(child.index)
+
+        if len(self._children) > 0:
+            ret = ret[:-1]
 
         ret += "}\n"
 

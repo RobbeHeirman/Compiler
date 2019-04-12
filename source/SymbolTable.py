@@ -4,19 +4,10 @@
  Course: Compilers
  Academic Year: 2018-2019
 """
-import string
-from enum import Enum, auto
-from typing import Dict, Any
 
+from typing import Dict
 
-class TypeSpecifier(Enum):
-    """
-    TypeSpecifier Attribute as Enum.
-    Specifies a type for a identifier token.
-    """
-    CHAR = 'char'
-    INT = 'int'
-    FLOAT = 'float'
+from source.Specifiers import TypeSpecifier
 
 
 class SymbolTable:
@@ -39,12 +30,12 @@ class SymbolTable:
 
             self.type_spec = type_spec
 
-    #_container: Dict[string, Attributes]
+    _container: Dict[str, Attributes]
 
     def __init__(self):
         self._container = dict()
 
-    def add_id(self, lexeme: string, type_spec) -> bool:
+    def add_id(self, lexeme: str, type_spec) -> bool:
         """
         Adds an id to the symbolic table. Returns True if adding was a succes. Returns false if there is a parse error.
         For example redeclaration of a identifier is not allowed.

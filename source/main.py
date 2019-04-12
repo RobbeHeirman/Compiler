@@ -24,7 +24,7 @@ def main(argv):
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
 
-    ast = AST()
+    ast = listener.ast
     dot_file = "AST.dot"
     ast.to_dot(dot_file)
     subprocess.call(["dot", "-Tpng", dot_file, "-o", "AST.png"])

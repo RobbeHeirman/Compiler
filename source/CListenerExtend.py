@@ -6,6 +6,7 @@
 """
 from source.AST import AST
 from source.Nodes import AbstractNode
+from source.Nodes.DeclarationNode import DeclarationNode
 from source.Nodes.RootNode import RootNode
 from source.gen.CListener import CListener
 from source.gen.CParser import CParser
@@ -24,6 +25,10 @@ class CListenerExtend(CListener):
         self._parent_node = None # Will always keep track of the parent AST node when traversing down
         self._ast = AST()
 
+    @property
+    def ast(self):
+        return self._ast
+
     def enterStatements(self, ctx:CParser.StatementContext):
         """
         This is the root of our C program. It will make a root node
@@ -39,10 +44,7 @@ class CListenerExtend(CListener):
         attributes. Also handles semantic errors like a redeclaration of an identifier.
         :param ctx: context of the node
         """
-        base_type = None
-        for i in range(ctx.getChildCount()):
-            child = ctx.getChild(i).getPayload()
-            print(type(ctx.getChild(i).getPayload()))
 
-            if isinstance(child, CParser.Base_typeContext):
-                print("yay!")
+        declaration_node = DeclarationNode()
+        self._parent_node.add_child(declaration_node)
+        self._parent_node = declaration_node

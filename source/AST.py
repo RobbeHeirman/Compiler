@@ -29,6 +29,10 @@ class AST:
         Generates a string, in dot language format. That can be used as a visual representation for the AST.
         :return:
         """
+        if self._root is None:
+            print("AST not initialized")
+            return
+
         graph_string = "graph{\n"
         graph_string += self._root.dot_string()
         graph_string += "}\n"
