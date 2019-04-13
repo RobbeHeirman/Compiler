@@ -1,3 +1,3 @@
 
 int i;
-int a, i;
+char a;

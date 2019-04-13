@@ -19,3 +19,6 @@ class RootNode(ScopedNode.ScopedNode):
     def resolve_expression(self):
         """ Doesn't doe anything, root is special"""
         pass
+
+    def generate_llvm(self):
+        pass

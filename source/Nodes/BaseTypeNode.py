@@ -9,6 +9,8 @@ from source.Specifiers import TypeSpecifier
 
 class BaseTypeNode(LeafNode):
 
+    _value: TypeSpecifier
+
     def __init__(self, parent_node, value: TypeSpecifier, filename: str, line: int, column: int):
         """
         Initializer
@@ -23,3 +25,7 @@ class BaseTypeNode(LeafNode):
     @property
     def label(self) -> str:
         return self._value.value
+
+    @property
+    def value(self)-> TypeSpecifier:
+        return self._value

@@ -70,3 +70,17 @@ class DeclarationNode(ExpressionNode):
                 success = False
 
         return success
+
+    def generate_llvm(self)->str:
+        """
+        This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
+        :return: the generated string
+        """
+        ret = ""
+        type_spec = self._base_type_node.value
+        for declarator in self._declarator_list:
+
+            lexeme = declarator.value
+            ret += "%{0} = alloca {1}, align {2}\n".format(lexeme, type_spec.llvm_type, type_spec.llvm_alignment)
+
+        return ret

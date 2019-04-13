@@ -61,3 +61,10 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
         Resolves an expression node. Depending on the expression that needs to be resolved
         """
         pass
+
+    def generate_llvm(self)->str:
+        """
+        Generates the corresponding node into llvm instructions.
+        :return: generates the instructions as a string
+        """
+        pass

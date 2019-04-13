@@ -30,6 +30,14 @@ class CListenerExtend(CListener):
         self._parent_node = None  # Will always keep track of the parent AST node when traversing down
         self._ast = AST()
         self._filename = filename
+        self._fail = False  # Keeping track of failed compilation.
+
+    #TODO: Fail switch and checker needs to be implemented here
+    def fail(self, boolean: bool):
+        """
+
+        :param boolean:
+        """
 
     @property
     def ast(self):
@@ -63,6 +71,7 @@ class CListenerExtend(CListener):
         :return:
         """
         self._parent_node.resolve_expression()
+        print(self._parent_node.generate_llvm())
         self._parent_node = self._parent_node.parent_node
 
     def enterBase_type(self, ctx: CParser.Base_typeContext):
