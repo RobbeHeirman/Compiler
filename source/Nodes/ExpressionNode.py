@@ -6,11 +6,11 @@ Academic Year: 2018-2019
 from abc import ABC, abstractmethod
 from typing import List
 
-from source.Nodes.AbstractNode import AbstractNode
-from source.SymbolTable import Attributes
+import source.Nodes.AbstractNode as AbstractNode
+import source.SymbolTable as SymbolTable
 
 
-class ExpressionNode(AbstractNode, ABC):
+class ExpressionNode(AbstractNode.AbstractNode, ABC):
     """
     Abstract node for all intermediate "expression" nodes. Complements leaf node
     """
@@ -44,7 +44,7 @@ class ExpressionNode(AbstractNode, ABC):
 
         return ret
 
-    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes)->bool:
+    def add_to_scope_symbol_table(self, lexeme: str, attribute: SymbolTable.Attributes)->bool:
         """
         Hook to add a lexeme to symbol table. Child classes may need to implement this.
         We will just call the parents add symbol to scope. Scoped nodes contain SymbolTables and will look

@@ -7,23 +7,45 @@
 
 from typing import Dict
 
-from source.Specifiers import TypeSpecifier
+import source.Specifiers as TypeSpecifier
+import source.messages as messages
 
 
 class Attributes:
     """
     Container class used by SymbolTable to keep track of token Attributes
     """
+    _column: int
+    _line: int
+    _filename: str
+    _type_spec: TypeSpecifier.TypeSpecifier
 
-    type_spec: TypeSpecifier
-
-    def __init__(self, type_spec: TypeSpecifier):
+    def __init__(self, type_spec: TypeSpecifier.TypeSpecifier, filename: str, line: int, column: int):
         """
         Initializer
         :param type_spec: The type_specifier attribute for this token.
+        :param filename: name of the file lexeme is found
+        :param line: the line where de lexeme is found.
+        :param column: the column where the lexeme is found.
         """
 
-        self.type_spec = type_spec
+        self._type_spec = type_spec
+        self._filename = filename
+        self._line = line
+        self._column = column
+
+
+    @property
+    def filename(self)->str:
+        return self._filename
+
+    @property
+    def line(self)->int:
+        return self._line
+
+    @property
+    def column(self)->int:
+        return self._column
 
 
 class SymbolTable:
@@ -47,7 +69,9 @@ class SymbolTable:
         """
         if lexeme in self._container.keys():
 
-            print("Redeclaration of {0}, TODO: Compile info (line, spot...".format(lexeme))
+            messages.error_redeclaration(lexeme, attribute)
+            attribute_prev = self._container[lexeme]
+            messages.note_prev_decl(lexeme, attribute_prev)
             return False
 
         self._container[lexeme] = attribute

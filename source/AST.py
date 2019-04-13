@@ -3,12 +3,12 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from source.Nodes.RootNode import RootNode
+import source.Nodes.RootNode as RootNode
 
 
 class AST:
     """Representation of the Abstract syntax tree"""
-    _root: RootNode
+    _root: RootNode.RootNode
 
     def __init__(self):
         """

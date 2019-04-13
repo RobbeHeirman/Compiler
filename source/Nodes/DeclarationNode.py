@@ -50,13 +50,23 @@ class DeclarationNode(ExpressionNode):
         DeclarationNode._add_overload_map[type(child)](self, child)
         super().add_child(child)
 
-    def resolve_expression(self):
+    def resolve_expression(self) -> bool:
         """
         Adding to the symbol table in case of a declaration.
-        :return:
+        :return: bool: true if everything worked correctly false else.
         """
         type_spec = self._base_type_node.value
+        success = True
+
         for node in self._declarator_list:
+
+            filename = node.filename
+            line = node.line
+            column = node.column
             lexeme = node.value
-            attribute = Attributes(type_spec)
-            self.add_to_scope_symbol_table(lexeme, attribute)
+            attribute = Attributes(type_spec, filename, line, column)
+
+            if not self.add_to_scope_symbol_table(lexeme, attribute):
+                success = False
+
+        return success

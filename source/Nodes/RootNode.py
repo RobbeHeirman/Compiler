@@ -3,11 +3,11 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from source.Nodes.ExpressionNode import ExpressionNode
-from source.Nodes.ScopedNode import ScopedNode
+
+import source.Nodes.ScopedNode as ScopedNode
 
 
-class RootNode(ScopedNode):
+class RootNode(ScopedNode.ScopedNode):
     """
     The root of our program. Root is a ScopedNode, the base scope of our C program.
     """
