@@ -14,12 +14,30 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
     """
     Abstract node for all intermediate "expression" nodes. Complements leaf node
     """
+    _failed: bool
     _children: List["AbstractNode"]
 
     def __init__(self, parent_node=None):
         super().__init__(parent_node)
 
         self._children = list()
+        self._failed = False
+
+    @property
+    def failed(self)->bool:
+        for child in self._children:
+            self._fail_switch(child.failed)
+        return self._failed
+
+    def _fail_switch(self, boolean:bool):
+        """
+        used so that a node can tell parents there is a semantic error
+        :param boolean: the boolean that tells if the expression failed.
+        :return:
+        """
+
+        if boolean:
+            self._failed = True
 
     def add_child(self, child: "AbstractNode"):
         """
@@ -44,7 +62,7 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
 
         return ret
 
-    def add_to_scope_symbol_table(self, lexeme: str, attribute: SymbolTable.Attributes)->bool:
+    def add_to_scope_symbol_table(self, lexeme: str, attribute: SymbolTable.Attributes) -> bool:
         """
         Hook to add a lexeme to symbol table. Child classes may need to implement this.
         We will just call the parents add symbol to scope. Scoped nodes contain SymbolTables and will look
@@ -62,9 +80,13 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
         """
         pass
 
-    def generate_llvm(self)->str:
+    def generate_llvm(self) -> str:
         """
         Generates the corresponding node into llvm instructions.
         :return: generates the instructions as a string
         """
-        pass
+        ret = ""
+
+        for child in self._children:
+            ret += child.generate_llvm()
+        return ret

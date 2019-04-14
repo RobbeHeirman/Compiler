@@ -24,6 +24,10 @@ class AST:
     def root(self, root):
         self._root = root
 
+    @property
+    def failed(self):
+        return self._root.failed
+
     def to_dot(self, filename):
         """
         Generates a string, in dot language format. That can be used as a visual representation for the AST.
@@ -39,3 +43,11 @@ class AST:
         file = open(filename, 'w')
         file.write(graph_string)
         file.close()
+
+    def generate_llvm(self)->str:
+        """
+        Generates the LLVM instruction code
+        :return: a string with the llvm instructions of this ast.
+        """
+
+        return self._root.generate_llvm()

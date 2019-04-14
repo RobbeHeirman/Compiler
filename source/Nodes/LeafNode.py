@@ -43,3 +43,6 @@ class LeafNode(AbstractNode, ABC):
     @property
     def column(self):
         return self._column
+
+    def generate_llvm(self):
+        pass

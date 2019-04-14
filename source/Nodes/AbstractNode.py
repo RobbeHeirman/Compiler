@@ -53,3 +53,11 @@ class AbstractNode(ABC):
     def dot_string(self):
         ret = "{0}[label = {1}];\n".format(self._index, self.label)
         return ret
+
+    @property
+    def failed(self):
+        return False
+
+    @abstractmethod
+    def generate_llvm(self):
+        pass

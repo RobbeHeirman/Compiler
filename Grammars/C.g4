@@ -13,7 +13,7 @@ declaration // specifier(optional)/base type/declarator/initializer(optional) (r
     : simple_declaration SEMICOLON // the simpelest form like: int a, int*a [];
     ;
 
-simple_declaration
+simple_declaration // int a, char foo....
     : base_type declarator (COMMA declarator)*
     ;
 
@@ -35,13 +35,35 @@ prefix_operator
 postfix_operator
     : ARRAY
     ;
+
+assignment // a = 4;, int b = a;
+    : lhs EQ rhs SEMICOLON
+    ;
+
+lhs // all possible L values
+    : ID
+    | simple_declaration
+    ;
+
+rhs // Possible R values
+    : constant
+    ;
+
+constant
+    : character
+    | numeral
+    |
+    ;
+
+character
+
 // =====================================================================================================================
 // =====================================================================================================================
 /** Tokens */
 // =====================================================================================================================
 
 /** Operators */
-// ======================================================================================================================
+// =====================================================================================================================
 
 // Unary operators
 DEREFERENCE: '*';

@@ -28,7 +28,11 @@ def main(argv):
     dot_file = "AST.dot"
     ast.to_dot(dot_file)
     subprocess.call(["dot", "-Tpng", dot_file, "-o", "AST.png"])
+    if ast.failed:
+        print("I failed :(")
 
+    else:
+        print(ast.generate_llvm())
 
 if __name__ == '__main__':
     main(sys.argv)

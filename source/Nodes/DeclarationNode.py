@@ -68,6 +68,7 @@ class DeclarationNode(ExpressionNode):
 
             if not self.add_to_scope_symbol_table(lexeme, attribute):
                 success = False
+                self._fail_switch(True)
 
         return success
 
@@ -77,9 +78,9 @@ class DeclarationNode(ExpressionNode):
         :return: the generated string
         """
         ret = ""
+
         type_spec = self._base_type_node.value
         for declarator in self._declarator_list:
-
             lexeme = declarator.value
             ret += "%{0} = alloca {1}, align {2}\n".format(lexeme, type_spec.llvm_type, type_spec.llvm_alignment)
 
