@@ -34,5 +34,6 @@ def main(argv):
     else:
         print(ast.generate_llvm())
 
+
 if __name__ == '__main__':
     main(sys.argv)

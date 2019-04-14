@@ -6,7 +6,8 @@ statements
     :statement* EOF;
 
 statement
-    : declaration
+    :assignment
+    |declaration
     ;
 
 declaration // specifier(optional)/base type/declarator/initializer(optional) (ref. C++ the programming language, p79)
@@ -14,7 +15,7 @@ declaration // specifier(optional)/base type/declarator/initializer(optional) (r
     ;
 
 simple_declaration // int a, char foo....
-    : base_type declarator (COMMA declarator)*
+    : base_type declarator (EQ rhs)? (COMMA declarator (EQ rhs)?)*
     ;
 
 base_type
@@ -37,12 +38,7 @@ postfix_operator
     ;
 
 assignment // a = 4;, int b = a;
-    : lhs EQ rhs SEMICOLON
-    ;
-
-lhs // all possible L values
-    : ID
-    | simple_declaration
+    : ID EQ rhs SEMICOLON
     ;
 
 rhs // Possible R values
@@ -50,12 +46,10 @@ rhs // Possible R values
     ;
 
 constant
-    : character
-    | numeral
-    |
+    : CHARACTER_C
+    | NUMERAL_C
+    | FLOAT_C
     ;
-
-character
 
 // =====================================================================================================================
 // =====================================================================================================================
@@ -76,6 +70,8 @@ EQ: '=';
 // Special Operators
 SEMICOLON: ';';
 COMMA: ',';
+S_QUOTE: '\'';
+POINT: '.';
 //======================================================================================================================
 
 // types
@@ -89,5 +85,34 @@ INT: 'int';
 // identifier(s) & literals
 // =====================================================================================================================
 
-ID: [_a-zA-Z] [_a-zA-Z0-9]*;
+ID: NONDIGIT_ID (NONDIGIT_ID | DIGIT)*;
 WS: [ \n\t\r]+ -> skip;
+
+fragment NONDIGIT_ID: [a-zA-Z_];
+fragment DIGIT: [0-9];
+
+
+
+CHARACTER_C: S_QUOTE (~['\\\r\n\u0085\u2028\u2029] | COMMONCHARACTER)  S_QUOTE;
+
+fragment COMMONCHARACTER
+    : SIMPLEESCAPESEQUENCE
+    ;
+
+fragment SIMPLEESCAPESEQUENCE // TODO: Extend
+    : '\\\''
+    | '\\"'
+    | '\\\\'
+    | '\\0'
+    | '\\a'
+    | '\\b'
+    | '\\f'
+    | '\\n'
+    | '\\r'
+    | '\\t'
+    | '\\v'
+    ;
+
+NUMERAL_C: DIGIT (DIGIT| '_')*;  // TODO: extend (binary, hexadecimal...)
+
+FLOAT_C: [0-9][0-9_]* ( ([eE] [-+]? [0-9][0-9_]*) | '.' [0-9][0-9_]* ([eE] [-+]? [0-9][0-9_]*)?);

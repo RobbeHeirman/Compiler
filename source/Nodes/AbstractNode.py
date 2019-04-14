@@ -60,4 +60,4 @@ class AbstractNode(ABC):
 
     @abstractmethod
     def generate_llvm(self):
-        pass
+        return ""

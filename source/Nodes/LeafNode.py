@@ -5,6 +5,8 @@ Academic Year: 2018-2019
 """
 from abc import ABC
 
+from antlr4 import ParserRuleContext
+
 from source.Nodes.AbstractNode import AbstractNode
 
 
@@ -12,21 +14,24 @@ class LeafNode(AbstractNode, ABC):
     """
     Represents all leaf nodes
     """
+    _value: str
+    _column: int
+    _line: int
+    _filename: str
 
-    def __init__(self, parent_node, value, filename: str, line: int, column: int):
+    def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
         """
-        Initializer
-        :param parent_node: the parent node
-        :param value: the yield of this leaf node
-        :param filename: the filename of this node
-        :param column: the column, (place on the line yield is found.)
-        :param line:  line yield is found
+
+        :param parent_node:
+        :param filename:
+        :param ctx: ParserRuleContextNode
         """
         super().__init__(parent_node)
-        self._line = line
-        self._column = column
+        start = ctx.start
         self._filename = filename
-        self._value = value
+        self._line = start.line
+        self._column = start.column
+        self._value = ctx.getText()
 
     @property
     def value(self):

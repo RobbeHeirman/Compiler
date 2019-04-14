@@ -5,12 +5,13 @@
  Academic Year: 2018-2019
 """
 from source.AST import AST
+from source.Nodes.AssignmentNode import AssignmentNode
+from source.Nodes.ConstantNode import ConstantNode
 from source.Nodes.DeclaratorNode import DeclaratorNode
 from source.Nodes.ExpressionNode import ExpressionNode
 from source.Nodes.BaseTypeNode import BaseTypeNode
 from source.Nodes.DeclarationNode import DeclarationNode
 from source.Nodes.RootNode import RootNode
-from source.Specifiers import TypeSpecifier
 from source.gen.CListener import CListener
 from source.gen.CParser import CParser
 
@@ -44,25 +45,24 @@ class CListenerExtend(CListener):
         self._ast.root = root_node
         self._parent_node = root_node
 
-    def enterDeclaration(self, ctx: CParser.DeclarationContext):
+    def enterSimple_declaration(self, ctx: CParser.Simple_declarationContext):
         """
         Handles a declaration statement. Creates a declaration node. Set it as last parent node so that children can
         can identify their parent
         :param ctx: context of the node
         """
-
         declaration_node = DeclarationNode(self._parent_node)
         self._parent_node.add_child(declaration_node)
         self._parent_node = declaration_node
 
-    def exitDeclaration(self, ctx: CParser.DeclarationContext):
+    def exitSimple_declaration(self, ctx: CParser.Simple_declarationContext):
         """
         Finishes a declaration statement. The node can be resolved. This will mostly attempt to add lexemes
         to the scope's symbol table.
         :param ctx: context of the node
         :return:
         """
-        self._parent_node.resolve_expression()
+
         self._parent_node = self._parent_node.parent_node
 
     def enterBase_type(self, ctx: CParser.Base_typeContext):
@@ -71,10 +71,8 @@ class CListenerExtend(CListener):
         :param ctx:
         :return:
         """
-        start = ctx.start
-        line = start.line
-        column = start.column
-        node = BaseTypeNode(self._parent_node, TypeSpecifier(ctx.getText()), self._filename, line, column)
+
+        node = BaseTypeNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(node)
 
     def enterDeclarator(self, ctx: CParser.DeclaratorContext):
@@ -83,9 +81,32 @@ class CListenerExtend(CListener):
         :param ctx:
         :return:
         """
-        start = ctx.start
-        line = start.line
-        column = start.column
 
-        node = DeclaratorNode(self._parent_node, ctx.getText(), self._filename, line, column)
+        # column = start.column
+        node = DeclaratorNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(node)
+
+    def enterAssignment(self, ctx: CParser.AssignmentContext):
+        """
+        Handle's assignment statement's. We enter the assignment statement so we just make the node.
+        :param ctx: ParserContextNode
+        :return:
+        """
+
+        assignment_node = AssignmentNode(self._parent_node)
+        self._parent_node.add_child(assignment_node)
+        self._parent_node = assignment_node
+
+    def exitAssignment(self, ctx: CParser.AssignmentContext):
+        """
+        Finishes the assignment. Expressions RHS & LHS have been evaluated. Now we just need to
+        assign the value.
+        :param ctx:
+        :return:
+        """
+        self._parent_node = self._parent_node.parent_node
+
+    def enterConstant(self, ctx:CParser.ConstantContext):
+
+        c_node = ConstantNode(self._parent_node,self._filename, ctx)
+        self._parent_node.add_child(c_node)

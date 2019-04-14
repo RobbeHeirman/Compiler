@@ -1,3 +1,2 @@
 
-int i;
-char a;
+int a = 10;

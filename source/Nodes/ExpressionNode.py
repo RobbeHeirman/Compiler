@@ -73,12 +73,6 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
         """
         return self._parent_node.add_to_scope_symbol_table(lexeme, attribute)
 
-    @abstractmethod
-    def resolve_expression(self):
-        """
-        Resolves an expression node. Depending on the expression that needs to be resolved
-        """
-        pass
 
     def generate_llvm(self) -> str:
         """
@@ -89,4 +83,5 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
 
         for child in self._children:
             ret += child.generate_llvm()
+
         return ret

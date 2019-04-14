@@ -5,6 +5,7 @@ Academic Year: 2018-2019
 """
 from typing import List
 from source.Nodes.BaseTypeNode import BaseTypeNode
+from source.Nodes.ConstantNode import ConstantNode
 from source.Nodes.DeclaratorNode import DeclaratorNode
 from source.Nodes.AbstractNode import AbstractNode
 from source.Nodes.ExpressionNode import ExpressionNode
@@ -15,6 +16,7 @@ class DeclarationNode(ExpressionNode):
     """
     Represents a Declaration in our abstract syntax tree.
     """
+    _lexeme: str
     _declarator_list: List[DeclaratorNode]
     _base_type_node: BaseTypeNode
 
@@ -25,6 +27,11 @@ class DeclarationNode(ExpressionNode):
 
         self._base_type_node = None
         self._declarator_list = []
+        self._id = None
+
+    @property
+    def id(self):
+        return self._id
 
     def _add_base_type(self, child: BaseTypeNode):
         """
@@ -35,10 +42,15 @@ class DeclarationNode(ExpressionNode):
 
     def _add_declarator(self, child: DeclaratorNode):
         self._declarator_list.append(child)
+        self._id = child.value
+        self._declare_variable(child)
 
+    def _add_constant(self):
+        pass
     _add_overload_map = {
         BaseTypeNode: _add_base_type,
         DeclaratorNode: _add_declarator,
+        ConstantNode: _add_constant,
         AbstractNode: None
     }
 
@@ -50,27 +62,17 @@ class DeclarationNode(ExpressionNode):
         DeclarationNode._add_overload_map[type(child)](self, child)
         super().add_child(child)
 
-    def resolve_expression(self) -> bool:
-        """
-        Adding to the symbol table in case of a declaration.
-        :return: bool: true if everything worked correctly false else.
-        """
+    def _declare_variable(self, node: DeclaratorNode):
+
+        filename = node.filename
+        line = node.line
+        column = node.column
         type_spec = self._base_type_node.value
-        success = True
+        lexeme = node.value
+        attribute = Attributes(type_spec, filename, line, column)
 
-        for node in self._declarator_list:
-
-            filename = node.filename
-            line = node.line
-            column = node.column
-            lexeme = node.value
-            attribute = Attributes(type_spec, filename, line, column)
-
-            if not self.add_to_scope_symbol_table(lexeme, attribute):
-                success = False
-                self._fail_switch(True)
-
-        return success
+        if not self.add_to_scope_symbol_table(lexeme, attribute):
+            self._fail_switch(True)
 
     def generate_llvm(self)->str:
         """
