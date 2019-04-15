@@ -37,7 +37,7 @@ def error_redeclaration(lexeme, attribute):
 
 
 def error_undeclared_var(lexeme, attribute):
-    print(BColors.FAIL + "{0}{1} undeclared".format(error(attribute), lexeme))
+    print(BColors.FAIL + "{0}{1} undeclared".format(error(attribute), lexeme) + BColors.ENDC)
 
 
 def note(attribute: "SymbolTable.Attributes"):

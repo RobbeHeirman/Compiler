@@ -67,7 +67,6 @@ class AbstractNode(ABC):
         :param boolean: the boolean that tells if the expression failed.
         :return:
         """
-
         if boolean:
             self._failed = True
 

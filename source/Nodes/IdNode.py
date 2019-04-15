@@ -5,7 +5,10 @@ Academic Year: 2018-2019
 """
 from antlr4 import ParserRuleContext
 
+from source import messages
 from source.Nodes.RHSNode import RHSNode
+from source.Specifiers import TypeSpecifier
+from source.SymbolTable import Attributes
 
 
 class IdNode(RHSNode):
@@ -13,13 +16,17 @@ class IdNode(RHSNode):
     def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
         super().__init__(parent_node, filename, ctx)
 
+        self.is_declared()
+
     @property
     def label(self):
         return str(self._value)
 
     def is_declared(self)->bool:
         if not self._parent_node.is_in_table(self._value):
-            print("Not in symbol table") #TODO semantic error
+            attr = Attributes(TypeSpecifier.DEFAULT, self._filename, self._line, self._column)
+            messages.error_undeclared_var(self._value, attr)
+            self._fail_switch(True)
             return False
         return True
 
