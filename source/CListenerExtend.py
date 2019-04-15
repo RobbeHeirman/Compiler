@@ -7,6 +7,7 @@
 from source.AST import AST
 from source.Nodes.AssignmentNode import AssignmentNode
 from source.Nodes.ConstantNode import ConstantNode
+from source.Nodes.DeclListNode import DeclListNode
 from source.Nodes.DeclaratorNode import DeclaratorNode
 from source.Nodes.ExpressionNode import ExpressionNode
 from source.Nodes.BaseTypeNode import BaseTypeNode
@@ -44,6 +45,14 @@ class CListenerExtend(CListener):
         root_node = RootNode()
         self._ast.root = root_node
         self._parent_node = root_node
+
+    def enterDecl_list(self, ctx: CParser.Decl_listContext):
+        """
+        Entering decl list example : int, a, b = 10, c..;
+        :param ctx:
+        :return:
+        """
+        decl_l_node = DeclListNode(self._parent_node)
 
     def enterSimple_declaration(self, ctx: CParser.Simple_declarationContext):
         """
@@ -106,7 +115,6 @@ class CListenerExtend(CListener):
         """
         self._parent_node = self._parent_node.parent_node
 
-    def enterConstant(self, ctx:CParser.ConstantContext):
-
-        c_node = ConstantNode(self._parent_node,self._filename, ctx)
+    def enterConstant(self, ctx: CParser.ConstantContext):
+        c_node = ConstantNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(c_node)

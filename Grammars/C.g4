@@ -7,15 +7,15 @@ statements
 
 statement
     :assignment
-    |declaration
+    |decl_list
     ;
 
-declaration // specifier(optional)/base type/declarator/initializer(optional) (ref. C++ the programming language, p79)
-    : simple_declaration SEMICOLON // the simpelest form like: int a, int*a [];
+decl_list
+    : base_type simple_declaration (COMMA simple_declaration)* SEMICOLON
     ;
 
 simple_declaration // int a, char foo....
-    : base_type declarator (EQ rhs)? (COMMA declarator (EQ rhs)?)*
+    :  declarator (EQ rhs)?
     ;
 
 base_type

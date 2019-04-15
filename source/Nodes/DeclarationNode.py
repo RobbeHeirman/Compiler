@@ -45,8 +45,9 @@ class DeclarationNode(ExpressionNode):
         self._id = child.value
         self._declare_variable(child)
 
-    def _add_constant(self):
+    def _add_constant(self, child):
         pass
+
     _add_overload_map = {
         BaseTypeNode: _add_base_type,
         DeclaratorNode: _add_declarator,
