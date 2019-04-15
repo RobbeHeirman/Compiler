@@ -56,11 +56,9 @@ class CListenerExtend(CListener):
         self._parent_node.add_child(decl_l_node)
         self._parent_node = decl_l_node
 
-    def exitDecl_list(self, ctx:CParser.Decl_listContext):
-
+    def exitDecl_list(self, ctx: CParser.Decl_listContext):
         self._parent_node.handle_semantics()
         self._parent_node = self._parent_node.parent_node
-
 
     def enterSimple_declaration(self, ctx: CParser.Simple_declarationContext):
         """

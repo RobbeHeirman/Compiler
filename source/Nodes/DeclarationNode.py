@@ -3,7 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from typing import List
+
 from source.Nodes.ConstantNode import ConstantNode
 from source.Nodes.DeclaratorNode import DeclaratorNode
 from source.Nodes.AbstractNode import AbstractNode
@@ -25,6 +25,7 @@ class DeclarationNode(ExpressionNode):
 
         self._base_type = None
         self._declarator = None
+        self._rhs = None
         self._id = None
 
     @property
@@ -36,12 +37,12 @@ class DeclarationNode(ExpressionNode):
         self._id = child.value
         # self._declare_variable(child)
 
-    def _add_constant(self, child):
-        pass
+    def _add_rhs(self, child):
+        self._rhs = child
 
     _add_overload_map = {
         DeclaratorNode: _add_declarator,
-        ConstantNode: _add_constant,
+        ConstantNode: _add_rhs,
         AbstractNode: None
     }
 
@@ -75,8 +76,14 @@ class DeclarationNode(ExpressionNode):
         ret = ""
 
         lexeme = self._declarator.value
-        ret += "%{0} = alloca {1}, align {2}\n".format(lexeme, self._base_type.llvm_type, self._base_type.llvm_alignment)
-
+        ret += "%{0} = alloca {1}, align {2}\n".format(lexeme,
+                                                       self._base_type.llvm_type,
+                                                       self._base_type.llvm_alignment)
+        if self._rhs is not None:
+            ret += 'store {0} {1}, {2}* %{3}'.format(self._base_type.llvm_type,
+                                                     self._rhs.llvm_code_value(),
+                                                     self._base_type.llvm_type,
+                                                     lexeme)
         return ret
 
     def handle_semantics(self):
