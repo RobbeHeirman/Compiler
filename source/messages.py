@@ -36,8 +36,13 @@ def error_redeclaration(lexeme, attribute):
     print(BColors.FAIL + "{0}redeclaration of \'{1}\' ".format(error(attribute), lexeme) + BColors.ENDC)
 
 
+def error_undeclared_var(lexeme, attribute):
+    print(BColors.FAIL + "{0}{1} undeclared".format(error(attribute), lexeme))
+
+
 def note(attribute: "SymbolTable.Attributes"):
     return "{0}note: ".format(file_info(attribute))
 
+
 def note_prev_decl(lexeme, attribute):
-    print(BColors.FAIL + "{0}previous declaration of \'{1}\' was here".format(note(attribute),lexeme) +BColors.ENDC)
+    print(BColors.FAIL + "{0}previous declaration of \'{1}\' was here".format(note(attribute), lexeme) + BColors.ENDC)

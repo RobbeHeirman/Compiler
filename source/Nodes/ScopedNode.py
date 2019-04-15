@@ -27,5 +27,13 @@ class ScopedNode(ExpressionNode.ExpressionNode, ABC):
         :param attribute: set of attributes that describes the lexeme
         :return: boolean, true if successfully added, false if not.
         """
-
         return self._symbol_table.add_id(lexeme, attribute)
+
+    def is_in_table(self, lexeme:str)->bool:
+        """
+        Checks if a lexeme is already in the symbol table
+        :param lexeme: The lexeme that needs to be returned
+        :return: bool if successful = true else false
+        """
+
+        return self._symbol_table.is_in_symbol_table(lexeme)

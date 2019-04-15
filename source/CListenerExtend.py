@@ -12,6 +12,7 @@ from source.Nodes.DeclaratorNode import DeclaratorNode
 from source.Nodes.ExpressionNode import ExpressionNode
 from source.Nodes.BaseTypeNode import BaseTypeNode
 from source.Nodes.DeclarationNode import DeclarationNode
+from source.Nodes.IdNode import IdNode
 from source.Nodes.RootNode import RootNode
 from source.gen.CListener import CListener
 from source.gen.CParser import CParser
@@ -57,7 +58,7 @@ class CListenerExtend(CListener):
         self._parent_node = decl_l_node
 
     def exitDecl_list(self, ctx: CParser.Decl_listContext):
-        self._parent_node.handle_semantics()
+
         self._parent_node = self._parent_node.parent_node
 
     def enterSimple_declaration(self, ctx: CParser.Simple_declarationContext):
@@ -85,7 +86,6 @@ class CListenerExtend(CListener):
         :param ctx:
         :return:
         """
-        print(self._parent_node)
         node = BaseTypeNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(node)
 
@@ -123,3 +123,7 @@ class CListenerExtend(CListener):
     def enterConstant(self, ctx: CParser.ConstantContext):
         c_node = ConstantNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(c_node)
+
+    def enterId_rhs(self, ctx:CParser.Id_rhsContext):
+        id_node = IdNode(self._parent_node, self._filename, ctx)
+        self._parent_node.add_child(id_node)

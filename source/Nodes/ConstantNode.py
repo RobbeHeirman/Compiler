@@ -3,11 +3,12 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from source.Nodes.LeafNode import LeafNode
+
 import re
+from source.Nodes.RHSNode import RHSNode
 
 
-class ConstantNode(LeafNode):
+class ConstantNode(RHSNode):
 
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node, filename, ctx)

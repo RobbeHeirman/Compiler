@@ -14,6 +14,7 @@ class TypeSpecifier(Enum):
     CHAR = 'char'
     INT = 'int'
     FLOAT = 'float'
+    DEFAULT = '' # Stub when dealing with incomplete info
 
     @property
     def llvm_type(self):

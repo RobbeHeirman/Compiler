@@ -3,13 +3,14 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from typing import List, Any
+from typing import List
 
 from source.Nodes.AbstractNode import AbstractNode
 from source.Nodes.BaseTypeNode import BaseTypeNode
 from source.Nodes.DeclarationNode import DeclarationNode
 from source.Nodes.ExpressionNode import ExpressionNode
 from source.Specifiers import TypeSpecifier
+from source.SymbolTable import Attributes
 
 
 class DeclListNode(ExpressionNode):
@@ -39,8 +40,9 @@ class DeclListNode(ExpressionNode):
 
         self._base_type = child.value
 
-    def _add_declaration_node(self, child:DeclarationNode):
+    def _add_declaration_node(self, child: DeclarationNode):
             self._declaration_nodes.append(child)
+            child.base_type = self._base_type
 
     _ADD_OVERLOAD_MAP = {
         BaseTypeNode: _add_base_type,
@@ -52,6 +54,7 @@ class DeclListNode(ExpressionNode):
         self._ADD_OVERLOAD_MAP[type(child)](self, child)
         super().add_child(child)
 
-    def handle_semantics(self):
-        for child in self._declaration_nodes:
-            child.declare_variable(self._base_type)
+    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes):
+
+        attribute.type_spec = self._base_type
+        super().add_to_scope_symbol_table(lexeme, attribute)

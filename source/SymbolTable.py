@@ -34,7 +34,6 @@ class Attributes:
         self._line = line
         self._column = column
 
-
     @property
     def filename(self)->str:
         return self._filename
@@ -47,6 +46,14 @@ class Attributes:
     def column(self)->int:
         return self._column
 
+    @property
+    def type_spec(self):
+        return self._type_spec
+
+    @type_spec.setter
+    def type_spec(self, value):
+        self._type_spec = value
+
 
 class SymbolTable:
     """
@@ -58,9 +65,9 @@ class SymbolTable:
     def __init__(self):
         self._container = dict()
 
-    def add_id(self, lexeme: str, attribute:Attributes) -> bool:
+    def add_id(self, lexeme: str, attribute: Attributes) -> bool:
         """
-        Adds an id to the symbolic table. Returns True if adding was a succes. Returns false if there is a parse error.
+        Adds an id to the symbolic table. Returns True if adding was a success. Returns false if there is a parse error.
         For example redeclaration of a identifier is not allowed.
 
         :param attribute: an attribute container with all attributes of  the lexeme
@@ -76,3 +83,12 @@ class SymbolTable:
 
         self._container[lexeme] = attribute
         return True
+
+    def is_in_symbol_table(self, lexeme)->bool:
+        """
+        Checks if a lexeme is in the symbol table
+        :param lexeme: the lexeme that needs to be checked.
+        :return:
+        """
+
+        return lexeme in self._container.keys()

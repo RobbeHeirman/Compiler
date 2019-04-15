@@ -3,7 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-
+from source.Nodes.IdNode import IdNode
 from source.Nodes.ConstantNode import ConstantNode
 from source.Nodes.DeclaratorNode import DeclaratorNode
 from source.Nodes.AbstractNode import AbstractNode
@@ -32,6 +32,14 @@ class DeclarationNode(ExpressionNode):
     def id(self):
         return self._id
 
+    @property
+    def base_type(self)-> TypeSpecifier:
+        return self._base_type
+
+    @base_type.setter
+    def base_type(self, value: TypeSpecifier):
+        self._base_type = value
+
     def _add_declarator(self, child: DeclaratorNode):
         self._declarator = child
         self._id = child.value
@@ -43,6 +51,7 @@ class DeclarationNode(ExpressionNode):
     _add_overload_map = {
         DeclaratorNode: _add_declarator,
         ConstantNode: _add_rhs,
+        IdNode: _add_rhs,
         AbstractNode: None
     }
 
@@ -80,7 +89,7 @@ class DeclarationNode(ExpressionNode):
                                                        self._base_type.llvm_type,
                                                        self._base_type.llvm_alignment)
         if self._rhs is not None:
-            ret += 'store {0} {1}, {2}* %{3}'.format(self._base_type.llvm_type,
+            ret += 'store {0} {1}, {2}* %{3}\n'.format(self._base_type.llvm_type,
                                                      self._rhs.llvm_code_value(),
                                                      self._base_type.llvm_type,
                                                      lexeme)

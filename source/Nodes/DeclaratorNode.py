@@ -4,6 +4,8 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from source.Nodes.LeafNode import LeafNode
+from source.Specifiers import TypeSpecifier
+from source.SymbolTable import Attributes
 
 
 class DeclaratorNode(LeafNode):
@@ -21,3 +23,7 @@ class DeclaratorNode(LeafNode):
         :param ctx:
         """
         super().__init__(parent_node, filename, ctx)
+
+        attribute = Attributes(TypeSpecifier.DEFAULT, filename, self._line, self._column)
+        self._parent_node.add_to_scope_symbol_table(self.value, attribute)
+

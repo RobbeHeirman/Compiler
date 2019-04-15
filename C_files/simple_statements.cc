@@ -1,2 +1,4 @@
 
-int a = 0.5;
+int a = i;
+int b = a;
+int c = a;

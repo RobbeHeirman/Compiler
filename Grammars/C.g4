@@ -29,7 +29,7 @@ declarator // optional prefix operator sequence + optional postfix operator
     ;
 
 prefix_operator
-    : DEREFERENCE
+    : ASTERIX
     | ADDRESS
     ;
 
@@ -43,6 +43,16 @@ assignment // a = 4;, int b = a;
 
 rhs // Possible R values
     : constant
+    | id_rhs
+    | LPARANT rhs RPARANT
+    | <assoc=right> rhs POWER rhs
+    | rhs (INCEREMENT | DECREMENT)
+    | rhs (ASTERIX | DIVIDE) rhs
+    | rhs (ADD | SUB) rhs
+    ;
+
+id_rhs
+    : ID
     ;
 
 constant
@@ -60,18 +70,28 @@ constant
 // =====================================================================================================================
 
 // Unary operators
-DEREFERENCE: '*';
+
 ADDRESS: '&';
 ARRAY: '[]';
+INCEREMENT: '++';
+DECREMENT: '--';
 
 // Binary operators
 EQ: '=';
+POWER: '^';
+DIVIDE: '/';
+ADD: '+';
+SUB: '-';
 
 // Special Operators
 SEMICOLON: ';';
 COMMA: ',';
 S_QUOTE: '\'';
 POINT: '.';
+LPARANT: '(';
+RPARANT: ')';
+
+ASTERIX: '*';
 //======================================================================================================================
 
 // types
