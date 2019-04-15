@@ -24,12 +24,12 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
         self._failed = False
 
     @property
-    def failed(self)->bool:
+    def failed(self) -> bool:
         for child in self._children:
             self._fail_switch(child.failed)
         return self._failed
 
-    def _fail_switch(self, boolean:bool):
+    def _fail_switch(self, boolean: bool):
         """
         used so that a node can tell parents there is a semantic error
         :param boolean: the boolean that tells if the expression failed.
@@ -73,6 +73,9 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
         """
         return self._parent_node.add_to_scope_symbol_table(lexeme, attribute)
 
+    @abstractmethod
+    def handle_semantics(self):
+        pass
 
     def generate_llvm(self) -> str:
         """
@@ -80,7 +83,6 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
         :return: generates the instructions as a string
         """
         ret = ""
-
         for child in self._children:
             ret += child.generate_llvm()
 

@@ -50,4 +50,4 @@ class LeafNode(AbstractNode, ABC):
         return self._column
 
     def generate_llvm(self):
-        pass
+        return ""

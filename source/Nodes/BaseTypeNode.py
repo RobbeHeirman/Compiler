@@ -5,6 +5,7 @@ Academic Year: 2018-2019
 """
 from antlr4 import ParserRuleContext
 
+from source.Nodes.ExpressionNode import ExpressionNode
 from source.Nodes.LeafNode import LeafNode
 from source.Specifiers import TypeSpecifier
 
@@ -13,7 +14,7 @@ class BaseTypeNode(LeafNode):
 
     _value: TypeSpecifier
 
-    def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
+    def __init__(self, parent_node: ExpressionNode, filename: str, ctx: ParserRuleContext):
         """
         Initializer
         :param parent_node: parent node.

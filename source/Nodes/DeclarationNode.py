@@ -4,11 +4,11 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from typing import List
-from source.Nodes.BaseTypeNode import BaseTypeNode
 from source.Nodes.ConstantNode import ConstantNode
 from source.Nodes.DeclaratorNode import DeclaratorNode
 from source.Nodes.AbstractNode import AbstractNode
 from source.Nodes.ExpressionNode import ExpressionNode
+from source.Specifiers import TypeSpecifier
 from source.SymbolTable import Attributes
 
 
@@ -17,39 +17,29 @@ class DeclarationNode(ExpressionNode):
     Represents a Declaration in our abstract syntax tree.
     """
     _lexeme: str
-    _declarator_list: List[DeclaratorNode]
-    _base_type_node: BaseTypeNode
-
+    _declarator_list: DeclaratorNode
     label = "Declaration"
 
-    def __init__(self, parent_node):
+    def __init__(self, parent_node: ExpressionNode):
         super().__init__(parent_node)
 
-        self._base_type_node = None
-        self._declarator_list = []
+        self._base_type = None
+        self._declarator = None
         self._id = None
 
     @property
     def id(self):
         return self._id
 
-    def _add_base_type(self, child: BaseTypeNode):
-        """
-        Adds a base type child
-        :param child: BaseTypeChild add a BaseTypeNode
-        """
-        self._base_type_node = child
-
     def _add_declarator(self, child: DeclaratorNode):
-        self._declarator_list.append(child)
+        self._declarator = child
         self._id = child.value
-        self._declare_variable(child)
+        # self._declare_variable(child)
 
     def _add_constant(self, child):
         pass
 
     _add_overload_map = {
-        BaseTypeNode: _add_base_type,
         DeclaratorNode: _add_declarator,
         ConstantNode: _add_constant,
         AbstractNode: None
@@ -63,12 +53,14 @@ class DeclarationNode(ExpressionNode):
         DeclarationNode._add_overload_map[type(child)](self, child)
         super().add_child(child)
 
-    def _declare_variable(self, node: DeclaratorNode):
+    def declare_variable(self, base_type: TypeSpecifier):
 
+        self._base_type = base_type
+        node = self._children[0]
         filename = node.filename
         line = node.line
         column = node.column
-        type_spec = self._base_type_node.value
+        type_spec = self._base_type
         lexeme = node.value
         attribute = Attributes(type_spec, filename, line, column)
 
@@ -82,9 +74,10 @@ class DeclarationNode(ExpressionNode):
         """
         ret = ""
 
-        type_spec = self._base_type_node.value
-        for declarator in self._declarator_list:
-            lexeme = declarator.value
-            ret += "%{0} = alloca {1}, align {2}\n".format(lexeme, type_spec.llvm_type, type_spec.llvm_alignment)
+        lexeme = self._declarator.value
+        ret += "%{0} = alloca {1}, align {2}\n".format(lexeme, self._base_type.llvm_type, self._base_type.llvm_alignment)
 
         return ret
+
+    def handle_semantics(self):
+        pass

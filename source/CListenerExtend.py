@@ -53,6 +53,14 @@ class CListenerExtend(CListener):
         :return:
         """
         decl_l_node = DeclListNode(self._parent_node)
+        self._parent_node.add_child(decl_l_node)
+        self._parent_node = decl_l_node
+
+    def exitDecl_list(self, ctx:CParser.Decl_listContext):
+
+        self._parent_node.handle_semantics()
+        self._parent_node = self._parent_node.parent_node
+
 
     def enterSimple_declaration(self, ctx: CParser.Simple_declarationContext):
         """
@@ -71,7 +79,6 @@ class CListenerExtend(CListener):
         :param ctx: context of the node
         :return:
         """
-
         self._parent_node = self._parent_node.parent_node
 
     def enterBase_type(self, ctx: CParser.Base_typeContext):
@@ -80,7 +87,7 @@ class CListenerExtend(CListener):
         :param ctx:
         :return:
         """
-
+        print(self._parent_node)
         node = BaseTypeNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(node)
 
