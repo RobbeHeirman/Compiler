@@ -6,8 +6,8 @@ statements
     :statement* EOF;
 
 statement
-    :assignment
-    |decl_list
+    : assignment
+    | decl_list
     ;
 
 decl_list
@@ -35,6 +35,7 @@ prefix_operator
 
 postfix_operator
     : ARRAY
+    | LPARANT RPARANT
     ;
 
 assignment // a = 4;, int b = a;

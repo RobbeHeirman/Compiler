@@ -12,7 +12,7 @@ class DeclaratorNode(LeafNode):
 
     @property
     def label(self) -> str:
-        return self._value
+        return '"{0}"'.format(self._value)
 
     # TODO: Declarator's are just id's for the time being.
     def __init__(self, parent_node, filename, ctx):

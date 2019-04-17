@@ -7,6 +7,7 @@ from abc import ABC
 from typing import List
 
 import source.Nodes.AbstractNode as AbstractNode
+from source.Specifiers import TypeSpecifier
 
 
 class ExpressionNode(AbstractNode.AbstractNode, ABC):
@@ -18,6 +19,10 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
 
     def __init__(self, parent_node=None):
         super().__init__(parent_node)
+
+    @property
+    def base_type(self) -> TypeSpecifier:
+        return self._parent_node.base_type
 
     def add_child(self, child: "AbstractNode"):
         """

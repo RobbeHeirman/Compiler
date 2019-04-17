@@ -108,8 +108,8 @@ class CListenerExtend(CListener):
         :param ctx: ParserContextNode
         :return:
         """
-
-        assignment_node = AssignmentNode(self._parent_node)
+        id_name = ctx.getChild(0).getText()
+        assignment_node = AssignmentNode(self._parent_node, id_name, self._filename, ctx)
         self._parent_node.add_child(assignment_node)
         self._parent_node = assignment_node
 

@@ -24,17 +24,17 @@ class DeclarationNode(ExpressionNode):
     def __init__(self, parent_node: ExpressionNode):
         super().__init__(parent_node)
 
-        self._base_type = None
         self._declarator = None
         self._rhs = None
         self._id = None
+        self._base_type = None
 
     @property
     def id(self):
         return self._id
 
     @property
-    def base_type(self) -> TypeSpecifier:
+    def base_type(self):
         return self._base_type
 
     @base_type.setter
@@ -92,7 +92,7 @@ class DeclarationNode(ExpressionNode):
                                                        self._base_type.llvm_alignment)
         if self._rhs is not None:
             ret += self._rhs.generate_llvm()
-            ret += 'store {0} {1}, {2}* %{3}\n'.format(self._base_type.llvm_type,
+            ret += 'store {0} %{1}, {2}* %{3}\n'.format(self._base_type.llvm_type,
                                                        self.register_index,
                                                        self._base_type.llvm_type,
                                                        lexeme)

@@ -42,7 +42,18 @@ class Operator(Enum):
     MULT = '*'
     DIV = '/'
     POW = '^'
+    REM = '%'
     INCR = '++'
     DECR = '--'
     DEFAULT = ''
 
+    def bin_operator_map(self):
+        _BINARY_LLVM_MAPPING = {
+            self.ADD: 'add',
+            self.SUB: 'sub',
+            self.MULT: 'mul',
+            self.DIV: 'sdiv',
+            self.REM: 'srem'
+
+        }
+        return _BINARY_LLVM_MAPPING[self]
