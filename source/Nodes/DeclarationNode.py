@@ -34,7 +34,7 @@ class DeclarationNode(ExpressionNode):
         return self._id
 
     @property
-    def base_type(self)-> TypeSpecifier:
+    def base_type(self) -> TypeSpecifier:
         return self._base_type
 
     @base_type.setter
@@ -79,7 +79,7 @@ class DeclarationNode(ExpressionNode):
         if not self.add_to_scope_symbol_table(lexeme, attribute):
             self._fail_switch(True)
 
-    def generate_llvm(self)->str:
+    def generate_llvm(self) -> str:
         """
         This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
         :return: the generated string
@@ -91,10 +91,11 @@ class DeclarationNode(ExpressionNode):
                                                        self._base_type.llvm_type,
                                                        self._base_type.llvm_alignment)
         if self._rhs is not None:
+            ret += self._rhs.generate_llvm()
             ret += 'store {0} {1}, {2}* %{3}\n'.format(self._base_type.llvm_type,
-                                                     self._rhs.llvm_code_value(),
-                                                     self._base_type.llvm_type,
-                                                     lexeme)
+                                                       self.register_index,
+                                                       self._base_type.llvm_type,
+                                                       lexeme)
         return ret
 
     def handle_semantics(self):

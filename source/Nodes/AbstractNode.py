@@ -4,6 +4,7 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from abc import ABC, abstractmethod
+from typing import List
 
 from source.Nodes import ExpressionNode
 from source.SymbolTable import Attributes
@@ -14,6 +15,7 @@ class AbstractNode(ABC):
     Abstract class of a node of the AST.
     Should be overridden by specific nodes of the AST.
     """
+    _children: List["AbstractNode"]
     _parent_node: ExpressionNode
     _index_counter = 0
 
@@ -54,7 +56,6 @@ class AbstractNode(ABC):
     def generate_llvm(self):
         return ""
 
-
     @property
     def failed(self) -> bool:
         for child in self._children:
@@ -80,3 +81,13 @@ class AbstractNode(ABC):
         :return bool true if successfully added, false if not.
         """
         return self._parent_node.add_to_scope_symbol_table(lexeme, attribute)
+
+    @property
+    def register_index(self) -> int:
+        return self._parent_node.register_index
+
+    def increment_register_index(self):
+        self._parent_node.increment_register_index()
+
+    def get_attribute(self, lexeme) -> Attributes:
+        return self._parent_node.get_attribute(lexeme)

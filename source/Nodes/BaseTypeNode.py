@@ -31,3 +31,9 @@ class BaseTypeNode(LeafNode):
     @property
     def value(self)-> TypeSpecifier:
         return self._value
+
+    def llvm_code_value(self):
+        pass
+
+    def llvm_type(self):
+        pass

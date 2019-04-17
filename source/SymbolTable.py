@@ -92,3 +92,6 @@ class SymbolTable:
         """
 
         return lexeme in self._container.keys()
+
+    def get_attribute(self, lexeme) -> Attributes:
+        return self._container[lexeme]

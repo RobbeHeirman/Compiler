@@ -4,9 +4,7 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from abc import ABC
-
 from antlr4 import ParserRuleContext
-
 from source.Nodes.AbstractNode import AbstractNode
 
 

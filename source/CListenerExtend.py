@@ -129,11 +129,23 @@ class CListenerExtend(CListener):
         :return:
         """
 
-        if ctx.getChildCount() == 3:  # Looking for the operator token
+        if ctx.getChild(0).getText() == '-':
+            node = RHSNode(self._parent_node, negative=True)
+            self._parent_node.add_child(node)
+            self._parent_node = node
+
+        elif ctx.getChildCount() == 2:
+            child = ctx.getChild(1)
+            if ctx.getChild(1).getText() == "++" or ctx.getChild(1).getText() == "--":
+                operator = Operator(child.getText())
+                rhs_node = RHSNode(self._parent_node, operator = operator)
+                self._parent_node.add_child(rhs_node)
+                self._parent_node = rhs_node
+        elif ctx.getChildCount() == 3:  # Looking for the operator token
             child = ctx.getChild(1)
             if child.getChildCount() == 0:  # Ignoring the parentheses, parser forced order of operations.
                 operator = Operator(child.getText())
-                rhs_node = RHSNode(self._parent_node, operator)
+                rhs_node = RHSNode(self._parent_node, operator=operator)
                 self._parent_node.add_child(rhs_node)
                 self._parent_node = rhs_node
 
@@ -142,9 +154,16 @@ class CListenerExtend(CListener):
         Need to pop the rhs nodes from the parent node
         :param ctx:
         :return:
-
         """
-        if ctx.getChildCount() == 3:
+
+        if ctx.getChild(0).getText() == '-':
+            self._parent_node = self._parent_node.parent_node
+
+        elif ctx.getChildCount() == 2:
+            if ctx.getChild(1).getText() == "++" or ctx.getChild(1).getText() == "--":
+                self._parent_node = self._parent_node.parent_node
+
+        elif ctx.getChildCount() == 3:
             if ctx.getChild(1).getChildCount() == 0:
                 self._parent_node = self._parent_node.parent_node
 

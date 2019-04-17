@@ -44,6 +44,7 @@ assignment // a = 4;, int b = a;
 rhs // Possible R values
     : constant
     | id_rhs
+    | SUB rhs
     | LPARANT rhs RPARANT
     | <assoc=right> rhs POWER rhs
     | rhs (INCEREMENT | DECREMENT)

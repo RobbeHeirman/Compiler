@@ -13,12 +13,15 @@ class ScopedNode(ExpressionNode.ExpressionNode, ABC):
     This node is an abstract node that presents all nodes with their own scope.
     This means this node has it's own SymbolTable
     """
+    _register_index: int
+
     def __init__(self):
         """
         Initializer
         """
         super().__init__()
         self._symbol_table = SymbolTable()
+        self._register_index = -1  # little hack to start at 0
 
     def add_to_scope_symbol_table(self, lexeme: str,  attribute: Attributes)->bool:
         """
@@ -37,3 +40,13 @@ class ScopedNode(ExpressionNode.ExpressionNode, ABC):
         """
 
         return self._symbol_table.is_in_symbol_table(lexeme)
+
+    @property
+    def register_index(self):
+        return self._register_index
+
+    def increment_register_index(self):
+        self._register_index += 1
+
+    def get_attribute(self, lexeme):
+        return self._symbol_table.get_attribute(lexeme)

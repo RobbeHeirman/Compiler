@@ -27,3 +27,8 @@ class DeclaratorNode(LeafNode):
         attribute = Attributes(TypeSpecifier.DEFAULT, filename, self._line, self._column)
         self._parent_node.add_to_scope_symbol_table(self.value, attribute)
 
+    def llvm_code_value(self):
+        pass
+
+    def llvm_type(self):
+        pass

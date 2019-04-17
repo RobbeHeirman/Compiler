@@ -6,10 +6,11 @@ Academic Year: 2018-2019
 
 import re
 
-from source.Nodes.LeafNode import LeafNode
+from source.Nodes.RHSLeafNode import RHSLeafNode
+from source.Specifiers import TypeSpecifier
 
 
-class ConstantNode(LeafNode):
+class ConstantNode(RHSLeafNode):
 
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node, filename, ctx)
@@ -21,7 +22,6 @@ class ConstantNode(LeafNode):
     def llvm_code_value(self):
 
         if re.search("'.'", self.value) is not None:
-            print("im a character!")
             return ord(self.value[1:2])
 
         elif re.search("[0-9]+\.[0-9]+", self.value) is not None:
@@ -29,3 +29,17 @@ class ConstantNode(LeafNode):
 
         else:
             return int(self.value)
+
+    def llvm_type(self):
+
+        if re.search("'.'", self.value) is not None:
+            return TypeSpecifier('char').llvm_type
+
+        elif re.search("[0-9]+\.[0-9]+", self.value) is not None:
+            return TypeSpecifier('float').llvm_type
+
+        else:
+
+            return TypeSpecifier('int').llvm_type
+
+

@@ -6,12 +6,12 @@ Academic Year: 2018-2019
 from antlr4 import ParserRuleContext
 
 from source import messages
-from source.Nodes.LeafNode import LeafNode
+from source.Nodes.RHSLeafNode import RHSLeafNode
 from source.Specifiers import TypeSpecifier
 from source.SymbolTable import Attributes
 
 
-class IdNode(LeafNode):
+class IdNode(RHSLeafNode):
 
     def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
         super().__init__(parent_node, filename, ctx)
@@ -32,3 +32,9 @@ class IdNode(LeafNode):
 
     def llvm_code_value(self):
         return str(self._value)
+
+    def llvm_type(self):
+
+        attr = self._parent_node.get_attribute(self._value)
+        typ = attr.type_spec
+        return typ.llvm_type
