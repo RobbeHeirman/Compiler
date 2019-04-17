@@ -3,18 +3,25 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from abc import ABC, abstractmethod
 
 from antlr4 import ParserRuleContext
 
-from source.Nodes.LeafNode import LeafNode
+from source.Nodes.ExpressionNode import ExpressionNode
+from source.Specifiers import Operator
 
 
-class RHSNode(LeafNode, ABC):
+class RHSNode(ExpressionNode):
 
-    def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
-        super().__init__(parent_node, filename, ctx)
+    _operator: Operator
 
-    @abstractmethod
+    def __init__(self, parent_node, operator: Operator = Operator.DEFAULT):
+        super().__init__(parent_node)
+
+        self._operator = operator
+
     def llvm_code_value(self):
         pass
+
+    @property
+    def label(self):
+        return '"{0}"'.format(self._operator.value)

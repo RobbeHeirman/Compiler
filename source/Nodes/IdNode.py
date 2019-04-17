@@ -6,12 +6,12 @@ Academic Year: 2018-2019
 from antlr4 import ParserRuleContext
 
 from source import messages
-from source.Nodes.RHSNode import RHSNode
+from source.Nodes.LeafNode import LeafNode
 from source.Specifiers import TypeSpecifier
 from source.SymbolTable import Attributes
 
 
-class IdNode(RHSNode):
+class IdNode(LeafNode):
 
     def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
         super().__init__(parent_node, filename, ctx)

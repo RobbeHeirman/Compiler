@@ -14,7 +14,7 @@ class TypeSpecifier(Enum):
     CHAR = 'char'
     INT = 'int'
     FLOAT = 'float'
-    DEFAULT = '' # Stub when dealing with incomplete info
+    DEFAULT = ''  # Stub when dealing with incomplete info
 
     @property
     def llvm_type(self):
@@ -28,10 +28,20 @@ class TypeSpecifier(Enum):
 
     @property
     def llvm_alignment(self):
-
         _LLVM_ALIGN = {
             self.CHAR: 1,
             self.INT: 4,
             self.FLOAT: 4
         }
         return _LLVM_ALIGN[self]
+
+
+class Operator(Enum):
+    ADD = '+'
+    SUB = '-'
+    MULT = '*'
+    DIV = '/'
+    INCR = '++'
+    DECR = '--'
+    DEFAULT = ''
+

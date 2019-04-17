@@ -3,6 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+from source.Nodes.RHSNode import RHSNode
 from source.Nodes.IdNode import IdNode
 from source.Nodes.ConstantNode import ConstantNode
 from source.Nodes.DeclaratorNode import DeclaratorNode
@@ -52,6 +53,7 @@ class DeclarationNode(ExpressionNode):
         DeclaratorNode: _add_declarator,
         ConstantNode: _add_rhs,
         IdNode: _add_rhs,
+        RHSNode: _add_rhs,
         AbstractNode: None
     }
 

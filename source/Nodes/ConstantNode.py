@@ -5,10 +5,11 @@ Academic Year: 2018-2019
 """
 
 import re
-from source.Nodes.RHSNode import RHSNode
+
+from source.Nodes.LeafNode import LeafNode
 
 
-class ConstantNode(RHSNode):
+class ConstantNode(LeafNode):
 
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node, filename, ctx)

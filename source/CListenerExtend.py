@@ -13,7 +13,9 @@ from source.Nodes.ExpressionNode import ExpressionNode
 from source.Nodes.BaseTypeNode import BaseTypeNode
 from source.Nodes.DeclarationNode import DeclarationNode
 from source.Nodes.IdNode import IdNode
+from source.Nodes.RHSNode import RHSNode
 from source.Nodes.RootNode import RootNode
+from source.Specifiers import Operator
 from source.gen.CListener import CListener
 from source.gen.CParser import CParser
 
@@ -120,10 +122,36 @@ class CListenerExtend(CListener):
         """
         self._parent_node = self._parent_node.parent_node
 
+    def enterRhs(self, ctx: CParser.RhsContext):
+        """
+        Any (sub) expression need to handle the operator kind
+        :param ctx:  ParserContextNode
+        :return:
+        """
+
+        if ctx.getChildCount() == 3:  # Looking for the operator token
+            child = ctx.getChild(1)
+            if child.getChildCount() == 0:  # Ignoring the parentheses, parser forced order of operations.
+                operator = Operator(child.getText())
+                rhs_node = RHSNode(self._parent_node, operator)
+                self._parent_node.add_child(rhs_node)
+                self._parent_node = rhs_node
+
+    def exitRhs(self, ctx:CParser.RhsContext):
+        """
+        Need to pop the rhs nodes from the parent node
+        :param ctx:
+        :return:
+
+        """
+        if ctx.getChildCount() == 3:
+            if ctx.getChild(1).getChildCount() == 0:
+                self._parent_node = self._parent_node.parent_node
+
     def enterConstant(self, ctx: CParser.ConstantContext):
         c_node = ConstantNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(c_node)
 
-    def enterId_rhs(self, ctx:CParser.Id_rhsContext):
+    def enterId_rhs(self, ctx: CParser.Id_rhsContext):
         id_node = IdNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(id_node)
