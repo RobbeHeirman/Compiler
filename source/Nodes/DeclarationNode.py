@@ -3,6 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+from source.Nodes.BaseTypeNode import BaseTypeNode
 from source.Nodes.RHSNode import RHSNode
 from source.Nodes.IdNode import IdNode
 from source.Nodes.ConstantNode import ConstantNode
@@ -49,11 +50,15 @@ class DeclarationNode(ExpressionNode):
     def _add_rhs(self, child):
         self._rhs = child
 
+    def _add_base_type(self, child: BaseTypeNode):
+        self._base_type = child.value
+
     _add_overload_map = {
         DeclaratorNode: _add_declarator,
         ConstantNode: _add_rhs,
         IdNode: _add_rhs,
         RHSNode: _add_rhs,
+        BaseTypeNode: _add_base_type,
         AbstractNode: None
     }
 
@@ -65,7 +70,7 @@ class DeclarationNode(ExpressionNode):
         DeclarationNode._add_overload_map[type(child)](self, child)
         super().add_child(child)
 
-    def declare_variable(self, base_type: TypeSpecifier):
+    """def declare_variable(self, base_type: TypeSpecifier):
 
         self._base_type = base_type
         node = self._children[0]
@@ -77,7 +82,7 @@ class DeclarationNode(ExpressionNode):
         attribute = Attributes(type_spec, filename, line, column)
 
         if not self.add_to_scope_symbol_table(lexeme, attribute):
-            self._fail_switch(True)
+            self._fail_switch(True)"""  # TODO: is deprecated?
 
     def generate_llvm(self) -> str:
         """
@@ -100,3 +105,7 @@ class DeclarationNode(ExpressionNode):
 
     def handle_semantics(self):
         pass
+
+    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes):
+        attribute.type_spec = self._base_type
+        super().add_to_scope_symbol_table(lexeme, attribute)

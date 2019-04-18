@@ -58,6 +58,10 @@ class Attributes:
     def type_spec(self, value):
         self._type_spec = value
 
+    @property
+    def decl_type(self):
+        return self._decl_type
+
 
 class SymbolTable:
     """
@@ -78,8 +82,8 @@ class SymbolTable:
         :param lexeme: The lexeme, the name of the identifier
         :return: True if this action is allowed, False if not.
         """
-        if lexeme in self._container.keys():
 
+        if lexeme in self._container.keys():
             messages.error_redeclaration(lexeme, attribute)
             attribute_prev = self._container[lexeme]
             messages.note_prev_decl(lexeme, attribute_prev)
@@ -99,3 +103,10 @@ class SymbolTable:
 
     def get_attribute(self, lexeme) -> Attributes:
         return self._container[lexeme]
+
+
+class GlobalSymbolTable(SymbolTable):
+    """
+    Extention for global variable support
+    """
+    pass  # TODO: need to do something with this.

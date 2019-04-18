@@ -40,6 +40,11 @@ def error_undeclared_var(lexeme, attribute):
     print(BColors.FAIL + "{0}{1} undeclared".format(error(attribute), lexeme) + BColors.ENDC)
 
 
+def redeclared_diff_symbol(lexeme, attribute):
+    print(BColors.FAIL + "{0} '{1}' redeclared as different kind of symbol".format(error(attribute), lexeme)
+          + BColors.ENDC)
+
+
 def note(attribute: "SymbolTable.Attributes"):
     return "{0}note: ".format(file_info(attribute))
 

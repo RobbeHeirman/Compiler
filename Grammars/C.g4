@@ -45,10 +45,11 @@ function_operator
     ;
 
 parameter_list
-    : (COMMA base_type declarator)* (base_type declarator)? param_opt
+    : (param (COMMA param)*)?
     ;
-param_opt
-    : (COMMA base_type declarator EQ rhs)* (base_type declarator EQ rhs)?
+
+param
+    : base_type declarator
     ;
 assignment // a = 4;, int b = a;
     : ID EQ rhs SEMICOLON

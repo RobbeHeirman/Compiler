@@ -12,6 +12,7 @@ from source.Nodes.DeclaratorNode import DeclaratorNode
 from source.Nodes.ExpressionNode import ExpressionNode
 from source.Nodes.BaseTypeNode import BaseTypeNode
 from source.Nodes.DeclarationNode import DeclarationNode
+from source.Nodes.FuncDefNode import FuncDefNode
 from source.Nodes.IdNode import IdNode
 from source.Nodes.RHSNode import RHSNode
 from source.Nodes.RootNode import RootNode
@@ -35,6 +36,9 @@ class CListenerExtend(CListener):
         self._parent_node = None  # Will always keep track of the parent AST node when traversing down
         self._ast = AST()
         self._filename = filename
+        root_node = RootNode()
+        self._ast.root = root_node
+        self._parent_node = root_node
 
     @property
     def ast(self):
@@ -45,9 +49,22 @@ class CListenerExtend(CListener):
         This is the root of our C program. It will make a root node
         :param ctx: Context of the node
         """
-        root_node = RootNode()
-        self._ast.root = root_node
-        self._parent_node = root_node
+
+    def enterFunc_def(self, ctx: CParser.Func_defContext):
+        func_node = FuncDefNode(self._parent_node, ctx.getChild(1).getText(), self._filename, ctx.getChild(1))
+        self._parent_node.add_child(func_node)
+        self._parent_node = func_node
+
+    def exitFunc_def(self, ctx: CParser.Func_defContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterParam(self, ctx: CParser.ParamContext):
+        decl_node = DeclarationNode(self._parent_node)
+        self._parent_node.add_child(decl_node)
+        self._parent_node = decl_node
+
+    def exitParam(self, ctx: CParser.ParamContext):
+        self._parent_node = self._parent_node.parent_node
 
     def enterDecl_list(self, ctx: CParser.Decl_listContext):
         """
