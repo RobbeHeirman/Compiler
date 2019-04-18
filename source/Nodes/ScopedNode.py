@@ -15,11 +15,11 @@ class ScopedNode(ExpressionNode.ExpressionNode, ABC):
     """
     _register_index: int
 
-    def __init__(self):
+    def __init__(self, parent_node=None):
         """
         Initializer
         """
-        super().__init__()
+        super().__init__(parent_node)
         self._symbol_table = SymbolTable()
         self._register_index = -1  # little hack to start at 0
 
