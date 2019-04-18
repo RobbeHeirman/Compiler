@@ -3,7 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from enum import Enum
+from enum import Enum, auto
 
 
 class TypeSpecifier(Enum):
@@ -57,3 +57,10 @@ class Operator(Enum):
 
         }
         return _BINARY_LLVM_MAPPING[self]
+
+
+class DeclType(Enum):
+
+    SIMPLE = auto()
+    FUNCTION = auto()
+

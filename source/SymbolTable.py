@@ -9,18 +9,21 @@ from typing import Dict
 
 import source.Specifiers as TypeSpecifier
 import source.messages as messages
+from source.Specifiers import DeclType
 
 
 class Attributes:
     """
     Container class used by SymbolTable to keep track of token Attributes
     """
+    _decl_type: DeclType
     _column: int
     _line: int
     _filename: str
     _type_spec: TypeSpecifier.TypeSpecifier
 
-    def __init__(self, type_spec: TypeSpecifier.TypeSpecifier, filename: str, line: int, column: int):
+    def __init__(self, type_spec: TypeSpecifier.TypeSpecifier, filename: str, line: int, column: int,
+                 decl_type: TypeSpecifier.DeclType):
         """
         Initializer
         :param type_spec: The type_specifier attribute for this token.
@@ -33,6 +36,7 @@ class Attributes:
         self._filename = filename
         self._line = line
         self._column = column
+        self._decl_type = decl_type
 
     @property
     def filename(self)->str:

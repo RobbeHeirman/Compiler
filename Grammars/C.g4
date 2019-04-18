@@ -7,11 +7,11 @@ statements
 
 statement
     : assignment
-    | decl_list
+    | decl_list SEMICOLON
     ;
 
 decl_list
-    : base_type simple_declaration (COMMA simple_declaration)* SEMICOLON
+    : base_type simple_declaration (COMMA simple_declaration)*
     ;
 
 simple_declaration // int a, char foo....
@@ -35,9 +35,19 @@ prefix_operator
 
 postfix_operator
     : ARRAY
-    | LPARANT RPARANT
+    | function_operator
     ;
 
+function_operator
+    : LPARANT parameter_list RPARANT
+    ;
+
+parameter_list
+    : (COMMA base_type declarator)* (base_type declarator)? param_opt
+    ;
+param_opt
+    : (COMMA base_type declarator EQ rhs)* (base_type declarator EQ rhs)?
+    ;
 assignment // a = 4;, int b = a;
     : ID EQ rhs SEMICOLON
     ;

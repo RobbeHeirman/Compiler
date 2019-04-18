@@ -23,7 +23,7 @@ class DeclaratorNode(LeafNode):
         :param ctx:
         """
         super().__init__(parent_node, filename, ctx)
-
+        print(ctx.getText())
         attribute = Attributes(TypeSpecifier.DEFAULT, filename, self._line, self._column)
         self._parent_node.add_to_scope_symbol_table(self.value, attribute)
 
