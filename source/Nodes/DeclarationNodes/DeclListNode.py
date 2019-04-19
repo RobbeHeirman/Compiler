@@ -5,10 +5,10 @@ Academic Year: 2018-2019
 """
 from typing import List
 
-from source.Nodes.AbstractNode import AbstractNode
-from source.Nodes.BaseTypeNode import BaseTypeNode
-from source.Nodes.DeclarationNode import DeclarationNode
-from source.Nodes.ExpressionNode import ExpressionNode
+from source.Nodes.AbstractNodes.AbstractNode import AbstractNode
+from source.Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
+from source.Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
+from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
 from source.Specifiers import TypeSpecifier
 from source.SymbolTable import Attributes
 

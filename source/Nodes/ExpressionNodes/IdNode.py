@@ -6,7 +6,7 @@ Academic Year: 2018-2019
 from antlr4 import ParserRuleContext
 
 from source import messages
-from source.Nodes.RHSLeafNode import RHSLeafNode
+from source.Nodes.ExpressionNodes.RHSLeafNode import RHSLeafNode
 from source.Specifiers import TypeSpecifier
 from source.SymbolTable import Attributes
 

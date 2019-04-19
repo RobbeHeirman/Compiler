@@ -7,8 +7,8 @@ from abc import ABC, abstractmethod
 
 from antlr4 import ParserRuleContext
 
-from source.Nodes.ExpressionNode import ExpressionNode
-from source.Nodes.LeafNode import LeafNode
+from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from source.Nodes.AbstractNodes.LeafNode import LeafNode
 
 
 class RHSLeafNode(LeafNode, ABC):

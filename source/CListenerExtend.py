@@ -5,17 +5,18 @@
  Academic Year: 2018-2019
 """
 from source.AST import AST
-from source.Nodes.AssignmentNode import AssignmentNode
-from source.Nodes.ConstantNode import ConstantNode
-from source.Nodes.DeclListNode import DeclListNode
-from source.Nodes.DeclaratorNode import DeclaratorNode
-from source.Nodes.ExpressionNode import ExpressionNode
-from source.Nodes.BaseTypeNode import BaseTypeNode
-from source.Nodes.DeclarationNode import DeclarationNode
-from source.Nodes.FuncDefNode import FuncDefNode
-from source.Nodes.IdNode import IdNode
-from source.Nodes.RHSNode import RHSNode
-from source.Nodes.RootNode import RootNode
+from source.Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
+from source.Nodes.ExpressionNodes.ConstantNode import ConstantNode
+from source.Nodes.DeclarationNodes.DeclListNode import DeclListNode
+from source.Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
+from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from source.Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
+from source.Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
+from source.Nodes.FunctionNodes.FuncDefNode import FuncDefNode
+from source.Nodes.ExpressionNodes.IdNode import IdNode
+from source.Nodes.ExpressionNodes.RHSNode import RHSNode
+from source.Nodes.FunctionNodes.ReturnNode import ReturnNode
+from source.Nodes.GlobalNodes.RootNode import RootNode
 from source.Specifiers import Operator
 from source.gen.CListener import CListener
 from source.gen.CParser import CParser
@@ -56,6 +57,15 @@ class CListenerExtend(CListener):
         self._parent_node = func_node
 
     def exitFunc_def(self, ctx: CParser.Func_defContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterRet_statement(self, ctx: CParser.Ret_statementContext):
+
+        ret_node = ReturnNode(self._parent_node)
+        self._parent_node.add_child(ret_node)
+        self._parent_node = ret_node
+
+    def exitRet_statement(self, ctx: CParser.Ret_statementContext):
         self._parent_node = self._parent_node.parent_node
 
     def enterParam(self, ctx: CParser.ParamContext):

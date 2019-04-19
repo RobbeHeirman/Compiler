@@ -5,7 +5,7 @@ Academic Year: 2018-2019
 """
 from antlr4 import ParserRuleContext
 
-from source.Nodes.ExpressionNode import ExpressionNode
+from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
 import source.messages as messages
 from source.Specifiers import TypeSpecifier
 from source.SymbolTable import Attributes

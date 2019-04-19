@@ -4,7 +4,7 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 
-import source.Nodes.ScopedNode as ScopedNode
+import source.Nodes.AbstractNodes.ScopedNode as ScopedNode
 
 
 class RootNode(ScopedNode.ScopedNode):

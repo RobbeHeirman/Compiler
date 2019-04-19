@@ -4,7 +4,7 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 
-from source.Nodes.ExpressionNode import ExpressionNode
+from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
 from source.Specifiers import Operator, TypeSpecifier
 
 

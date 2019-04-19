@@ -3,11 +3,10 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from antlr4 import ParserRuleContext
 from antlr4.tree.Tree import TerminalNodeImpl
 
-from source.Nodes.ExpressionNode import ExpressionNode
-from source.Nodes.ScopedNode import ScopedNode
+from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from source.Nodes.AbstractNodes.ScopedNode import ScopedNode
 from source.Specifiers import DeclType, TypeSpecifier
 from source.SymbolTable import Attributes
 from source.messages import redeclared_diff_symbol, note_prev_decl

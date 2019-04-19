@@ -4,7 +4,7 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from abc import ABC
-import source.Nodes.ExpressionNode as ExpressionNode
+import source.Nodes.AbstractNodes.ExpressionNode as ExpressionNode
 from source.SymbolTable import SymbolTable, Attributes
 
 

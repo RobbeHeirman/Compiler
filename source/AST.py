@@ -3,7 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-import source.Nodes.RootNode as RootNode
+import source.Nodes.GlobalNodes.RootNode as RootNode
 
 
 class AST:

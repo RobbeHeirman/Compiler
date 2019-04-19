@@ -6,7 +6,7 @@ Academic Year: 2018-2019
 
 import re
 
-from source.Nodes.RHSLeafNode import RHSLeafNode
+from source.Nodes.ExpressionNodes.RHSLeafNode import RHSLeafNode
 from source.Specifiers import TypeSpecifier
 
 

@@ -21,7 +21,8 @@ class TypeSpecifier(Enum):
         _LLVM_TYPE = {
             self.CHAR: 'i8',
             self.INT: 'i32',
-            self.FLOAT: 'float'
+            self.FLOAT: 'float',
+            self.DEFAULT: ''
         }
 
         return _LLVM_TYPE[self]
