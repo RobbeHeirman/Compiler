@@ -11,6 +11,7 @@ statement
     | decl_list SEMICOLON
     | func_def
     | ret_statement SEMICOLON
+    | selection_statements
     ;
 
 decl_list
@@ -85,6 +86,21 @@ ret_statement
     : RETURN rhs
     ;
 
+selection_statements
+    : if_statement
+    ;
+
+if_statement
+    : IF LPARANT condition RPARANT LBRACES statements RBRACES
+    ;
+condition
+    : rhs cond_operator rhs
+    ;
+
+cond_operator
+    : EQ EQ
+    | SMALLER
+    | BIGGER;
 
 // =====================================================================================================================
 // =====================================================================================================================
@@ -107,7 +123,8 @@ POWER: '^';
 DIVIDE: '/';
 ADD: '+';
 SUB: '-';
-
+SMALLER: '<';
+BIGGER: '>';
 // Special Operators
 SEMICOLON: ';';
 COMMA: ',';
@@ -131,6 +148,7 @@ INT: 'int';
 // Keywords
 // =====================================================================================================================
 RETURN: 'return';
+IF: 'if';
 
 // identifier(s) & literals
 // =====================================================================================================================
