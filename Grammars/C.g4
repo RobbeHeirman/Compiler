@@ -2,8 +2,8 @@ grammar C;
 
 // Rules
 // =====================================================================================================================
-statements
-    :statement*
+    statements
+    : statement*
     ;
 
 statement
@@ -162,7 +162,7 @@ ELSE: 'else';
 // =====================================================================================================================
 
 ID: NONDIGIT_ID (NONDIGIT_ID | DIGIT)*;
-WS: [ \n\t\r]+ -> skip;
+
 
 fragment NONDIGIT_ID: [a-zA-Z_];
 fragment DIGIT: [0-9];
@@ -192,3 +192,7 @@ fragment SIMPLEESCAPESEQUENCE // TODO: Extend
 NUMERAL_C: DIGIT (DIGIT| '_')*;  // TODO: extend (binary, hexadecimal...)
 
 FLOAT_C: [0-9][0-9_]* ( ([eE] [-+]? [0-9][0-9_]*) | '.' [0-9][0-9_]* ([eE] [-+]? [0-9][0-9_]*)?);
+
+WS: [ \n\t\r]+ -> skip;
+BLOCK_COMMENT: '/*' .* '*/' -> skip;
+LINE_COMMENT: '//' ~[\r\n]* -> skip;
