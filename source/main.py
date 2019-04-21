@@ -14,7 +14,7 @@ import CListenerExtend as CListenerExtend
 
 
 def main(argv):
-    input_file = argv[1]
+    input_file = argv[0]
     input_stream = FileStream(input_file)
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
@@ -25,16 +25,22 @@ def main(argv):
     walker.walk(listener, tree)
 
     ast = listener.ast
+
     dot_file = "AST.dot"
+    if len(argv) == 3:
+        dot_file = argv[2]
     ast.to_dot(dot_file)
-    subprocess.call(["dot", "-Tpng", dot_file, "-o", "AST.png"])
+    dot_name = dot_file[0: -4]
+    dot_name += ".png"
+    subprocess.call(["dot", "-Tpng", dot_file, "-o", dot_name])
     if ast.failed:
         print("Failed to compile.")
         return 1
 
     else:
-        f = open(argv[2], 'w+')
+        f = open(argv[1], 'w+')
         f.writelines(ast.generate_llvm())
+        f.close()
     return 0
 
 

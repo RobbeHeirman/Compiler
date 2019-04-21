@@ -7,7 +7,7 @@ from antlr4 import ParserRuleContext
 
 import messages
 from Nodes.ExpressionNodes.RHSLeafNode import RHSLeafNode
-from Specifiers import TypeSpecifier
+from Specifiers import TypeSpecifier, DeclType
 from SymbolTable import Attributes
 
 
@@ -24,7 +24,7 @@ class IdNode(RHSLeafNode):
 
     def is_declared(self)->bool:
         if not self._parent_node.is_in_table(self._value):
-            attr = Attributes(TypeSpecifier.DEFAULT, self._filename, self._line, self._column)
+            attr = Attributes(TypeSpecifier.DEFAULT, self._filename, self._line, self._column, DeclType.SIMPLE)
             messages.error_undeclared_var(self._value, attr)
             self._fail_switch(True)
             return False
