@@ -4,22 +4,22 @@
  Course: Compilers
  Academic Year: 2018-2019
 """
-from source.AST import AST
-from source.Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
-from source.Nodes.ExpressionNodes.ConstantNode import ConstantNode
-from source.Nodes.DeclarationNodes.DeclListNode import DeclListNode
-from source.Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
-from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
-from source.Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
-from source.Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
-from source.Nodes.FunctionNodes.FuncDefNode import FuncDefNode
-from source.Nodes.ExpressionNodes.IdNode import IdNode
-from source.Nodes.ExpressionNodes.RHSNode import RHSNode
-from source.Nodes.FunctionNodes.ReturnNode import ReturnNode
-from source.Nodes.GlobalNodes.RootNode import RootNode
-from source.Specifiers import Operator
-from source.gen.CListener import CListener
-from source.gen.CParser import CParser
+from AST import AST
+from Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
+from Nodes.ExpressionNodes.ConstantNode import ConstantNode
+from Nodes.DeclarationNodes.DeclListNode import DeclListNode
+from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
+from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
+from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
+from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
+from Nodes.ExpressionNodes.IdNode import IdNode
+from Nodes.ExpressionNodes.RHSNode import RHSNode
+from Nodes.FunctionNodes.ReturnNode import ReturnNode
+from Nodes.GlobalNodes.RootNode import RootNode
+from Specifiers import Operator
+from gen.CListener import CListener
+from gen.CParser import CParser
 
 
 class CListenerExtend(CListener):

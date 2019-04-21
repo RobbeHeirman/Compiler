@@ -4,8 +4,8 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 
-from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
-from source.Specifiers import TypeSpecifier
+from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Specifiers import TypeSpecifier
 
 
 class ReturnNode(ExpressionNode):

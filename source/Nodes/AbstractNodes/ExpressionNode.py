@@ -6,8 +6,8 @@ Academic Year: 2018-2019
 from abc import ABC
 from typing import List
 
-import source.Nodes.AbstractNodes.AbstractNode as AbstractNode
-from source.Specifiers import TypeSpecifier
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
+from Specifiers import TypeSpecifier
 
 
 class ExpressionNode(AbstractNode.AbstractNode, ABC):

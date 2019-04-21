@@ -3,15 +3,15 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from source.Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
-from source.Nodes.ExpressionNodes.RHSNode import RHSNode
-from source.Nodes.ExpressionNodes.IdNode import IdNode
-from source.Nodes.ExpressionNodes.ConstantNode import ConstantNode
-from source.Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
-from source.Nodes.AbstractNodes.AbstractNode import AbstractNode
-from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
-from source.Specifiers import TypeSpecifier
-from source.SymbolTable import Attributes
+from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
+from Nodes.ExpressionNodes.RHSNode import RHSNode
+from Nodes.ExpressionNodes.IdNode import IdNode
+from Nodes.ExpressionNodes.ConstantNode import ConstantNode
+from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
+from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Specifiers import TypeSpecifier
+from SymbolTable import Attributes
 
 
 class DeclarationNode(ExpressionNode):

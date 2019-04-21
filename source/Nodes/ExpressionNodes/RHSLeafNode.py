@@ -7,8 +7,8 @@ from abc import ABC, abstractmethod
 
 from antlr4 import ParserRuleContext
 
-from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
-from source.Nodes.AbstractNodes.LeafNode import LeafNode
+from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Nodes.AbstractNodes.LeafNode import LeafNode
 
 
 class RHSLeafNode(LeafNode, ABC):
@@ -19,7 +19,7 @@ class RHSLeafNode(LeafNode, ABC):
 
     def generate_llvm(self):
         self.increment_register_index()
-        return "%{0} load {1}* {2}\n".format(self.register_index, self._parent_node.base_type.llvm_type,
+        return "%{0} = load {1}* {2}\n".format(self.register_index, self._parent_node.base_type.llvm_type,
                                              self.llvm_code_value())
 
     @abstractmethod

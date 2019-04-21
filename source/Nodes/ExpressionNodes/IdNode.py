@@ -5,10 +5,10 @@ Academic Year: 2018-2019
 """
 from antlr4 import ParserRuleContext
 
-from source import messages
-from source.Nodes.ExpressionNodes.RHSLeafNode import RHSLeafNode
-from source.Specifiers import TypeSpecifier
-from source.SymbolTable import Attributes
+import messages
+from Nodes.ExpressionNodes.RHSLeafNode import RHSLeafNode
+from Specifiers import TypeSpecifier
+from SymbolTable import Attributes
 
 
 class IdNode(RHSLeafNode):

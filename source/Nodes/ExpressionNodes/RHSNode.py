@@ -4,8 +4,8 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 
-from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
-from source.Specifiers import Operator, TypeSpecifier
+from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Specifiers import Operator, TypeSpecifier
 
 
 class RHSNode(ExpressionNode):
@@ -21,7 +21,6 @@ class RHSNode(ExpressionNode):
     def generate_llvm(self):
         ret = ""
         if len(self._children) == 1:  # Unary expression
-            print("??")
             return self._children[0].generate_llvm()
 
         if len(self._children) == 2:  # Binary expression
@@ -40,7 +39,7 @@ class RHSNode(ExpressionNode):
             else:
                 operating_word = self._operator.bin_operator_map()
             self.increment_register_index()
-            ret += "%{0} {1} {2} %{3}, %{4}\n".format(self.register_index, operating_word,
+            ret += "%{0} = {1} {2} %{3}, %{4}\n".format(self.register_index, operating_word,
                                                       self.base_type.llvm_type, index1, index2)
         return ret
 

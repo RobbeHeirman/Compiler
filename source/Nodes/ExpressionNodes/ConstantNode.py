@@ -6,8 +6,8 @@ Academic Year: 2018-2019
 
 import re
 
-from source.Nodes.ExpressionNodes.RHSLeafNode import RHSLeafNode
-from source.Specifiers import TypeSpecifier
+from Nodes.ExpressionNodes.RHSLeafNode import RHSLeafNode
+from Specifiers import TypeSpecifier
 
 
 class ConstantNode(RHSLeafNode):

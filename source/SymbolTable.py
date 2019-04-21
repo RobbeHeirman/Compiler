@@ -7,9 +7,9 @@
 
 from typing import Dict
 
-import source.Specifiers as TypeSpecifier
-import source.messages as messages
-from source.Specifiers import DeclType
+import Specifiers as TypeSpecifier
+import messages as messages
+from Specifiers import DeclType
 
 
 class Attributes:

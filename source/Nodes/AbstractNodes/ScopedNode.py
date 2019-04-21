@@ -4,8 +4,8 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from abc import ABC
-import source.Nodes.AbstractNodes.ExpressionNode as ExpressionNode
-from source.SymbolTable import SymbolTable, Attributes
+import Nodes.AbstractNodes.ExpressionNode as ExpressionNode
+from SymbolTable import SymbolTable, Attributes
 
 
 class ScopedNode(ExpressionNode.ExpressionNode, ABC):

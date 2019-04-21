@@ -5,7 +5,7 @@ Academic Year: 2018-2019
 """
 from abc import ABC
 from antlr4 import ParserRuleContext
-from source.Nodes.AbstractNodes.AbstractNode import AbstractNode
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 
 
 class LeafNode(AbstractNode, ABC):

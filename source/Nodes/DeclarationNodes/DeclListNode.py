@@ -5,12 +5,12 @@ Academic Year: 2018-2019
 """
 from typing import List
 
-from source.Nodes.AbstractNodes.AbstractNode import AbstractNode
-from source.Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
-from source.Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
-from source.Nodes.AbstractNodes.ExpressionNode import ExpressionNode
-from source.Specifiers import TypeSpecifier
-from source.SymbolTable import Attributes
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
+from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
+from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
+from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Specifiers import TypeSpecifier
+from SymbolTable import Attributes
 
 
 class DeclListNode(ExpressionNode):

@@ -6,8 +6,8 @@ Academic Year: 2018-2019
 from abc import ABC, abstractmethod
 from typing import List
 
-from source.Nodes.AbstractNodes import ExpressionNode
-from source.SymbolTable import Attributes
+from Nodes.AbstractNodes import ExpressionNode
+from SymbolTable import Attributes
 
 
 class AbstractNode(ABC):

@@ -3,9 +3,9 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from source.Nodes.AbstractNodes.LeafNode import LeafNode
-from source.Specifiers import TypeSpecifier, DeclType
-from source.SymbolTable import Attributes
+from Nodes.AbstractNodes.LeafNode import LeafNode
+from Specifiers import TypeSpecifier, DeclType
+from SymbolTable import Attributes
 import re
 
 

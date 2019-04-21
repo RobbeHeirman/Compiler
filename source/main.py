@@ -8,13 +8,13 @@ import subprocess
 import sys
 from antlr4 import *
 
-from source.gen.CLexer import CLexer
-from source.gen.CParser import CParser
-import source.CListenerExtend as CListenerExtend
+from gen.CLexer import CLexer
+from gen.CParser import CParser
+import CListenerExtend as CListenerExtend
 
 
 def main(argv):
-    input_file = "/home/robbe/PycharmProjects/compilers2019/C_files/simple_statements.cc"
+    input_file = argv[1]
     input_stream = FileStream(input_file)
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
@@ -29,10 +29,13 @@ def main(argv):
     ast.to_dot(dot_file)
     subprocess.call(["dot", "-Tpng", dot_file, "-o", "AST.png"])
     if ast.failed:
-        print("I failed :(")
+        print("Failed to compile.")
+        return 1
 
     else:
-        print(ast.generate_llvm())
+        f = open(argv[2], 'w+')
+        f.writelines(ast.generate_llvm())
+    return 0
 
 
 if __name__ == '__main__':
