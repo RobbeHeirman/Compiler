@@ -2,3 +2,6 @@ source/gen/
 .idea/
 tasks/
 venv/
+test_results/
+.dot
+.png

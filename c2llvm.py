@@ -26,7 +26,10 @@ def test():
 
         dot_name = "{0}.dot".format(strip_name)
         full_dot = "{0}/{1}".format(test_dir, dot_name)
-        source.main.main(["{0}/{1}".format(path, file), "{0}/{1}".format(test_dir, llvm_name), full_dot])
+        try:
+            source.main.main(["{0}/{1}".format(path, file), "{0}/{1}".format(test_dir, llvm_name), full_dot])
+        except:
+            pass
 
 
 if __name__ == "__main__":
