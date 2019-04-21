@@ -3,7 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-import source.SymbolTable as SymbolTable
+import source.SymbolTable
 
 
 class BColors:
@@ -17,7 +17,7 @@ class BColors:
     UNDERLINE = '\033[4m'
 
 
-def file_info(attribute: "SymbolTable.Attributes"):
+def file_info(attribute: "source.SymbolTable.Attributes"):
     """Starter prints all info of where something should be told about"""
 
     filename = attribute.filename
@@ -27,7 +27,7 @@ def file_info(attribute: "SymbolTable.Attributes"):
     return "{0}:{1}:{2}: ".format(filename, line, column)
 
 
-def error(attribute: "SymbolTable.Attributes"):
+def error(attribute: "source.SymbolTable.Attributes"):
     """Defines of type error"""
     return "{0}error: ".format(file_info(attribute))
 
@@ -45,7 +45,7 @@ def redeclared_diff_symbol(lexeme, attribute):
           + BColors.ENDC)
 
 
-def note(attribute: "SymbolTable.Attributes"):
+def note(attribute: "source.SymbolTable.Attributes"):
     return "{0}note: ".format(file_info(attribute))
 
 

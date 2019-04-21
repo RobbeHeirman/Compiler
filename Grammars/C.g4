@@ -90,8 +90,13 @@ selection_statements
     : if_statement
     ;
 
+
 if_statement
-    : IF LPARANT condition RPARANT LBRACES statements RBRACES
+    : IF cond_statement (ELSE IF cond_statement)* (ELSE LBRACES statements RBRACES)?
+    ;
+
+cond_statement
+    :LPARANT condition RPARANT LBRACES statements RBRACES
     ;
 condition
     : rhs cond_operator rhs
@@ -143,12 +148,15 @@ RBRACES: '}';
 CHAR: 'char';
 FLOAT: 'float';
 INT: 'int';
+
 // =====================================================================================================================
 
 // Keywords
 // =====================================================================================================================
 RETURN: 'return';
 IF: 'if';
+ELSE: 'else';
+
 
 // identifier(s) & literals
 // =====================================================================================================================

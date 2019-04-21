@@ -14,7 +14,7 @@ import source.CListenerExtend as CListenerExtend
 
 
 def main(argv):
-    input_file = "C_Files/simple_statements.cc"
+    input_file = "/home/robbe/PycharmProjects/compilers2019/C_files/simple_statements.cc"
     input_stream = FileStream(input_file)
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
