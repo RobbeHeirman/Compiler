@@ -1,5 +1,12 @@
 
-int c = 8 + 12; // SHowing this generates correct llvm
-int d = 4 - 55;
-int e = 4 * (c + d);
 
+int main(){
+int a;
+int f;
+      if ( a < 12){
+        a = a + 20;
+    }
+
+
+
+}

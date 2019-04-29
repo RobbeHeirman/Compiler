@@ -12,6 +12,7 @@ statement
     | func_def
     | ret_statement SEMICOLON
     | selection_statements
+    | while_statement
     ;
 
 decl_list
@@ -29,16 +30,11 @@ base_type
     ;
 
 declarator // optional prefix operator sequence + optional postfix operator
-    : prefix_operator* ID postfix_operator?
-    ;
-
-prefix_operator
-    : ASTERIX
-    | ADDRESS
+    : (ASTERIX)* ID postfix_operator?
     ;
 
 postfix_operator
-    : ARRAY
+    : LEFT_BRACKET rhs? RIGHT_BRACKET
     | function_operator
     ;
 
@@ -69,9 +65,12 @@ rhs // Possible R values
     ;
 
 id_rhs
-    : ID
+    : (ADDRESS | ASTERIX)* ID rhs_postfix
     ;
-
+rhs_postfix
+    : LPARANT (rhs (COMMA rhs)*)? RPARANT
+    | LEFT_BRACKET rhs RIGHT_BRACKET
+    ;
 constant
     : CHARACTER_C
     | NUMERAL_C
@@ -93,6 +92,10 @@ selection_statements
 
 if_statement
     : IF cond_statement (ELSE IF cond_statement)* (ELSE LBRACES statements RBRACES)?
+    ;
+
+while_statement
+    : WHILE cond_statement
     ;
 
 cond_statement
@@ -118,7 +121,6 @@ cond_operator
 // Unary operators
 
 ADDRESS: '&';
-ARRAY: '[]';
 INCEREMENT: '++';
 DECREMENT: '--';
 
@@ -140,6 +142,9 @@ RPARANT: ')';
 ASTERIX: '*';
 LBRACES: '{';
 RBRACES: '}';
+LEFT_BRACKET: '[';
+RIGHT_BRACKET: ']';
+
 //======================================================================================================================
 
 // types
@@ -156,6 +161,7 @@ INT: 'int';
 RETURN: 'return';
 IF: 'if';
 ELSE: 'else';
+WHILE: 'while';
 
 
 // identifier(s) & literals

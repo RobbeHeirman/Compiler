@@ -22,6 +22,7 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
 
     @property
     def base_type(self) -> TypeSpecifier:
+        print(self.label)
         return self._parent_node.base_type
 
     def add_child(self, child: "AbstractNode"):

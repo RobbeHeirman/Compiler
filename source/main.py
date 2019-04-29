@@ -14,7 +14,8 @@ import CListenerExtend as CListenerExtend
 
 
 def main(argv):
-    input_file = argv[0]
+    # input_file = argv[0]
+    input_file = "C_files/simple_statements.c"
     input_stream = FileStream(input_file)
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
@@ -38,7 +39,8 @@ def main(argv):
         return 1
 
     else:
-        f = open(argv[1], 'w+')
+        # f = open(argv[1], 'w+')
+        f = open("result.llsv", 'w+')
         f.writelines(ast.generate_llvm())
         f.close()
     return 0
