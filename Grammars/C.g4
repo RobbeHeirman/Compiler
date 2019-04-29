@@ -13,6 +13,7 @@ statement
     | ret_statement SEMICOLON
     | selection_statements
     | while_statement
+    | include_statement 
     ;
 
 decl_list
@@ -109,6 +110,10 @@ cond_operator
     : EQ EQ
     | SMALLER
     | BIGGER;
+
+include_statement
+    :'#include'SMALLER 'stdio.h' BIGGER
+    ;
 
 // =====================================================================================================================
 // =====================================================================================================================
