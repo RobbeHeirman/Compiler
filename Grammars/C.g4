@@ -13,7 +13,7 @@ statement
     | ret_statement SEMICOLON
     | selection_statements
     | while_statement
-    | include_statement 
+    | include_statement
     ;
 
 decl_list
@@ -66,7 +66,7 @@ rhs // Possible R values
     ;
 
 id_rhs
-    : (ADDRESS | ASTERIX)* ID rhs_postfix
+    : (ADDRESS | ASTERIX)* ID rhs_postfix?
     ;
 rhs_postfix
     : LPARANT (rhs (COMMA rhs)*)? RPARANT
