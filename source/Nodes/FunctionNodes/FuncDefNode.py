@@ -31,4 +31,4 @@ class FuncDefNode(ScopedNode):
 
     @property
     def label(self):
-        return '"func def: {0}"'.format(self._id)
+        return 'func def: {0}'.format(self._id)

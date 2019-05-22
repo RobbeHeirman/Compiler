@@ -1,4 +1,5 @@
-int * a[12 + 5];
+#include <stdio.h>
+
 
 /*int a;
 char b;

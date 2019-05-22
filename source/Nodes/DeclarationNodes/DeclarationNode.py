@@ -53,6 +53,9 @@ class DeclarationNode(ExpressionNode):
     def _add_base_type(self, child: BaseTypeNode):
         self._base_type = child.value
 
+    def _add_default(self, child):
+        pass
+
     _add_overload_map = {
         DeclaratorNode: _add_declarator,
         ConstantNode: _add_rhs,
@@ -67,7 +70,7 @@ class DeclarationNode(ExpressionNode):
         extends add_child of abstractNode. To quick filter useful information for DeclarationNode
         :param child: An abstractNode
         """
-        DeclarationNode._add_overload_map[type(child)](self, child)
+        DeclarationNode._add_overload_map.get(type(child), DeclarationNode._add_default)(self, child)
         super().add_child(child)
 
     """def declare_variable(self, base_type: TypeSpecifier):

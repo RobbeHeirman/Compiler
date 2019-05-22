@@ -6,7 +6,9 @@
 """
 from AST import AST
 from Nodes.DeclarationNodes.ArrayNode import ArrayNode
+from Nodes.DeclarationNodes.IncludeStatementNode import IncludeStatementNode
 from Nodes.DeclarationNodes.PtrNode import PtrNode
+from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.DeclarationNodes.DeclListNode import DeclListNode
@@ -14,9 +16,13 @@ from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
+from Nodes.ExpressionNodes.PostFixNode import PostFixNode
+from Nodes.ExpressionNodes.PrefixNode import PrefixNode
+from Nodes.ExpressionNodes.RHSFunctionNode import RHSFunctionNode
 from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
 from Nodes.ExpressionNodes.IdNode import IdNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
+from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Nodes.FunctionNodes.ReturnNode import ReturnNode
 from Nodes.GlobalNodes.RootNode import RootNode
 from Specifiers import Operator
@@ -59,6 +65,14 @@ class CListenerExtend(CListener):
         self._parent_node = func_node
 
     def exitFunc_def(self, ctx: CParser.Func_defContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterParameter_list(self, ctx: CParser.Parameter_listContext):
+        node = ParamListNode(self._parent_node)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitParameter_list(self, ctx: CParser.Parameter_listContext):
         self._parent_node = self._parent_node.parent_node
 
     def enterRet_statement(self, ctx: CParser.Ret_statementContext):
@@ -154,6 +168,14 @@ class CListenerExtend(CListener):
         node = IdNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(node)
 
+    def enterArray_init(self, ctx: CParser.Array_initContext):
+        node = ArrayInitNode(self._parent_node)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitArray_init(self, ctx: CParser.Array_initContext):
+        self._parent_node = self._parent_node.parent_node
+
     def enterAssignment(self, ctx: CParser.AssignmentContext):
         """
         Handle's assignment statement's. We enter the assignment statement so we just make the node.
@@ -180,7 +202,6 @@ class CListenerExtend(CListener):
         :param ctx:  ParserContextNode
         :return:
         """
-
         if ctx.getChild(0).getText() == '-':
             node = RHSNode(self._parent_node, negative=True)
             self._parent_node.add_child(node)
@@ -190,10 +211,12 @@ class CListenerExtend(CListener):
             child = ctx.getChild(1)
             if ctx.getChild(1).getText() == "++" or ctx.getChild(1).getText() == "--":
                 operator = Operator(child.getText())
-                rhs_node = RHSNode(self._parent_node, operator = operator)
+                rhs_node = RHSNode(self._parent_node, operator=operator)
                 self._parent_node.add_child(rhs_node)
                 self._parent_node = rhs_node
+
         elif ctx.getChildCount() == 3:  # Looking for the operator token
+
             child = ctx.getChild(1)
             if child.getChildCount() == 0:  # Ignoring the parentheses, parser forced order of operations.
                 operator = Operator(child.getText())
@@ -201,7 +224,7 @@ class CListenerExtend(CListener):
                 self._parent_node.add_child(rhs_node)
                 self._parent_node = rhs_node
 
-    def exitRhs(self, ctx:CParser.RhsContext):
+    def exitRhs(self, ctx: CParser.RhsContext):
         """
         Need to pop the rhs nodes from the parent node
         :param ctx:
@@ -226,3 +249,37 @@ class CListenerExtend(CListener):
     def enterId_rhs(self, ctx: CParser.Id_rhsContext):
         id_node = IdNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(id_node)
+
+    def enterRhs_prefix(self, ctx: CParser.Rhs_prefixContext):
+        node = PrefixNode(self._parent_node)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitRhs_prefix(self, ctx: CParser.Rhs_prefixContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterRhs_postfix(self, ctx: CParser.Rhs_postfixContext):
+        node = PostFixNode(self._parent_node)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitRhs_postfix(self, ctx: CParser.Rhs_postfixContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterRhs_function_operator(self, ctx: CParser.Rhs_function_operatorContext):
+
+        node = RHSFunctionNode(self._parent_node)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitRhs_function_operator(self, ctx: CParser.Rhs_function_operatorContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterInclude_statement(self, ctx: CParser.Include_statementContext):
+
+        node = IncludeStatementNode(self._parent_node, self._filename, ctx)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitInclude_statement(self, ctx: CParser.Include_statementContext):
+        self._parent_node = self._parent_node.parent_node

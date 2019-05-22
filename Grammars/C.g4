@@ -44,8 +44,12 @@ declarator // optional prefix operator sequence + optional postfix operator
     | id_decl
     ;
 
-ptr_decl:
-    ASTERIX
+ptr_decl
+    : ASTERIX
+    ;
+
+ref_decl
+    : ADDRESS
     ;
 
 id_decl:
@@ -78,6 +82,8 @@ assignment // a = 4;, int b = a;
 
 rhs // Possible R values
     : constant
+    | rhs rhs_postfix
+    | rhs_prefix rhs
     | id_rhs
     | SUB rhs
     | LPARANT rhs RPARANT
@@ -88,12 +94,33 @@ rhs // Possible R values
     ;
 
 id_rhs
-    : (ADDRESS | ASTERIX)* ID rhs_postfix?
+    : ID
     ;
+
+rhs_prefix
+    : (ptr_decl)+
+    | rhs_addr rhs_prefix
+    | (ptr_decl)+ rhs_addr rhs_prefix
+    | (ptr_decl)+ rhs_addr
+    ;
+
+rhs_addr
+    : ADDRESS
+    ;
+
 rhs_postfix
-    : LPARANT (rhs (COMMA rhs)*)? RPARANT
-    | LEFT_BRACKET rhs RIGHT_BRACKET
+    : rhs_function_operator
+    | array_operator
     ;
+
+rhs_function_operator
+    : LPARANT rhs_param_list RPARANT
+    ;
+
+rhs_param_list
+    : (rhs (COMMA rhs)*)?
+    ;
+
 constant
     : CHARACTER_C
     | NUMERAL_C

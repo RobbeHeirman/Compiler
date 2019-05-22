@@ -19,9 +19,9 @@ class AssignmentNode(ExpressionNode):
         self._id = id_name
         self._base_type = None
         if not self._parent_node.is_in_table(self._id):
-            attr = Attributes(TypeSpecifier.DEFAULT, filename, ctx.start.line, ctx.start.column)
+            # attr = Attributes(TypeSpecifier.DEFAULT, filename, ctx.start.line, ctx.start.column)
             self._fail_switch(True)
-            messages.error_undeclared_var(self._id, attr)
+            # messages.error_undeclared_var(self._id, attr)
 
         else:
             attr = self._parent_node.get_attribute(self._id)
