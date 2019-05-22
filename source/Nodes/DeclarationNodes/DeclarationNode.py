@@ -44,7 +44,7 @@ class DeclarationNode(ExpressionNode):
 
     def _add_declarator(self, child: DeclaratorNode):
         self._declarator = child
-        self._id = child.value
+        # self._id = child.value
         # self._declare_variable(child)
 
     def _add_rhs(self, child):
@@ -91,8 +91,8 @@ class DeclarationNode(ExpressionNode):
         """
         ret = ""
 
-        lexeme = self._declarator.value
-        ret += "%{0} = alloca {1}, align {2}\n".format(lexeme,
+        # lexeme = self._declarator.value
+        """ret += "%{0} = alloca {1}, align {2}\n".format(lexeme,
                                                        self._base_type.llvm_type,
                                                        self._base_type.llvm_alignment)
         if self._rhs is not None:
@@ -101,7 +101,7 @@ class DeclarationNode(ExpressionNode):
                                                        self.register_index,
                                                        self._base_type.llvm_type,
                                                        lexeme)
-        return ret
+        return ret"""
 
     def handle_semantics(self):
         pass

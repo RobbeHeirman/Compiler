@@ -17,7 +17,7 @@ class ConstantNode(RHSLeafNode):
 
     @property
     def label(self):
-        return "\"{0}\"".format(str(self._value))
+        return "{0}".format(str(self._value))
 
     def llvm_code_value(self):
 

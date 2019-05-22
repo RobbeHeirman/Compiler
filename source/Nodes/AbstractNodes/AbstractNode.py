@@ -49,7 +49,7 @@ class AbstractNode(ABC):
         self._parent_node = value
 
     def dot_string(self):
-        ret = "{0}[label = {1}];\n".format(self._index, self.label)
+        ret = "{0}[label = \"{1}\"];\n".format(self._index, self.label)
         return ret
 
     @abstractmethod

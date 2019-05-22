@@ -11,7 +11,10 @@ from Specifiers import TypeSpecifier
 
 
 class BaseTypeNode(LeafNode):
-
+    """
+    Represents a base type Node.
+    This is always a leaf_node
+    """
     _value: TypeSpecifier
 
     def __init__(self, parent_node: ExpressionNode, filename: str, ctx: ParserRuleContext):

@@ -5,6 +5,8 @@
  Academic Year: 2018-2019
 """
 from AST import AST
+from Nodes.DeclarationNodes.ArrayNode import ArrayNode
+from Nodes.DeclarationNodes.PtrNode import PtrNode
 from Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.DeclarationNodes.DeclListNode import DeclListNode
@@ -127,6 +129,29 @@ class CListenerExtend(CListener):
 
         # column = start.column
         node = DeclaratorNode(self._parent_node, self._filename, ctx)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitDeclarator(self, ctx: CParser.DeclaratorContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterPtr_decl(self, ctx: CParser.Ptr_declContext):
+
+        node = PtrNode(self._parent_node, self._filename, ctx)
+        self._parent_node.add_child(node)
+
+    def enterArray_operator(self, ctx: CParser.Array_operatorContext):
+
+        node = ArrayNode(self._parent_node)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitArray_operator(self, ctx: CParser.Array_operatorContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterId_decl(self, ctx: CParser.Id_declContext):
+
+        node = IdNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(node)
 
     def enterAssignment(self, ctx: CParser.AssignmentContext):

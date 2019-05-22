@@ -46,9 +46,9 @@ class RHSNode(ExpressionNode):
     @property
     def label(self):
         if self._neg:
-            return '"* -1"'
+            return '* -1'
 
-        return '"{0}"'.format(self._operator.value)
+        return '{0}'.format(self._operator.value)
 
     @property
     def base_type(self):

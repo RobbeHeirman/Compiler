@@ -41,7 +41,7 @@ def main(argv):
     else:
         # f = open(argv[1], 'w+')
         f = open("result.llsv", 'w+')
-        f.writelines(ast.generate_llvm())
+        # f.writelines(ast.generate_llvm())
         f.close()
     return 0
 

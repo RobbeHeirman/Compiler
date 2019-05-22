@@ -19,7 +19,7 @@ class DeclListNode(ExpressionNode):
     """
     _declaration_nodes: List[DeclarationNode]
     _base_type: TypeSpecifier
-    label = "decl_list"
+    _BASE_LABEL = "decl_list"
 
     def __init__(self, parent_node: AbstractNode):
         super().__init__(parent_node)
@@ -31,6 +31,10 @@ class DeclListNode(ExpressionNode):
     def base_type(self) -> TypeSpecifier:
         return self._base_type
 
+    @property
+    def label(self):
+        return '{0}'.format(self._BASE_LABEL)
+
     def _add_base_type(self, child:BaseTypeNode):
         """
         Adds a base type node
@@ -38,12 +42,13 @@ class DeclListNode(ExpressionNode):
         :type child: BaseTypeNode
         """
 
-        self._base_type = child.value
+        self._base_type = child.value  # We are just interested in the base type, maybe this node needs to be ommited?
 
     def _add_declaration_node(self, child: DeclarationNode):
             self._declaration_nodes.append(child)
             child.base_type = self._base_type
 
+    # This is how we mimic function overloading. Basicly the node needs to know what to do with his child.
     _ADD_OVERLOAD_MAP = {
         BaseTypeNode: _add_base_type,
         DeclarationNode: _add_declaration_node,

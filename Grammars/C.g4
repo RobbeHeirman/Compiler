@@ -21,7 +21,11 @@ decl_list
     ;
 
 simple_declaration // int a, char foo....
-    :  declarator (EQ rhs)?
+    :  declarator (EQ (array_init | rhs))?
+    ;
+
+array_init
+    : LBRACES rhs (COMMA rhs)* RBRACES
     ;
 
 base_type
@@ -31,14 +35,32 @@ base_type
     ;
 
 declarator // optional prefix operator sequence + optional postfix operator
-    : (ASTERIX)* ID postfix_operator?
+    : LPARANT declarator RPARANT
+    | declarator postfix_operator
+    | ptr_decl declarator
+    | LPARANT id_decl RPARANT
+    | id_decl postfix_operator
+    | ptr_decl id_decl
+    | id_decl
+    ;
+
+ptr_decl:
+    ASTERIX
+    ;
+
+id_decl:
+    ID
     ;
 
 postfix_operator
-    : LEFT_BRACKET rhs? RIGHT_BRACKET
+    : array_operator
     | function_operator
     ;
 
+array_operator
+    :
+    LEFT_BRACKET rhs? RIGHT_BRACKET
+    ;
 function_operator
     : LPARANT parameter_list RPARANT
     ;
