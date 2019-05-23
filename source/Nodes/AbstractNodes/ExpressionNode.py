@@ -33,6 +33,13 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
 
         self._children.append(child)
 
+    def remove_child(self, child):
+        """
+        Removes a child by value (reference of child node)
+        """
+
+        self._children.remove(child)
+
     def dot_string(self) -> str:
         """Generates the visual representation of the node in .dot"""
         ret = super().dot_string()
@@ -61,5 +68,3 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
             ret += child.generate_llvm()
 
         return ret
-
-

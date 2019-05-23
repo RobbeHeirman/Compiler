@@ -4,16 +4,16 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
-from Specifiers import ConditionalOperator
+from Specifiers import ConditionType
 
 
-class ConditionNode(ExpressionNode):
+class IfElseNode(ExpressionNode):
 
-    def __init__(self, parent_node, operator):
+    def __init__(self, parent_node, c_type: ConditionType):
         super().__init__(parent_node)
 
-        self._type = ConditionalOperator(operator)
+        self._cond_type = c_type
 
     @property
     def label(self):
-        return self._type.value
+        return self._cond_type.value

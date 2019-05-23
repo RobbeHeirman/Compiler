@@ -14,7 +14,6 @@ class RHSNode(ExpressionNode):
 
     def __init__(self, parent_node: ExpressionNode, **kwargs):
         super().__init__(parent_node)
-
         self._operator = kwargs.get('operator', Operator.DEFAULT)
         self._neg = kwargs.get("negative", False)
 

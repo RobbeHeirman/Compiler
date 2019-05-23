@@ -5,11 +5,11 @@ Academic Year: 2018-2019
 """
 from antlr4 import ParserRuleContext
 
-from Nodes.AbstractNodes.LeafNode import LeafNode
+from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
 
 
-class PtrNode(LeafNode):
+class PtrNode(ExpressionNode):
     label = "*"
 
-    def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
-        super().__init__(parent_node, filename, ctx)
+    def __init__(self, parent_node):
+        super().__init__(parent_node)

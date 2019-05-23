@@ -5,6 +5,8 @@
  Academic Year: 2018-2019
 """
 from AST import AST
+from Nodes.ConditionalNodes.ConditionNode import ConditionNode
+from Nodes.ConditionalNodes.IfElseNode import IfElseNode
 from Nodes.DeclarationNodes.ArrayNode import ArrayNode
 from Nodes.DeclarationNodes.IncludeStatementNode import IncludeStatementNode
 from Nodes.DeclarationNodes.PtrNode import PtrNode
@@ -25,7 +27,7 @@ from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Nodes.FunctionNodes.ReturnNode import ReturnNode
 from Nodes.GlobalNodes.RootNode import RootNode
-from Specifiers import Operator
+from Specifiers import Operator, ConditionType
 from gen.CListener import CListener
 from gen.CParser import CParser
 
@@ -151,7 +153,7 @@ class CListenerExtend(CListener):
 
     def enterPtr_decl(self, ctx: CParser.Ptr_declContext):
 
-        node = PtrNode(self._parent_node, self._filename, ctx)
+        node = PtrNode(self._parent_node)
         self._parent_node.add_child(node)
 
     def enterArray_operator(self, ctx: CParser.Array_operatorContext):
@@ -282,4 +284,55 @@ class CListenerExtend(CListener):
         self._parent_node = node
 
     def exitInclude_statement(self, ctx: CParser.Include_statementContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterIf_statement(self, ctx: CParser.If_statementContext):
+
+        c_type = ConditionType.IF
+        node = IfElseNode(self._parent_node, c_type)
+
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitIf_statement(self, ctx: CParser.If_statementContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterElse_if_statement(self, ctx: CParser.Else_if_statementContext):
+        c_type = ConditionType.ELSE_IF
+        node = IfElseNode(self._parent_node, c_type)
+
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitElse_if_statement(self, ctx: CParser.Else_if_statementContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterElse_statement(self, ctx: CParser.Else_statementContext):
+        c_type = ConditionType.ELSE
+        node = IfElseNode(self._parent_node, c_type)
+
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitElse_statement(self, ctx: CParser.Else_statementContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterWhile_statement(self, ctx: CParser.While_statementContext):
+
+        c_type = ConditionType.WHILE
+        node = IfElseNode(self._parent_node, c_type)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitWhile_statement(self, ctx: CParser.While_statementContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterCondition(self, ctx: CParser.ConditionContext):
+
+        op_val = ctx.getChild(1).getText()
+        node = ConditionNode(self._parent_node, op_val)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitCondition(self, ctx: CParser.ConditionContext):
         self._parent_node = self._parent_node.parent_node

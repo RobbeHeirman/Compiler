@@ -3,32 +3,45 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
-from Nodes.ExpressionNodes.RHSNode import RHSNode
-from Nodes.ExpressionNodes.IdNode import IdNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
+from Nodes.ExpressionNodes.IdNode import IdNode
+from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
 from Specifiers import TypeSpecifier
 from SymbolTable import Attributes
+from typing import Union
 
 
 class DeclarationNode(ExpressionNode):
     """
     Represents a Declaration in our abstract syntax tree.
+    Will deduct the base type of the declaration in the first pass.
+    Has 1 or 2 children a declarator (will become a stack of pre and postfix type specifiers after first pass)
+    An optional initializer as 2d child.
     """
     _lexeme: str
     _declarator_list: DeclaratorNode
-    label = "Declaration"
+
+    _BASE_LABEL = "Declaration"
 
     def __init__(self, parent_node: ExpressionNode):
         super().__init__(parent_node)
 
-        self._declarator = None
-        self._rhs = None
-        self._id = None
-        self._base_type = None
+        # The 2 child nodes
+        self._declarator_node = None
+        self._rhs_node = None
+
+        self._id = None  # Id can be deducted from children.
+        self._base_type = None  # Base type gets passed from a decl_list node.
+
+    @property
+    def label(self):
+        ret_label = self._BASE_LABEL
+        if self._base_type is not None:
+            ret_label += "\\nBase type: {0}".format(self._base_type.value)
+
+        return ret_label
 
     @property
     def id(self):
@@ -43,35 +56,36 @@ class DeclarationNode(ExpressionNode):
         self._base_type = value
 
     def _add_declarator(self, child: DeclaratorNode):
-        self._declarator = child
-        # self._id = child.value
-        # self._declare_variable(child)
+        self._declarator_node = child
 
     def _add_rhs(self, child):
-        self._rhs = child
+        self._rhs_node = child
 
-    def _add_base_type(self, child: BaseTypeNode):
-        self._base_type = child.value
-
-    def _add_default(self, child):
-        pass
-
+    # Can we do something to make overloading more generic
     _add_overload_map = {
         DeclaratorNode: _add_declarator,
-        ConstantNode: _add_rhs,
-        IdNode: _add_rhs,
         RHSNode: _add_rhs,
-        BaseTypeNode: _add_base_type,
-        AbstractNode: None
+        ConstantNode: _add_rhs,
+        IdNode: _add_rhs
     }
 
-    def add_child(self, child: AbstractNode):
+    def add_child(self, child: Union[DeclaratorNode, RHSNode]):
         """
         extends add_child of abstractNode. To quick filter useful information for DeclarationNode
         :param child: An abstractNode
         """
-        DeclarationNode._add_overload_map.get(type(child), DeclarationNode._add_default)(self, child)
+        DeclarationNode._add_overload_map.get(type(child))(self, child)
         super().add_child(child)
+
+    def first_pass(self):
+        """
+        Mainly used for node cleanup. We can remove all the "Declarator stub nodes. They were mainly there
+        to handle typeSpecifier hierarchy
+        """
+
+        # TODO: find the id in the declaration_node
+
+        self._declarator_node.first_pass()
 
     """def declare_variable(self, base_type: TypeSpecifier):
 
@@ -87,15 +101,14 @@ class DeclarationNode(ExpressionNode):
         if not self.add_to_scope_symbol_table(lexeme, attribute):
             self._fail_switch(True)"""  # TODO: is deprecated?
 
-    def generate_llvm(self) -> str:
-        """
+    """def generate_llvm(self) -> str:
+
         This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
-        :return: the generated string
-        """
+
         ret = ""
 
         # lexeme = self._declarator.value
-        """ret += "%{0} = alloca {1}, align {2}\n".format(lexeme,
+        ret += "%{0} = alloca {1}, align {2}\n".format(lexeme,
                                                        self._base_type.llvm_type,
                                                        self._base_type.llvm_alignment)
         if self._rhs is not None:

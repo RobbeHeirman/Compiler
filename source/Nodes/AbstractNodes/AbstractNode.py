@@ -91,3 +91,7 @@ class AbstractNode(ABC):
 
     def get_attribute(self, lexeme) -> Attributes:
         return self._parent_node.get_attribute(lexeme)
+
+    def first_pass(self):
+        for child in self._children:
+            child.first_pass()

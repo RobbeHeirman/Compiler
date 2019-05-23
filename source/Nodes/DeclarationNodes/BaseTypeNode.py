@@ -33,6 +33,10 @@ class BaseTypeNode(LeafNode):
 
     @property
     def value(self)-> TypeSpecifier:
+        """
+        Returns the base type of the node.
+        :return: Type specifier, type of the node.
+        """
         return self._value
 
     def llvm_code_value(self):

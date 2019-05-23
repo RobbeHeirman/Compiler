@@ -4,13 +4,13 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
-from Nodes.AbstractNodes.LeafNode import LeafNode
-from Specifiers import TypeSpecifier, DeclType
-from SymbolTable import Attributes
-import re
 
 
 class DeclaratorNode(ExpressionNode):
+    """
+    We use this node to handle prefix/postfix hierarchy.
+    We can omit this in a future pass. This node has no actual info about the program.
+    """
     label = "Declarator"
 
     def __init__(self, parent_node, filename, ctx):

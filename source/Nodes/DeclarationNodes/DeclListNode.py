@@ -10,45 +10,45 @@ from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
 from Specifiers import TypeSpecifier
-from SymbolTable import Attributes
 
 
 class DeclListNode(ExpressionNode):
     """
     Start of a , separated list of declarations.
+    this such nodes has ONE base type and a list of declarations
     """
     _declaration_nodes: List[DeclarationNode]
-    _base_type: TypeSpecifier
+    _base_type: BaseTypeNode
+    _parent_node: ExpressionNode
+
     _BASE_LABEL = "decl_list"
 
     def __init__(self, parent_node: AbstractNode):
         super().__init__(parent_node)
 
-        self._base_type = None
+        self._base_type_node = None
         self._declaration_nodes = list()
 
     @property
     def base_type(self) -> TypeSpecifier:
-        return self._base_type
+        return self._base_type_node.value
 
     @property
     def label(self):
         return '{0}'.format(self._BASE_LABEL)
 
-    def _add_base_type(self, child:BaseTypeNode):
+    def _add_base_type(self, child: BaseTypeNode):
         """
         Adds a base type node
         :param child: a base type node
         :type child: BaseTypeNode
         """
-
-        self._base_type = child.value  # We are just interested in the base type, maybe this node needs to be ommited?
+        self._base_type_node = child
 
     def _add_declaration_node(self, child: DeclarationNode):
-            self._declaration_nodes.append(child)
-            child.base_type = self._base_type
+        self._declaration_nodes.append(child)
 
-    # This is how we mimic function overloading. Basicly the node needs to know what to do with his child.
+    # This is how we mimic function overloading. Basically the node needs to know what to do with his child.
     _ADD_OVERLOAD_MAP = {
         BaseTypeNode: _add_base_type,
         DeclarationNode: _add_declaration_node,
@@ -59,7 +59,22 @@ class DeclListNode(ExpressionNode):
         self._ADD_OVERLOAD_MAP[type(child)](self, child)
         super().add_child(child)
 
-    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes):
+    def first_pass(self):
+        """
+        On the first pass we need to decide the type of the list. And prepend what we found to the declarations.
+        Since the list is just an abstract way of handling a multi declaration on a single line.
+        """
 
-        attribute.type_spec = self._base_type
-        super().add_to_scope_symbol_table(lexeme, attribute)
+        # We will tell al the declaration nodes what their base type is. They need it for further code generation
+        # A base type is integer, float, char (can be extended with void, double...)
+        # Since we don't really need more info from this node. It will become obsolete in further code gen,
+        # So we remove it.
+
+        for decl_node in self._declaration_nodes:
+            decl_node.base_type = self._base_type_node.value
+            decl_node.parent_node = self._parent_node
+
+            self._parent_node.add_child(decl_node)
+            decl_node.first_pass()
+
+        self._parent_node.remove_child(self)

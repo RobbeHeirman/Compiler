@@ -60,6 +60,12 @@ class Operator(Enum):
         return _BINARY_LLVM_MAPPING[self]
 
 
+class ConditionalOperator(Enum):
+    BIGGER = '>'
+    SMALLER = '<'
+    EQUALS = '=='
+
+
 class DeclType(Enum):
     SIMPLE = auto()
     FUNCTION = auto()
@@ -69,3 +75,4 @@ class ConditionType(Enum):
     IF = 'if'
     ELSE_IF = 'else if'
     ELSE = 'else'
+    WHILE = 'while'

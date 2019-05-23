@@ -9,9 +9,10 @@ from antlr4 import ParserRuleContext
 
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
 from Nodes.AbstractNodes.LeafNode import LeafNode
+from Nodes.ExpressionNodes.RHSNode import RHSNode
 
 
-class RHSLeafNode(LeafNode, ABC):
+class RHSLeafNode(LeafNode, RHSNode, ABC):
     _parent_node: ExpressionNode
 
     def __init__(self, parent_node: ExpressionNode, filename: str, ctx: ParserRuleContext):

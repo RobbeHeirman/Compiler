@@ -51,3 +51,10 @@ class AST:
         """
 
         return self._root.generate_llvm()
+
+    def first_pass(self):
+        """
+        First time passing to own generated AST.
+        :return:
+        """
+        self._root.first_pass()
