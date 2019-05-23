@@ -17,7 +17,7 @@ class TypeSpecifier(Enum):
     DEFAULT = ''  # Stub when dealing with incomplete info
 
     @property
-    def llvm_type(self) ->str:
+    def llvm_type(self) -> str:
         _LLVM_TYPE = {
             self.CHAR: 'i8',
             self.INT: 'i32',
@@ -28,7 +28,7 @@ class TypeSpecifier(Enum):
         return _LLVM_TYPE[self]
 
     @property
-    def llvm_alignment(self) ->int:
+    def llvm_alignment(self) -> int:
         _LLVM_ALIGN = {
             self.CHAR: 1,
             self.INT: 4,
@@ -61,7 +61,11 @@ class Operator(Enum):
 
 
 class DeclType(Enum):
-
     SIMPLE = auto()
     FUNCTION = auto()
 
+
+class ConditionType(Enum):
+    IF = 'if'
+    ELSE_IF = 'else if'
+    ELSE = 'else'

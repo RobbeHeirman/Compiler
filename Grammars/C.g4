@@ -136,14 +136,21 @@ ret_statement
     ;
 
 selection_statements
-    : if_statement
+    : if_statement (else_if_statement)* (else_statement)?
     ;
 
 
 if_statement
-    : IF cond_statement (ELSE IF cond_statement)* (ELSE LBRACES statements RBRACES)?
+    : IF cond_statement
     ;
 
+else_if_statement
+    : ELSE IF cond_statement
+    ;
+
+else_statement
+    : ELSE LBRACES statements RBRACES
+    ;
 while_statement
     : WHILE cond_statement
     ;

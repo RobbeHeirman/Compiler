@@ -1,6 +1,9 @@
-#include <stdio.h>
 
+if (4 < 12){
 
+    int a = 12;
+
+}
 /*int a;
 char b;
 float c;
