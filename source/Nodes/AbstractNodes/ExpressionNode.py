@@ -43,7 +43,6 @@ class ExpressionNode(AbstractNode.AbstractNode, ABC):
     def dot_string(self) -> str:
         """Generates the visual representation of the node in .dot"""
         ret = super().dot_string()
-
         ret += "{0}--{{".format(self._index)
         for child in self._children:
             ret += "{0} ".format(child.index)

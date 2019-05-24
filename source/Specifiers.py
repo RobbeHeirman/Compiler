@@ -76,3 +76,10 @@ class ConditionType(Enum):
     ELSE_IF = 'else if'
     ELSE = 'else'
     WHILE = 'while'
+
+
+class DeclaratorSpecifier(Enum):
+    PTR = "*"
+    ARRAY = "[]"
+    FUNC = "()"
+    ADDRESS = "&"

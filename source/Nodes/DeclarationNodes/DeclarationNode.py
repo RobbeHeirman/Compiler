@@ -3,8 +3,10 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.ExpressionNodes.IdNode import IdNode
+from Nodes.ExpressionNodes.RHSFunctionNode import RHSFunctionNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
@@ -20,8 +22,8 @@ class DeclarationNode(ExpressionNode):
     Has 1 or 2 children a declarator (will become a stack of pre and postfix type specifiers after first pass)
     An optional initializer as 2d child.
     """
+    _declarator_node: DeclaratorNode
     _lexeme: str
-    _declarator_list: DeclaratorNode
 
     _BASE_LABEL = "Declaration"
 
@@ -41,6 +43,9 @@ class DeclarationNode(ExpressionNode):
         if self._base_type is not None:
             ret_label += "\\nBase type: {0}".format(self._base_type.value)
 
+        if self._id is not None:
+            ret_label += "\\n Identifier: {0}".format(self._id)
+
         return ret_label
 
     @property
@@ -55,6 +60,23 @@ class DeclarationNode(ExpressionNode):
     def base_type(self, value: TypeSpecifier):
         self._base_type = value
 
+    def dot_string(self) -> str:
+        """Generates the visual representation of the node in .dot"""
+        ret = AbstractNode.dot_string(self)
+
+        ret += "{0}--{{".format(self._index)
+        ret += "{0} ".format(self._declarator_node.index)
+        ret += "}[label = \" Decl\" ]\n"
+
+        ret += "{0}--{{".format(self._index)
+        ret += "{0} ".format(self._rhs_node.index)
+        ret += "}[label = \" = \" ]\n"
+
+        for child in self._children:
+            ret += child.dot_string()
+
+        return ret
+
     def _add_declarator(self, child: DeclaratorNode):
         self._declarator_node = child
 
@@ -66,7 +88,8 @@ class DeclarationNode(ExpressionNode):
         DeclaratorNode: _add_declarator,
         RHSNode: _add_rhs,
         ConstantNode: _add_rhs,
-        IdNode: _add_rhs
+        IdNode: _add_rhs,
+        RHSFunctionNode: _add_declarator
     }
 
     def add_child(self, child: Union[DeclaratorNode, RHSNode]):
@@ -83,7 +106,7 @@ class DeclarationNode(ExpressionNode):
         to handle typeSpecifier hierarchy
         """
 
-        # TODO: find the id in the declaration_node
+        self._id = self._declarator_node.find_id()
 
         self._declarator_node.first_pass()
 

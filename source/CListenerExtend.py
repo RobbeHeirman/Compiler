@@ -7,9 +7,7 @@
 from AST import AST
 from Nodes.ConditionalNodes.ConditionNode import ConditionNode
 from Nodes.ConditionalNodes.IfElseNode import IfElseNode
-from Nodes.DeclarationNodes.ArrayNode import ArrayNode
 from Nodes.DeclarationNodes.IncludeStatementNode import IncludeStatementNode
-from Nodes.DeclarationNodes.PtrNode import PtrNode
 from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
@@ -27,7 +25,7 @@ from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Nodes.FunctionNodes.ReturnNode import ReturnNode
 from Nodes.GlobalNodes.RootNode import RootNode
-from Specifiers import Operator, ConditionType
+from Specifiers import Operator, ConditionType, DeclaratorSpecifier
 from gen.CListener import CListener
 from gen.CParser import CParser
 
@@ -144,29 +142,25 @@ class CListenerExtend(CListener):
         """
 
         # column = start.column
-        node = DeclaratorNode(self._parent_node, self._filename, ctx)
-        self._parent_node.add_child(node)
-        self._parent_node = node
+        if ctx.getChild(0).getText() is not "(":  # parenthesis are just used to order
+            node = DeclaratorNode(self._parent_node)
+            self._parent_node.add_child(node)
+            self._parent_node = node
 
     def exitDeclarator(self, ctx: CParser.DeclaratorContext):
-        self._parent_node = self._parent_node.parent_node
+
+        if ctx.getChild(0).getText() is not "(":
+            self._parent_node = self._parent_node.parent_node
 
     def enterPtr_decl(self, ctx: CParser.Ptr_declContext):
 
-        node = PtrNode(self._parent_node)
-        self._parent_node.add_child(node)
+        self._parent_node.declarator_type = DeclaratorSpecifier.PTR
 
     def enterArray_operator(self, ctx: CParser.Array_operatorContext):
 
-        node = ArrayNode(self._parent_node)
-        self._parent_node.add_child(node)
-        self._parent_node = node
-
-    def exitArray_operator(self, ctx: CParser.Array_operatorContext):
-        self._parent_node = self._parent_node.parent_node
+        self._parent_node.declarator_type = DeclaratorSpecifier.ARRAY
 
     def enterId_decl(self, ctx: CParser.Id_declContext):
-
         node = IdNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(node)
 
