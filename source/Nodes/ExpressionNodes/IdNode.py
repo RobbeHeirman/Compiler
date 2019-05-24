@@ -5,13 +5,10 @@ Academic Year: 2018-2019
 """
 from antlr4 import ParserRuleContext
 
-import messages
-from Nodes.ExpressionNodes.RHSLeafNode import RHSLeafNode
-from Specifiers import TypeSpecifier, DeclType
-from SymbolTable import Attributes
+from Nodes.AbstractNodes.LeafNode import LeafNode
 
 
-class IdNode(RHSLeafNode):
+class IdNode(LeafNode):
 
     def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
         super().__init__(parent_node, filename, ctx)

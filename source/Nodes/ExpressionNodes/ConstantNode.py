@@ -6,11 +6,11 @@ Academic Year: 2018-2019
 
 import re
 
-from Nodes.ExpressionNodes.RHSLeafNode import RHSLeafNode
+from Nodes.AbstractNodes.LeafNode import LeafNode
 from Specifiers import TypeSpecifier
 
 
-class ConstantNode(RHSLeafNode):
+class ConstantNode(LeafNode):
 
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node, filename, ctx)

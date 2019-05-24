@@ -64,13 +64,15 @@ class DeclarationNode(ExpressionNode):
         """Generates the visual representation of the node in .dot"""
         ret = AbstractNode.dot_string(self)
 
-        ret += "{0}--{{".format(self._index)
-        ret += "{0} ".format(self._declarator_node.index)
-        ret += "}[label = \" Decl\" ]\n"
+        if self._declarator_node is not None:
+            ret += "{0}--{{".format(self._index)
+            ret += "{0} ".format(self._declarator_node.index)
+            ret += "}[label = \" Decl\" ]\n"
 
-        ret += "{0}--{{".format(self._index)
-        ret += "{0} ".format(self._rhs_node.index)
-        ret += "}[label = \" = \" ]\n"
+        if self._rhs_node is not None:
+            ret += "{0}--{{".format(self._index)
+            ret += "{0} ".format(self._rhs_node.index)
+            ret += "}[label = \" = \" ]\n"
 
         for child in self._children:
             ret += child.dot_string()
@@ -84,20 +86,21 @@ class DeclarationNode(ExpressionNode):
         self._rhs_node = child
 
     # Can we do something to make overloading more generic
-    _add_overload_map = {
-        DeclaratorNode: _add_declarator,
-        RHSNode: _add_rhs,
-        ConstantNode: _add_rhs,
-        IdNode: _add_rhs,
-        RHSFunctionNode: _add_declarator
-    }
 
     def add_child(self, child: Union[DeclaratorNode, RHSNode]):
         """
         extends add_child of abstractNode. To quick filter useful information for DeclarationNode
         :param child: An abstractNode
         """
-        DeclarationNode._add_overload_map.get(type(child))(self, child)
+
+        if isinstance(child, DeclaratorNode):
+            self._add_declarator(child)
+
+        elif isinstance(child, RHSNode):
+            self._add_rhs(child)
+
+        else:
+            print("something went wrong")
         super().add_child(child)
 
     def first_pass(self):
@@ -108,7 +111,18 @@ class DeclarationNode(ExpressionNode):
 
         self._id = self._declarator_node.find_id()
 
-        self._declarator_node.first_pass()
+        if self._declarator_node is not None:
+            self._declarator_node.first_pass()
+
+        if self._rhs_node is not None:
+            self._rhs_node.first_pass()
+
+    def remove_child(self, child):
+
+        if isinstance(child, DeclaratorNode):
+            self._declarator_node = None
+
+        super().remove_child(child)
 
     """def declare_variable(self, base_type: TypeSpecifier):
 

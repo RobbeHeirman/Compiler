@@ -16,8 +16,7 @@ from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
-from Nodes.ExpressionNodes.PostFixNode import PostFixNode
-from Nodes.ExpressionNodes.PrefixNode import PrefixNode
+from Nodes.ExpressionNodes.FixNode import FixNode, FixType
 from Nodes.ExpressionNodes.RHSFunctionNode import RHSFunctionNode
 from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
 from Nodes.ExpressionNodes.IdNode import IdNode
@@ -198,27 +197,29 @@ class CListenerExtend(CListener):
         :param ctx:  ParserContextNode
         :return:
         """
-        if ctx.getChild(0).getText() == '-':
-            node = RHSNode(self._parent_node, negative=True)
+
+        if ctx.getChild(0).getText() is '(':  # parenthesis RHS nodes can be ignored.
+            return
+
+        else:
+            node = RHSNode(self._parent_node)
             self._parent_node.add_child(node)
             self._parent_node = node
 
-        elif ctx.getChildCount() == 2:
-            child = ctx.getChild(1)
-            if ctx.getChild(1).getText() == "++" or ctx.getChild(1).getText() == "--":
-                operator = Operator(child.getText())
-                rhs_node = RHSNode(self._parent_node, operator=operator)
-                self._parent_node.add_child(rhs_node)
-                self._parent_node = rhs_node
+            if ctx.getChild(0).getText() == '-':
+                node.neg = True
 
-        elif ctx.getChildCount() == 3:  # Looking for the operator token
+            if ctx.getChildCount() == 2:
+                child = ctx.getChild(1)
+                if ctx.getChild(1).getText() == "++" or ctx.getChild(1).getText() == "--":
+                    operator = Operator(child.getText())
+                    node.operator = operator
 
-            child = ctx.getChild(1)
-            if child.getChildCount() == 0:  # Ignoring the parentheses, parser forced order of operations.
+            elif ctx.getChildCount() == 3:  # Looking for the operator token
+
+                child = ctx.getChild(1)
                 operator = Operator(child.getText())
-                rhs_node = RHSNode(self._parent_node, operator=operator)
-                self._parent_node.add_child(rhs_node)
-                self._parent_node = rhs_node
+                node.operator = operator
 
     def exitRhs(self, ctx: CParser.RhsContext):
         """
@@ -227,16 +228,10 @@ class CListenerExtend(CListener):
         :return:
         """
 
-        if ctx.getChild(0).getText() == '-':
-            self._parent_node = self._parent_node.parent_node
+        if ctx.getChild(0).getText() is '(':  # parenthesis RHS nodes can be ignored.
+            return
 
-        elif ctx.getChildCount() == 2:
-            if ctx.getChild(1).getText() == "++" or ctx.getChild(1).getText() == "--":
-                self._parent_node = self._parent_node.parent_node
-
-        elif ctx.getChildCount() == 3:
-            if ctx.getChild(1).getChildCount() == 0:
-                self._parent_node = self._parent_node.parent_node
+        self._parent_node = self._parent_node.parent_node
 
     def enterConstant(self, ctx: CParser.ConstantContext):
         c_node = ConstantNode(self._parent_node, self._filename, ctx)
@@ -247,7 +242,8 @@ class CListenerExtend(CListener):
         self._parent_node.add_child(id_node)
 
     def enterRhs_prefix(self, ctx: CParser.Rhs_prefixContext):
-        node = PrefixNode(self._parent_node)
+        val = ctx.getChild(0).getText()
+        node = FixNode(self._parent_node, FixType(val))
         self._parent_node.add_child(node)
         self._parent_node = node
 
@@ -255,20 +251,12 @@ class CListenerExtend(CListener):
         self._parent_node = self._parent_node.parent_node
 
     def enterRhs_postfix(self, ctx: CParser.Rhs_postfixContext):
-        node = PostFixNode(self._parent_node)
+        val = ctx.getChild(0).getChild(0).getText() + ctx.getChild(0).getChild(2).getText()
+        node = FixNode(self._parent_node, FixType(val))
         self._parent_node.add_child(node)
         self._parent_node = node
 
     def exitRhs_postfix(self, ctx: CParser.Rhs_postfixContext):
-        self._parent_node = self._parent_node.parent_node
-
-    def enterRhs_function_operator(self, ctx: CParser.Rhs_function_operatorContext):
-
-        node = RHSFunctionNode(self._parent_node)
-        self._parent_node.add_child(node)
-        self._parent_node = node
-
-    def exitRhs_function_operator(self, ctx: CParser.Rhs_function_operatorContext):
         self._parent_node = self._parent_node.parent_node
 
     def enterInclude_statement(self, ctx: CParser.Include_statementContext):

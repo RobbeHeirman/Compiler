@@ -96,10 +96,8 @@ id_rhs
     ;
 
 rhs_prefix
-    : (ptr_decl)+
-    | rhs_addr rhs_prefix
-    | (ptr_decl)+ rhs_addr rhs_prefix
-    | (ptr_decl)+ rhs_addr
+    : rhs_addr
+    | ptr_decl
     ;
 
 rhs_addr
