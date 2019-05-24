@@ -59,7 +59,6 @@ class DeclaratorNode(ExpressionNode):
         self._declarator_node = child
 
     def _add_id_node(self, child):
-
         self._id_node = child
 
     _OVERLOAD_MAP = {
@@ -72,6 +71,9 @@ class DeclaratorNode(ExpressionNode):
             self._add_declarator_node(child)
 
         elif isinstance(child, RHSNode):
+            if isinstance(child, IdNode):
+                self._add_id_node(child)
+
             self._rhs_node = child
 
         else:
@@ -88,6 +90,9 @@ class DeclaratorNode(ExpressionNode):
 
         # this node contained the identifier, so it can just return it
         if self._id_node is not None:
+
+            if self in self.parent_node._children:
+                self._parent_node.remove_child(self)
             return self._id_node.value
 
         elif self._declarator_node is not None:
@@ -98,26 +103,9 @@ class DeclaratorNode(ExpressionNode):
         We mainly want to remove this type of node in the Ast since it doesn't generate useful info.
         We use this node to handle pre postfix hierarchy.
         """
-        pass
-        """" if self._specifier_node is not None:
-            if self._declarator_node is not None:
-                # Siblings becomes child of
-                self._declarator_node.parent_node = self._specifier_node
-                self._specifier_node.add_child(self._declarator_node)
 
-            # New parent is attached
-            self._specifier_node.parent_node = self.parent_node
-            self.parent_node.add_child(self._specifier_node)
-
-        elif self._declarator_node is not None:  # handling the dummy declarator nodes
-
-            self._declarator_node.parent_node = self.parent_node
-            self.parent_node.add_child(self._declarator_node)
-
-        if self._declarator_node is not None:
-            self._declarator_node.first_pass()
-
-        self._parent_node.remove_child(self)"""
+        if self._id_node is None:
+            self._id_node = self.find_id()
 
     def llvm_code_value(self):
         pass

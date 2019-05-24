@@ -39,8 +39,6 @@ declarator // optional prefix operator sequence + optional postfix operator
     | declarator postfix_operator
     | ptr_decl declarator
     | LPARANT id_decl RPARANT
-    | id_decl postfix_operator
-    | ptr_decl id_decl
     | id_decl
     ;
 
