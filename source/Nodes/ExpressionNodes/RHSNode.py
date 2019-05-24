@@ -96,6 +96,13 @@ class RHSNode(ExpressionNode):
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
+            elif self._member_operator_node.f_type == FixType.FUNCTION:
+                self.type = RHSNodeType.FUNCTION
+                self._member_operator_node.rhs_node.parent = self
+                self.add_child(self._member_operator_node.rhs_node)
+                self.remove_child(self._member_operator_node)
+                self._member_operator_node = None
+
         elif self._identifier_node is not None:
             self.type = RHSNodeType.IDENTIFIER
             self.identifier = self._identifier_node.value

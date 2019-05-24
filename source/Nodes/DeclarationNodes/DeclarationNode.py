@@ -4,9 +4,6 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.ExpressionNodes.ConstantNode import ConstantNode
-from Nodes.ExpressionNodes.IdNode import IdNode
-from Nodes.ExpressionNodes.RHSFunctionNode import RHSFunctionNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
