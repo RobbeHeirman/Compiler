@@ -58,7 +58,12 @@ class CListenerExtend(CListener):
         """
 
     def enterFunc_def(self, ctx: CParser.Func_defContext):
-        func_node = FuncDefNode(self._parent_node, ctx.getChild(1).getText(), self._filename, ctx.getChild(1))
+        counter = 0
+        while ctx.getChild(counter + 1).getText() is '*':
+            counter += 1
+
+        func_node = FuncDefNode(self._parent_node, ctx.getChild(counter + 1).getText(), counter, self._filename,
+                                ctx.getChild(1))
         self._parent_node.add_child(func_node)
         self._parent_node = func_node
 

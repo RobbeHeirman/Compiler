@@ -4,6 +4,7 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
+from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
@@ -30,6 +31,7 @@ class DeclarationNode(ExpressionNode):
         # The 2 child nodes
         self._declarator_node = None
         self._rhs_node = None
+        self._base_type_node = None
 
         self._id = None  # Id can be deducted from children.
         self._base_type = None  # Base type gets passed from a decl_list node.
@@ -60,6 +62,11 @@ class DeclarationNode(ExpressionNode):
     def dot_string(self) -> str:
         """Generates the visual representation of the node in .dot"""
         ret = AbstractNode.dot_string(self)
+
+        if self._base_type_node is not None:
+            ret += "{0}--{{".format(self._index)
+            ret += "{0} ".format(self._base_type_node.index)
+            ret += "}\n"
 
         if self._declarator_node is not None:
             ret += "{0}--{{".format(self._index)
@@ -96,7 +103,11 @@ class DeclarationNode(ExpressionNode):
         elif isinstance(child, RHSNode):
             self._add_rhs(child)
 
+        elif isinstance(child, BaseTypeNode):
+            self._base_type_node = child
+            self._base_type = child.value
         else:
+            print(type(child))
             print("something went wrong")
         super().add_child(child)
 
@@ -105,8 +116,8 @@ class DeclarationNode(ExpressionNode):
         Mainly used for node cleanup. We can remove all the "Declarator stub nodes. They were mainly there
         to handle typeSpecifier hierarchy
         """
-
-        self._id = self._declarator_node.find_id()
+        if self._declarator_node is not None:
+            self._id = self._declarator_node.find_id()
 
         if self._declarator_node is not None:
             self._declarator_node.first_pass()
@@ -114,10 +125,17 @@ class DeclarationNode(ExpressionNode):
         if self._rhs_node is not None:
             self._rhs_node.first_pass()
 
+        if self._base_type_node is not None:
+            self._base_type = self._base_type_node.value
+            self.remove_child(self._base_type_node)
+
     def remove_child(self, child):
 
         if isinstance(child, DeclaratorNode):
             self._declarator_node = None
+
+        if isinstance(child, BaseTypeNode):
+            self._base_type_node = None
 
         super().remove_child(child)
 

@@ -29,7 +29,7 @@ class AssignmentNode(ExpressionNode):
 
     @property
     def label(self):
-        return '{0} = '.format(self._id)
+        return 'Identifier: {0}\n='.format(self._id)
 
     @property
     def base_type(self):

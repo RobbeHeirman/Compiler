@@ -107,6 +107,9 @@ class DeclaratorNode(ExpressionNode):
         if self._id_node is None:
             self._id_node = self.find_id()
 
+        for child in self._children:
+            child.first_pass()
+
     def llvm_code_value(self):
         pass
 

@@ -7,7 +7,7 @@ from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
 
 
 class ParamListNode(ExpressionNode):
-    label = "param_list"
+    label = "Param list"
 
     def __init__(self, parent_node):
         super().__init__(parent_node)
