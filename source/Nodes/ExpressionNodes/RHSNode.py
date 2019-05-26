@@ -7,8 +7,6 @@ Academic Year: 2018-2019
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode, ExpressionNodeType
-from Nodes.ExpressionNodes.FixNode import FixNode, FixType
-from Nodes.ExpressionNodes.IdNode import IdNode
 from Specifiers import Operator, TypeSpecifier
 
 
@@ -17,24 +15,22 @@ class RHSNode(ExpressionNode):
     operator: Operator
     _parent_node: NonLeafNode
 
+    _BASE_LABEL = "RHS"
+
     def __init__(self, parent_node: NonLeafNode, **kwargs):
 
         super().__init__(parent_node)
 
         self.operator = kwargs.get('operator', Operator.DEFAULT)
         self.neg = kwargs.get("negative", False)
-        self.type = None
-        self.identifier = None
         self.constant = None
 
-        self._member_operator_node = None
-        self._identifier_node = None
         self._constant_node = None
         self._extra_node = None  # for array expression and function signatures
 
     @property
     def label(self):
-        ret = "RHS"
+        ret = self._BASE_LABEL
         if self.neg:
             ret += '* -1'
         if self.operator is not Operator.DEFAULT:
@@ -50,63 +46,23 @@ class RHSNode(ExpressionNode):
                     ret += "{0}".format(self.constant)
         return ret
 
+
     def add_child(self, child):
 
-        if isinstance(child, IdNode):
-            self._identifier_node = child
-            self.type = ExpressionNodeType.IDENTIFIER
-
-        elif isinstance(child, ConstantNode):
+        if isinstance(child, ConstantNode):
             self._constant_node = child
             self.type = ExpressionNodeType.CONSTANT
-
-        elif isinstance(child, FixNode):
-            self._member_operator_node = child
 
         super().add_child(child)
 
     def first_pass(self):
 
-        if self._member_operator_node is not None:
-            if self._member_operator_node.f_type == FixType.PTR:
-                self.type = ExpressionNodeType.PTR
-                self.remove_child(self._member_operator_node)
-                self._member_operator_node = None
-
-            elif self._member_operator_node.f_type == FixType.ADDRESS:
-                self.type = ExpressionNodeType.ADDR
-                self.remove_child(self._member_operator_node)
-                self._member_operator_node = None
-
-            elif self._member_operator_node.f_type == FixType.ARRAY:
-                self.type = ExpressionNodeType.ARRAY
-
-                self._member_operator_node.rhs_node.parent = self
-                self.add_child(self._member_operator_node.rhs_node)
-                self.remove_child(self._member_operator_node)
-                self._member_operator_node = None
-
-            elif self._member_operator_node.f_type == FixType.FUNCTION:
-                self.type = ExpressionNodeType.FUNCTION
-                self._member_operator_node.rhs_node.parent = self
-                self.add_child(self._member_operator_node.rhs_node)
-                self.remove_child(self._member_operator_node)
-                self._member_operator_node = None
-
-        elif self._identifier_node is not None:
-            self.type = ExpressionNodeType.IDENTIFIER
-            self.identifier = self._identifier_node.value
-            self.remove_child(self._identifier_node)
-            self._identifier_node = None
-
-        elif self._constant_node is not None:
+        if self._constant_node is not None:
             self.type = ExpressionNodeType.CONSTANT
             self.constant = self._constant_node.value
             self.remove_child(self._constant_node)
             self._constant_node = None
-
-        for child in self._children:
-            child.first_pass()
+        super().first_pass()
 
     def generate_llvm(self):
         ret = ""
