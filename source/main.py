@@ -15,7 +15,7 @@ import CListenerExtend as CListenerExtend
 
 def main(argv):
     # input_file = argv[0]
-    input_file = "C_files/simple_statements.c"
+    input_file = "../C_files/simple_statements.c"
     input_stream = FileStream(input_file)
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)

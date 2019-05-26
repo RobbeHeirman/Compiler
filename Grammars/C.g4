@@ -46,10 +46,6 @@ ptr_decl
     : ASTERIX
     ;
 
-ref_decl
-    : ADDRESS
-    ;
-
 id_decl:
     ID
     ;
@@ -75,7 +71,17 @@ param
     : base_type declarator
     ;
 assignment // a = 4;, int b = a;
-    : ID EQ rhs SEMICOLON
+    : lhs EQ rhs SEMICOLON
+    ;
+
+lhs // L value nodes
+    : lhs rhs_postfix
+    | rhs_prefix lhs
+    | id_lhs
+    ;
+
+id_lhs
+    : ID
     ;
 
 rhs // Possible R values

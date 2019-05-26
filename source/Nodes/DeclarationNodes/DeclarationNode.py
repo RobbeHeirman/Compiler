@@ -5,6 +5,7 @@ Academic Year: 2018-2019
 """
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
+from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
@@ -100,7 +101,7 @@ class DeclarationNode(ExpressionNode):
         if isinstance(child, DeclaratorNode):
             self._add_declarator(child)
 
-        elif isinstance(child, RHSNode):
+        elif isinstance(child, RHSNode) or isinstance(child, ArrayInitNode):
             self._add_rhs(child)
 
         elif isinstance(child, BaseTypeNode):
