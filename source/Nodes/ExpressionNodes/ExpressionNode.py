@@ -41,6 +41,7 @@ class ExpressionNode(NonLeafNode, ABC):
     def add_child(self, child: AbstractNode):
 
         if isinstance(child, IdNode):
+
             self._identifier_node = child
             self.type = ExpressionNodeType.IDENTIFIER
 
