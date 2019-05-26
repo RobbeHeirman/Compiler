@@ -5,18 +5,18 @@ Academic Year: 2018-2019
 """
 from antlr4 import ParserRuleContext
 
-from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 import messages as messages
 from Specifiers import TypeSpecifier
 from SymbolTable import Attributes
 
 
-class AssignmentNode(ExpressionNode):
+class AssignmentNode(NonLeafNode):
 
-    def __init__(self, parent_node, id_name: str, filename: str, ctx: ParserRuleContext):
+    def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
         super().__init__(parent_node)
 
-        self._id = id_name
+        self._id = None
         self._base_type = None
         if not self._parent_node.is_in_table(self._id):
             # attr = Attributes(TypeSpecifier.DEFAULT, filename, ctx.start.line, ctx.start.column)
@@ -29,7 +29,7 @@ class AssignmentNode(ExpressionNode):
 
     @property
     def label(self):
-        return 'Identifier: {0}\n='.format(self._id)
+        return '='
 
     @property
     def base_type(self):

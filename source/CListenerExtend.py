@@ -13,10 +13,11 @@ from Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.DeclarationNodes.DeclListNode import DeclListNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
-from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
 from Nodes.ExpressionNodes.FixNode import FixNode, FixType
+from Nodes.ExpressionNodes.LHSNode import LHSNode
 from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
 from Nodes.ExpressionNodes.IdNode import IdNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
@@ -35,7 +36,7 @@ class CListenerExtend(CListener):
     """
     _filename: str
     _ast: AST
-    _parent_node: ExpressionNode
+    _parent_node: NonLeafNode
 
     def __init__(self, filename: str):
         # Some info about the traversing will be recorded
@@ -182,7 +183,7 @@ class CListenerExtend(CListener):
         :return:
         """
         id_name = ctx.getChild(0).getText()
-        assignment_node = AssignmentNode(self._parent_node, id_name, self._filename, ctx)
+        assignment_node = AssignmentNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(assignment_node)
         self._parent_node = assignment_node
 
@@ -193,6 +194,15 @@ class CListenerExtend(CListener):
         :param ctx:
         :return:
         """
+        self._parent_node = self._parent_node.parent_node
+
+    def enterLhs(self, ctx:CParser.LhsContext):
+
+        node = LHSNode(self._parent_node)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitLhs(self, ctx:CParser.LhsContext):
         self._parent_node = self._parent_node.parent_node
 
     def enterRhs(self, ctx: CParser.RhsContext):

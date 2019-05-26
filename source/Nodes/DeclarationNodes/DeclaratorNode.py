@@ -3,19 +3,19 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.ExpressionNodes.IdNode import IdNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Specifiers import DeclaratorSpecifier
 
 
-class DeclaratorNode(ExpressionNode):
+class DeclaratorNode(NonLeafNode):
     """
     We use this node to handle prefix/postfix hierarchy.
     We can omit this in a future pass. This node has no actual info about the program.
     """
     _declarator_type: DeclaratorSpecifier
-    _specifier_node: ExpressionNode
+    _specifier_node: NonLeafNode
     _declarator_node: "DeclaratorNode"
     _id_node: IdNode
 

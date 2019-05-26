@@ -8,18 +8,18 @@ from typing import List
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
-from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Specifiers import TypeSpecifier
 
 
-class DeclListNode(ExpressionNode):
+class DeclListNode(NonLeafNode):
     """
     Start of a , separated list of declarations.
     this such nodes has ONE base type and a list of declarations
     """
     _declaration_nodes: List[DeclarationNode]
     _base_type: BaseTypeNode
-    _parent_node: ExpressionNode
+    _parent_node: NonLeafNode
 
     _BASE_LABEL = "decl_list"
 

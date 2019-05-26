@@ -3,10 +3,10 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 
 
-class ParamListNode(ExpressionNode):
+class ParamListNode(NonLeafNode):
     label = "Param list"
 
     def __init__(self, parent_node):

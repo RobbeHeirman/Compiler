@@ -6,7 +6,7 @@ Academic Year: 2018-2019
 from abc import ABC, abstractmethod
 from typing import List
 
-from Nodes.AbstractNodes import ExpressionNode
+from Nodes.AbstractNodes import NonLeafNode
 from SymbolTable import Attributes
 
 
@@ -16,7 +16,7 @@ class AbstractNode(ABC):
     Should be overridden by specific nodes of the AST.
     """
     _children: List["AbstractNode"]
-    _parent_node: ExpressionNode
+    _parent_node: NonLeafNode
     _index_counter = 0
 
     def __init__(self, parent: "AbstractNode" = None):

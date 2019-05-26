@@ -4,14 +4,14 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 
-from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Specifiers import TypeSpecifier
 
 
-class ReturnNode(ExpressionNode):
+class ReturnNode(NonLeafNode):
     label = "return"
 
-    def __init__(self, parent_node: ExpressionNode):
+    def __init__(self, parent_node: NonLeafNode):
         super().__init__(parent_node)
 
     @property

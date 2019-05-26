@@ -77,11 +77,7 @@ assignment // a = 4;, int b = a;
 lhs // L value nodes
     : lhs rhs_postfix
     | rhs_prefix lhs
-    | id_lhs
-    ;
-
-id_lhs
-    : ID
+    | id_rhs
     ;
 
 rhs // Possible R values

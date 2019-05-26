@@ -8,13 +8,13 @@ from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
-from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Specifiers import TypeSpecifier
 from SymbolTable import Attributes
 from typing import Union
 
 
-class DeclarationNode(ExpressionNode):
+class DeclarationNode(NonLeafNode):
     """
     Represents a Declaration in our abstract syntax tree.
     Will deduct the base type of the declaration in the first pass.
@@ -26,7 +26,7 @@ class DeclarationNode(ExpressionNode):
 
     _BASE_LABEL = "Declaration"
 
-    def __init__(self, parent_node: ExpressionNode):
+    def __init__(self, parent_node: NonLeafNode):
         super().__init__(parent_node)
 
         # The 2 child nodes

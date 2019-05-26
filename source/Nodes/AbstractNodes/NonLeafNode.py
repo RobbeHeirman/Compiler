@@ -10,7 +10,7 @@ import Nodes.AbstractNodes.AbstractNode as AbstractNode
 from Specifiers import TypeSpecifier
 
 
-class ExpressionNode(AbstractNode.AbstractNode, ABC):
+class NonLeafNode(AbstractNode.AbstractNode, ABC):
     """
     Abstract node for all intermediate "expression" nodes. Complements leaf node
     """

@@ -4,11 +4,11 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from abc import ABC
-import Nodes.AbstractNodes.ExpressionNode as ExpressionNode
+import Nodes.AbstractNodes.NonLeafNode as ExpressionNode
 from SymbolTable import SymbolTable, Attributes
 
 
-class ScopedNode(ExpressionNode.ExpressionNode, ABC):
+class ScopedNode(ExpressionNode.NonLeafNode, ABC):
     """
     This node is an abstract node that presents all nodes with their own scope.
     This means this node has it's own SymbolTable

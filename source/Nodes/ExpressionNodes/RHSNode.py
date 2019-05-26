@@ -3,31 +3,21 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from enum import Enum, auto
 
-from Nodes.AbstractNodes.ExpressionNode import ExpressionNode
+from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
+from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode, ExpressionNodeType
 from Nodes.ExpressionNodes.FixNode import FixNode, FixType
 from Nodes.ExpressionNodes.IdNode import IdNode
 from Specifiers import Operator, TypeSpecifier
 
 
-class RHSNodeType(Enum):
-    BINARY_OPERATOR = auto()
-    CONSTANT = "Constant: "
-    IDENTIFIER = "Identifier: "
-    PTR = "*"
-    ADDR = "&"
-    ARRAY = "[]"
-    FUNCTION = "()"
-
-
 class RHSNode(ExpressionNode):
-    type: RHSNodeType
+    type: ExpressionNodeType
     operator: Operator
-    _parent_node: ExpressionNode
+    _parent_node: NonLeafNode
 
-    def __init__(self, parent_node: ExpressionNode, **kwargs):
+    def __init__(self, parent_node: NonLeafNode, **kwargs):
 
         super().__init__(parent_node)
 
@@ -54,9 +44,9 @@ class RHSNode(ExpressionNode):
             if self.type is not None:
                 ret += "\n{0}".format(self.type.value)
 
-                if self.type is RHSNodeType.IDENTIFIER:
+                if self.type is ExpressionNodeType.IDENTIFIER:
                     ret += "{0}".format(self.identifier)
-                elif self.type is RHSNodeType.CONSTANT:
+                elif self.type is ExpressionNodeType.CONSTANT:
                     ret += "{0}".format(self.constant)
         return ret
 
@@ -64,11 +54,11 @@ class RHSNode(ExpressionNode):
 
         if isinstance(child, IdNode):
             self._identifier_node = child
-            self.type = RHSNodeType.IDENTIFIER
+            self.type = ExpressionNodeType.IDENTIFIER
 
         elif isinstance(child, ConstantNode):
             self._constant_node = child
-            self.type = RHSNodeType.CONSTANT
+            self.type = ExpressionNodeType.CONSTANT
 
         elif isinstance(child, FixNode):
             self._member_operator_node = child
@@ -79,17 +69,17 @@ class RHSNode(ExpressionNode):
 
         if self._member_operator_node is not None:
             if self._member_operator_node.f_type == FixType.PTR:
-                self.type = RHSNodeType.PTR
+                self.type = ExpressionNodeType.PTR
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
             elif self._member_operator_node.f_type == FixType.ADDRESS:
-                self.type = RHSNodeType.ADDR
+                self.type = ExpressionNodeType.ADDR
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
             elif self._member_operator_node.f_type == FixType.ARRAY:
-                self.type = RHSNodeType.ARRAY
+                self.type = ExpressionNodeType.ARRAY
 
                 self._member_operator_node.rhs_node.parent = self
                 self.add_child(self._member_operator_node.rhs_node)
@@ -97,20 +87,20 @@ class RHSNode(ExpressionNode):
                 self._member_operator_node = None
 
             elif self._member_operator_node.f_type == FixType.FUNCTION:
-                self.type = RHSNodeType.FUNCTION
+                self.type = ExpressionNodeType.FUNCTION
                 self._member_operator_node.rhs_node.parent = self
                 self.add_child(self._member_operator_node.rhs_node)
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
         elif self._identifier_node is not None:
-            self.type = RHSNodeType.IDENTIFIER
+            self.type = ExpressionNodeType.IDENTIFIER
             self.identifier = self._identifier_node.value
             self.remove_child(self._identifier_node)
             self._identifier_node = None
 
         elif self._constant_node is not None:
-            self.type = RHSNodeType.CONSTANT
+            self.type = ExpressionNodeType.CONSTANT
             self.constant = self._constant_node.value
             self.remove_child(self._constant_node)
             self._constant_node = None
