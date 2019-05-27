@@ -28,6 +28,23 @@ class ExpressionNode(NonLeafNode, ABC):
         self.type = None
         self.identifier = None
 
+        # Book keeping info
+        self.filename = None
+        self.line = None
+        self.column = None
+
+    def get_error_info(self):
+        """
+        :return: A tuple filename, line, column
+        """
+        if self.filename is None:
+            for child in self._children:
+                val = child.get_error_info()
+                if val is not None:
+                    return val
+        else:
+            return self.filename, self.line, self.column
+
     @property
     def label(self):
         ret = self._BASE_LABEL
@@ -82,6 +99,11 @@ class ExpressionNode(NonLeafNode, ABC):
         if self._identifier_node is not None:
             self.type = ExpressionNodeType.IDENTIFIER
             self.identifier = self._identifier_node.value
+
+            self.filename = self._identifier_node.filename
+            self.line = self._identifier_node.line
+            self.column = self._identifier_node.columnt
+
             self.remove_child(self._identifier_node)
             self._identifier_node = None
 

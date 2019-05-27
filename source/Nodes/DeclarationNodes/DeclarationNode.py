@@ -3,6 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import messages
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
@@ -22,6 +23,7 @@ class DeclarationNode(NonLeafNode):
     An optional initializer as 2d child.
     """
     _declarator_node: DeclaratorNode
+    _rhs_node: RHSNode
     _lexeme: str
 
     _BASE_LABEL = "Declaration"
@@ -34,8 +36,14 @@ class DeclarationNode(NonLeafNode):
         self._rhs_node = None
         self._base_type_node = None
 
+        # Base info
         self._id = None  # Id can be deducted from children.
         self._base_type = None  # Base type gets passed from a decl_list node.
+
+        # Error message info
+        self._filename = None
+        self._line = None
+        self._column = None
 
     @property
     def label(self):
@@ -128,7 +136,11 @@ class DeclarationNode(NonLeafNode):
         to handle typeSpecifier hierarchy
         """
         if self._declarator_node is not None:
-            self._id = self._declarator_node.find_id()
+            node = self._declarator_node.find_id()
+            self._id = node.value
+            self._filename = node.filename
+            self._line = node.line
+            self._column = node.column
 
         if self._declarator_node is not None:
             self._declarator_node.first_pass()
@@ -147,29 +159,37 @@ class DeclarationNode(NonLeafNode):
         :return: true if successfully added identifier and children are semantically correct.
         """
 
+        ret = True
+
         # First we need to pack the identifier's attributes. We have the base type and id trough reference of
         # the remaining decelerators we can deduce the type stack.
         type_stack = self._declarator_node.generate_type_operator_stack()
 
+        # We have all the info for the corresponding attribute object
+        attr = Attributes(self._base_type, type_stack, self._filename, self._line, self._column)
+
         # Now we need to check if there are no violations on the operators.
         # 1) Explicit list init if array has no init size if type is array .
         if type_stack[-1] is DeclaratorSpecifier.ARRAY:  # Last element is top of the stack.
-            if self._declarator_node.array_has_length():
-                print("yay!")
 
-    """def declare_variable(self, base_type: TypeSpecifier):
+            if not self._declarator_node.array_has_length():  # If array size is not specified MUST have array init rhs.
+                if self._rhs_node is None:
+                    messages.error_array_size_missing(self._id, attr)
+                    ret = False
 
-        self._base_type = base_type
-        node = self._children[0]
-        filename = node.filename
-        line = node.line
-        column = node.column
-        type_spec = self._base_type
-        lexeme = node.value
-        attribute = Attributes(type_spec, filename, line, column)
-
-        if not self.add_to_scope_symbol_table(lexeme, attribute):
-            self._fail_switch(True)"""  # TODO: is deprecated?
+            if self._rhs_node is not None:  # The rhs of an array is an init list {0,1 ,2 3, 4}
+                if not isinstance(self._rhs_node, ArrayInitNode):
+                    tpl = self._rhs_node.get_error_info()
+                    t_file = attr.filename
+                    attr.filename = tpl[0]
+                    t_line = attr.line
+                    attr.line = tpl[1]
+                    t_column = attr.column
+                    attr.column = tpl[2]
+                    messages.error_invalid_initializer(self._id, attr)
+                    attr.filename = t_file
+                    attr.line = t_line
+                    attr.column = t_column
 
     """def generate_llvm(self) -> str:
 

@@ -17,7 +17,7 @@ class BColors:
     UNDERLINE = '\033[4m'
 
 
-def file_info(attribute: "source.SymbolTable.Attributes"):
+def file_info(attribute: "SymbolTable.Attributes"):
     """Starter prints all info of where something should be told about"""
 
     filename = attribute.filename
@@ -27,7 +27,7 @@ def file_info(attribute: "source.SymbolTable.Attributes"):
     return "{0}:{1}:{2}: ".format(filename, line, column)
 
 
-def error(attribute: "source.SymbolTable.Attributes"):
+def error(attribute: "SymbolTable.Attributes"):
     """Defines of type error"""
     return "{0}error: ".format(file_info(attribute))
 
@@ -40,12 +40,20 @@ def error_undeclared_var(lexeme, attribute):
     print(BColors.FAIL + "{0}{1} undeclared".format(error(attribute), lexeme) + BColors.ENDC)
 
 
-def redeclared_diff_symbol(lexeme, attribute):
+def error_redeclared_diff_symbol(lexeme, attribute):
     print(BColors.FAIL + "{0} '{1}' redeclared as different kind of symbol".format(error(attribute), lexeme)
           + BColors.ENDC)
 
 
-def note(attribute: "source.SymbolTable.Attributes"):
+def error_array_size_missing(lexeme, attribute):
+    print(BColors.FAIL + "{0}array size missing in '{1}' ".format(error(attribute), lexeme) + BColors.ENDC)
+
+
+def error_invalid_initializer(lexeme, attribute):
+    print(BColors.FAIL + "{0}invalid initializer".format(error(attribute), lexeme) + BColors.ENDC)
+
+
+def note(attribute: "SymbolTable.Attributes"):
     return "{0}note: ".format(file_info(attribute))
 
 

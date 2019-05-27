@@ -20,6 +20,7 @@ class DeclaratorNode(NonLeafNode):
     _declarator_node: "DeclaratorNode"
     _id_node: IdNode
 
+
     _BASE_LABEL = "Declarator"
 
     def __init__(self, parent_node):
@@ -87,7 +88,7 @@ class DeclaratorNode(NonLeafNode):
             self._declarator_node = None
         super().remove_child(child)
 
-    def find_id(self):
+    def find_id(self) -> IdNode:
         """
         We will search the identifier in the declarator tree. The declaration node wants this info for the symbol
         table.
@@ -96,7 +97,7 @@ class DeclaratorNode(NonLeafNode):
         # this node contained the identifier, so it can just return it
         if self._id_node is not None:
             self._parent_node.remove_child(self)
-            return self._id_node.value
+            return self._id_node
 
         elif self._declarator_node is not None:
             return self._declarator_node.find_id()

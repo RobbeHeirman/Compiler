@@ -46,20 +46,28 @@ class RHSNode(ExpressionNode):
                     ret += "{0}".format(self.constant)
         return ret
 
-
     def add_child(self, child):
 
         if isinstance(child, ConstantNode):
             self._constant_node = child
             self.type = ExpressionNodeType.CONSTANT
+            self.filename = child.filename
+            self.line = child.line
+            self.column = child.column
 
         super().add_child(child)
 
     def first_pass(self):
 
         if self._constant_node is not None:
+
             self.type = ExpressionNodeType.CONSTANT
             self.constant = self._constant_node.value
+
+            self._filename = self._constant_node.filename
+            self._line = self._constant_node.line
+            self._column = self._constant_node.column
+
             self.remove_child(self._constant_node)
             self._constant_node = None
         super().first_pass()

@@ -44,13 +44,25 @@ class Attributes:
     def filename(self)->str:
         return self._filename
 
+    @filename.setter
+    def filename(self, attr):
+        self._filename = attr
+
     @property
     def line(self)->int:
         return self._line
 
+    @line.setter
+    def line(self, val):
+        self._line = val
+
     @property
     def column(self)->int:
         return self._column
+
+    @column.setter
+    def column(self, val):
+        self._column = val
 
     @property
     def decl_type(self):

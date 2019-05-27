@@ -10,7 +10,7 @@ from Nodes.AbstractNodes.ScopedNode import ScopedNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Specifiers import TypeSpecifier
 from SymbolTable import Attributes
-from messages import redeclared_diff_symbol, note_prev_decl
+from messages import error_redeclared_diff_symbol, note_prev_decl
 
 
 class FuncDefNode(ScopedNode):
