@@ -53,6 +53,11 @@ def error_invalid_initializer(lexeme, attribute):
     print(BColors.FAIL + "{0}invalid initializer".format(error(attribute), lexeme) + BColors.ENDC)
 
 
+def error_func_initialized_like_var(lexeme, attribute):
+    print(BColors.FAIL + "{0}function '{1}' is initialized like a variable".format(error(attribute), lexeme)
+          + BColors.ENDC)
+
+
 def note(attribute: "SymbolTable.Attributes"):
     return "{0}note: ".format(file_info(attribute))
 

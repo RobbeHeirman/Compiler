@@ -137,10 +137,11 @@ class DeclarationNode(NonLeafNode):
         """
         if self._declarator_node is not None:
             node = self._declarator_node.find_id()
-            self._id = node.value
-            self._filename = node.filename
-            self._line = node.line
-            self._column = node.column
+            if node is not None:
+                self._id = node.value
+                self._filename = node.filename
+                self._line = node.line
+                self._column = node.column
 
         if self._declarator_node is not None:
             self._declarator_node.first_pass()
@@ -163,14 +164,16 @@ class DeclarationNode(NonLeafNode):
 
         # First we need to pack the identifier's attributes. We have the base type and id trough reference of
         # the remaining decelerators we can deduce the type stack.
-        type_stack = self._declarator_node.generate_type_operator_stack()
+        type_stack = []
+        if self._declarator_node is not None:
+            type_stack = self._declarator_node.generate_type_operator_stack()
 
         # We have all the info for the corresponding attribute object
         attr = Attributes(self._base_type, type_stack, self._filename, self._line, self._column)
 
         # Now we need to check if there are no violations on the operators.
         # 1) Explicit list init if array has no init size if type is array .
-        if type_stack[-1] is DeclaratorSpecifier.ARRAY:  # Last element is top of the stack.
+        if len(type_stack) > 0 and type_stack[-1] is DeclaratorSpecifier.ARRAY:  # Last element is top of the stack.
 
             if not self._declarator_node.array_has_length():  # If array size is not specified MUST have array init rhs.
                 if self._rhs_node is None:
@@ -192,11 +195,16 @@ class DeclarationNode(NonLeafNode):
                     attr.column = t_column
                     ret = False
 
-        # Functions are allowed to be declared but definitions are not handles by this node
-        elif type_stack[-1] is DeclaratorSpecifier.FUNC:
+        # Functions are allowed to be declared but definitions are not handled by this node
+        elif len(type_stack) > 0 and type_stack[-1] is DeclaratorSpecifier.FUNC:
             if self._rhs_node is not None:
-                print("boo")
+                messages.error_func_initialized_like_var(self._id, attr)
+                ret = False
 
+        # Add to the scopes symbol_table.
+
+        if not self.add_to_scope_symbol_table(self._id, attr):
+            ret = False
         return ret
 
     """def generate_llvm(self) -> str:
@@ -216,7 +224,3 @@ class DeclarationNode(NonLeafNode):
                                                        self._base_type.llvm_type,
                                                        lexeme)
         return ret"""
-
-    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes):
-        attribute.type_spec = self._base_type
-        super().add_to_scope_symbol_table(lexeme, attribute)

@@ -97,7 +97,7 @@ class AbstractNode(ABC):
         AST cleanup.
         :return:
         """
-        for child in self._children:
+        for child in reversed(self._children):
             child.first_pass()
 
     def semantic_analysis(self) -> bool:
