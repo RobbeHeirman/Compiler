@@ -112,6 +112,16 @@ class DeclarationNode(NonLeafNode):
             print("something went wrong")
         super().add_child(child)
 
+    def remove_child(self, child):
+
+        if isinstance(child, DeclaratorNode):
+            self._declarator_node = None
+
+        if isinstance(child, BaseTypeNode):
+            self._base_type_node = None
+
+        super().remove_child(child)
+
     def first_pass(self):
         """
         Mainly used for node cleanup. We can remove all the "Declarator stub nodes. They were mainly there
@@ -130,15 +140,17 @@ class DeclarationNode(NonLeafNode):
             self._base_type = self._base_type_node.value
             self.remove_child(self._base_type_node)
 
-    def remove_child(self, child):
+    def semantic_analysis(self) -> bool:
+        """
+        On a declaration, a new identifier is introduced into the scope. This has to be an unique identifier
+        on this scope lvl. But it can overshadow higher scoped (global...) declared variables with the same identifier.
+        :return: true if successfully added identifier and children are semantically correct.
+        """
 
-        if isinstance(child, DeclaratorNode):
-            self._declarator_node = None
-
-        if isinstance(child, BaseTypeNode):
-            self._base_type_node = None
-
-        super().remove_child(child)
+        # First we need to pack the identifier's attributes. We have the base type and id trough reference of
+        # the remaining decelerators we can deduce the type stack.
+        type_stack = self._declarator_node.generate_type_operator_stack()
+        print(type_stack)
 
     """def declare_variable(self, base_type: TypeSpecifier):
 
@@ -171,9 +183,6 @@ class DeclarationNode(NonLeafNode):
                                                        self._base_type.llvm_type,
                                                        lexeme)
         return ret"""
-
-    def handle_semantics(self):
-        pass
 
     def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes):
         attribute.type_spec = self._base_type

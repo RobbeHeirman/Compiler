@@ -3,6 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.ExpressionNodes.IdNode import IdNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
@@ -109,6 +110,22 @@ class DeclaratorNode(NonLeafNode):
 
         for child in self._children:
             child.first_pass()
+
+    def generate_type_operator_stack(self, type_stack=None):
+        """
+        This function generates the operators stack.
+        :param type_stack: A stack of DeclaratorSpecifiers that represents the member operator stack.
+        :return: the type_stack
+        """
+        if type_stack is None:
+            type_stack = []
+
+        if self._declarator_type is not None:
+            type_stack.append(self._declarator_type)
+
+        if self._declarator_node is not None:
+            self._declarator_node.generate_type_operator_stack(type_stack)
+        return type_stack
 
     def llvm_code_value(self):
         pass

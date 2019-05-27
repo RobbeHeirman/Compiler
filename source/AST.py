@@ -58,3 +58,12 @@ class AST:
         :return:
         """
         self._root.first_pass()
+
+    def semantic_analysis(self) -> bool:
+        """
+        Does the semantic analysis of our program.
+        Will fill in & check the symbol table(s) (Scoped)
+        :return: True if the program is semantically correct.
+        """
+
+        return self._root.semantic_analysis()  # let's do this!

@@ -3,7 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from enum import Enum, auto
+from enum import Enum
 
 
 class TypeSpecifier(Enum):
@@ -64,11 +64,6 @@ class ConditionalOperator(Enum):
     BIGGER = '>'
     SMALLER = '<'
     EQUALS = '=='
-
-
-class DeclType(Enum):
-    SIMPLE = auto()
-    FUNCTION = auto()
 
 
 class ConditionType(Enum):

@@ -5,38 +5,40 @@
  Academic Year: 2018-2019
 """
 
-from typing import Dict
+from typing import Dict, List
 
 import Specifiers as TypeSpecifier
 import messages as messages
-from Specifiers import DeclType
 
 
 class Attributes:
     """
     Container class used by SymbolTable to keep track of token Attributes
     """
-    _decl_type: DeclType
+
+    _base_type: TypeSpecifier.TypeSpecifier
+    _type_stack: List[TypeSpecifier.DeclaratorSpecifier]
+
     _column: int
     _line: int
     _filename: str
-    _type_spec: TypeSpecifier.TypeSpecifier
 
-    def __init__(self, type_spec: TypeSpecifier.TypeSpecifier, filename: str, line: int, column: int,
-                 decl_type: TypeSpecifier.DeclType):
+    def __init__(self, base_type: TypeSpecifier.TypeSpecifier, type_stack: List[TypeSpecifier.DeclaratorSpecifier],
+                 filename: str, line: int, column: int, ):
         """
         Initializer
-        :param type_spec: The type_specifier attribute for this token.
+        :param base_type: The type_specifier attribute for this token.
+        :param type_stack: The operators applied on the declaration (*, [], ())
         :param filename: name of the file lexeme is found
         :param line: the line where de lexeme is found.
         :param column: the column where the lexeme is found.
         """
 
-        self._type_spec = type_spec
+        self._base_type = base_type
+        self._Operator_stack = type_stack  # Stacks all the declared operators operators
         self._filename = filename
         self._line = line
         self._column = column
-        self._decl_type = decl_type
 
     @property
     def filename(self)->str:
@@ -51,16 +53,8 @@ class Attributes:
         return self._column
 
     @property
-    def type_spec(self):
-        return self._type_spec
-
-    @type_spec.setter
-    def type_spec(self, value):
-        self._type_spec = value
-
-    @property
     def decl_type(self):
-        return self._decl_type
+        return self._base_type
 
 
 class SymbolTable:
@@ -107,6 +101,6 @@ class SymbolTable:
 
 class GlobalSymbolTable(SymbolTable):
     """
-    Extention for global variable support
+    Extension for global variable support
     """
     pass  # TODO: need to do something with this.

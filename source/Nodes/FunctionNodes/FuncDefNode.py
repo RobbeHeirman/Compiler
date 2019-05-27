@@ -8,7 +8,7 @@ from antlr4.tree.Tree import TerminalNodeImpl
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.AbstractNodes.ScopedNode import ScopedNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
-from Specifiers import DeclType, TypeSpecifier
+from Specifiers import TypeSpecifier
 from SymbolTable import Attributes
 from messages import redeclared_diff_symbol, note_prev_decl
 
@@ -24,14 +24,14 @@ class FuncDefNode(ScopedNode):
         self._ptr_count = ptr_count
         self._base_type = None
         self._base_type_node = None
-        attr = Attributes(TypeSpecifier.DEFAULT, filename, ctx.getSymbol().line, ctx.getSymbol().column,
+        """attr = Attributes(TypeSpecifier.DEFAULT, filename, ctx.getSymbol().line, ctx.getSymbol().column,
                           DeclType.FUNCTION)
         if self._parent_node.is_in_table(self._id):  # Declared in global scope?
             attr2 = self._parent_node.get_attribute(self._id)
             if attr2.decl_type != DeclType.FUNCTION:  # Should be a forward declaration
                 self._fail_switch(True)
                 redeclared_diff_symbol(self._id, attr)
-                note_prev_decl(self._id, attr2)
+                note_prev_decl(self._id, attr2)"""
 
     @property
     def label(self):

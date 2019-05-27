@@ -15,7 +15,7 @@ import CListenerExtend as CListenerExtend
 
 def main(argv):
     # input_file = argv[0]
-    input_file = "../C_files/simple_statements.c"
+    input_file = "C_files/simple_statements.c"
     input_stream = FileStream(input_file)
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
@@ -49,6 +49,9 @@ def main(argv):
     dot_name = dot_file[0: -4]
     dot_name += ".png"
     subprocess.call(["dot", "-Tpng", dot_file, "-o", dot_name])
+
+    ast.semantic_analysis()
+
     return 0
 
 

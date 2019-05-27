@@ -93,9 +93,23 @@ class AbstractNode(ABC):
         return self._parent_node.get_attribute(lexeme)
 
     def first_pass(self):
+        """
+        AST cleanup.
+        :return:
+        """
         for child in self._children:
             child.first_pass()
 
-    def semantic_analysis(self):
+    def semantic_analysis(self) -> bool:
+        """
+        Not all nodes check for semantic correctness. Those who do not just forward the check to their children.
+        this function NEEDS to be overwritten by nodes who do check on semantics.
+        :return: true if the program if all children evaluate that the the (sub) program is semantically correct.
+        """
+
+        ret_val = True
         for child in self._children:
-            child.semantic_analysis()
+            if not child.semantic_analysis():
+                ret_val = False
+
+        return ret_val
