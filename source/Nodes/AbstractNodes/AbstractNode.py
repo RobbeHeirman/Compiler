@@ -95,3 +95,7 @@ class AbstractNode(ABC):
     def first_pass(self):
         for child in self._children:
             child.first_pass()
+
+    def semantic_analysis(self):
+        for child in self._children:
+            child.semantic_analysis()
