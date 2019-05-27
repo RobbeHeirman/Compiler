@@ -6,6 +6,7 @@ Academic Year: 2018-2019
 
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.ExpressionNodes.IdNode import IdNode
+from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Specifiers import DeclaratorSpecifier
 
@@ -77,6 +78,9 @@ class DeclaratorNode(NonLeafNode):
                 self._add_id_node(child)
 
             self._rhs_node = child
+
+        elif isinstance(child, ParamListNode):
+            pass
 
         else:
             self._OVERLOAD_MAP.get(type(child))(self, child)

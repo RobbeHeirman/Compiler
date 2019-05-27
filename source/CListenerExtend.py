@@ -160,6 +160,9 @@ class CListenerExtend(CListener):
 
         self._parent_node.declarator_type = DeclaratorSpecifier.PTR
 
+    def enterFunction_operator(self, ctx: CParser.Function_operatorContext):
+        self._parent_node.declarator_type = DeclaratorSpecifier.FUNC
+
     def enterArray_operator(self, ctx: CParser.Array_operatorContext):
 
         self._parent_node.declarator_type = DeclaratorSpecifier.ARRAY

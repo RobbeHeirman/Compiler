@@ -190,6 +190,14 @@ class DeclarationNode(NonLeafNode):
                     attr.filename = t_file
                     attr.line = t_line
                     attr.column = t_column
+                    ret = False
+
+        # Functions are allowed to be declared but definitions are not handles by this node
+        elif type_stack[-1] is DeclaratorSpecifier.FUNC:
+            if self._rhs_node is not None:
+                print("boo")
+
+        return ret
 
     """def generate_llvm(self) -> str:
 
