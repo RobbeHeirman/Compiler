@@ -9,7 +9,7 @@ from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
-from Specifiers import TypeSpecifier
+from Specifiers import TypeSpecifier, DeclaratorSpecifier
 from SymbolTable import Attributes
 from typing import Union
 
@@ -150,7 +150,12 @@ class DeclarationNode(NonLeafNode):
         # First we need to pack the identifier's attributes. We have the base type and id trough reference of
         # the remaining decelerators we can deduce the type stack.
         type_stack = self._declarator_node.generate_type_operator_stack()
-        print(type_stack)
+
+        # Now we need to check if there are no violations on the operators.
+        # 1) Explicit list init if array has no init size if type is array .
+        if type_stack[-1] is DeclaratorSpecifier.ARRAY:  # Last element is top of the stack.
+            if self._declarator_node.array_has_length():
+                print("yay!")
 
     """def declare_variable(self, base_type: TypeSpecifier):
 

@@ -82,18 +82,20 @@ class DeclaratorNode(NonLeafNode):
 
         super().add_child(child)
 
+    def remove_child(self, child):
+        if isinstance(child, DeclaratorNode):
+            self._declarator_node = None
+        super().remove_child(child)
+
     def find_id(self):
         """
         We will search the identifier in the declarator tree. The declaration node wants this info for the symbol
         table.
         :return: the identifier
         """
-
         # this node contained the identifier, so it can just return it
         if self._id_node is not None:
-
-            if self in self.parent_node._children:
-                self._parent_node.remove_child(self)
+            self._parent_node.remove_child(self)
             return self._id_node.value
 
         elif self._declarator_node is not None:
@@ -126,6 +128,15 @@ class DeclaratorNode(NonLeafNode):
         if self._declarator_node is not None:
             self._declarator_node.generate_type_operator_stack(type_stack)
         return type_stack
+
+    def array_has_length(self) -> bool:
+        if self._declarator_node is not None:
+            return self._declarator_node.array_has_length()
+        else:  # This is the last of the nodes.
+            if self._rhs_node is None:
+                return False
+            else:
+                return True
 
     def llvm_code_value(self):
         pass

@@ -20,9 +20,12 @@ def main(argv):
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = CParser(stream)
+    if parser.getNumberOfSyntaxErrors() is not 0:
+        return 1
     tree = parser.statements()
     listener = CListenerExtend.CListenerExtend(input_file)
     walker = ParseTreeWalker()
+
     walker.walk(listener, tree)
 
     ast = listener.ast
@@ -56,4 +59,4 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    sys.exit(main(sys.argv))
