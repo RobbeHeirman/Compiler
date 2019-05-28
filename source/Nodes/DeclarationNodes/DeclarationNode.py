@@ -64,6 +64,10 @@ class DeclarationNode(NonLeafNode):
     def base_type(self):
         return self._base_type
 
+    def to_attribute(self):
+        return Attributes(self.base_type, self._declarator_node.generate_type_operator_stack(),
+                          self._filename, self._line, self._column)
+
     @base_type.setter
     def base_type(self, value: TypeSpecifier):
         self._base_type = value
@@ -200,7 +204,7 @@ class DeclarationNode(NonLeafNode):
             if self._rhs_node is not None:
                 messages.error_func_initialized_like_var(self._id, attr)
                 ret = False
-
+            attr.function_signature = self._declarator_node.get_function_signature()
         # Add to the scopes symbol_table.
 
         if not self.add_to_scope_symbol_table(self._id, attr):

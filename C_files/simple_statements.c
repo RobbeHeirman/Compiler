@@ -1,7 +1,2 @@
-int a(){
-
-}
-
-
-int k;
-int i = *k[11][44];
+int a(int* i);
+int i;

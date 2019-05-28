@@ -184,15 +184,48 @@ class ExpressionNode(NonLeafNode, ABC):
         else:
             return self._parent_node.find_type_stack(stack)
 
-    def _stack_analysis(self, own_stack, attr_stack):
+    def _stack_analysis(self, own_stack, attr_stack) -> bool:
         """"
         Recursively calling this until all own stack symbols are matched.
+        :return: True if successful without semantic errors
         """
 
         own_stack.reverse()  # More clearer operation on the stack
-        print(own_stack)
         if len(own_stack) is 0:
-            return
+            return True
 
-        if own_stack[-1] is DeclaratorSpecifier.ARRAY:
-            print("hier")
+        attr = Attributes(self.base_type, own_stack, self.filename, self.line, self.column)
+
+        if own_stack[-1] is DeclaratorSpecifier.ADDRESS:  # Need to check if applied on Lvalue
+            own_stack.pop(-1)
+
+            if not own_stack or own_stack[-1] is DeclaratorSpecifier.PTR:
+                pass
+
+            else:
+                messages.error_lvalue_required_addr(attr)
+                return False
+
+        if not own_stack:
+            return True
+
+        if own_stack[-1] is DeclaratorSpecifier.PTR:
+            if len(attr_stack) > 0 and attr_stack[-1] is DeclaratorSpecifier.PTR:
+                pass
+            else:
+                messages.error_unary_not_ptr(attr)
+                return False
+
+        elif own_stack[-1] is DeclaratorSpecifier.ARRAY:
+            if len(attr_stack) > 0 and attr_stack[-1] is DeclaratorSpecifier.ARRAY:
+                pass
+            else:
+
+                messages.error_subscript_not_array(attr)
+                return False
+        if len(own_stack) > 0:
+            own_stack.pop(-1)
+        if len(attr_stack) > 0:
+            attr_stack.pop(-1)
+
+        return self._stack_analysis(own_stack, attr_stack)

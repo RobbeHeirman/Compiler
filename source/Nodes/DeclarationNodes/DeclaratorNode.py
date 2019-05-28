@@ -16,6 +16,7 @@ class DeclaratorNode(NonLeafNode):
     We use this node to handle prefix/postfix hierarchy.
     We can omit this in a future pass. This node has no actual info about the program.
     """
+    _param_list_node: ParamListNode
     _declarator_type: DeclaratorSpecifier
     _specifier_node: NonLeafNode
     _declarator_node: "DeclaratorNode"
@@ -30,13 +31,11 @@ class DeclaratorNode(NonLeafNode):
         """
         super().__init__(parent_node)
         # self._extra_label = ''
-        """attribute = Attributes(TypeSpecifier.DEFAULT, filename, self._line, self._column,
-                               self.find_decl_type(ctx.getText()))
-        self._parent_node.add_to_scope_symbol_table(self.value, attribute)"""
 
         self._declarator_node = None
         self._id_node = None
         self._rhs_node = None
+        self._param_list_node = None
 
         self._declarator_type = None
 
@@ -79,7 +78,7 @@ class DeclaratorNode(NonLeafNode):
             self._rhs_node = child
 
         elif isinstance(child, ParamListNode):
-            pass
+            self._param_list_node = child
 
         else:
             self._OVERLOAD_MAP.get(type(child))(self, child)
@@ -141,6 +140,9 @@ class DeclaratorNode(NonLeafNode):
                 return False
             else:
                 return True
+
+    def get_function_signature(self):
+        return self._param_list_node.get_function_signature()
 
     def llvm_code_value(self):
         pass

@@ -39,6 +39,7 @@ class Attributes:
         self._filename = filename
         self._line = line
         self._column = column
+        self.function_signature = []
 
     @property
     def filename(self)->str:
@@ -91,15 +92,17 @@ class SymbolTable:
 
         if lexeme in self._container.keys():
             attr = self._container[lexeme]
-            if attr.operator_stack[-1] is not TypeSpecifier.DeclaratorSpecifier.FUNC \
-                    or attribute.operator_stack[-1] is not TypeSpecifier.DeclaratorSpecifier.FUNC:
-                messages.error_redeclaration(lexeme, attribute)
-                attribute_prev = self._container[lexeme]
-                messages.note_prev_decl(lexeme, attribute_prev)
-                return False
+            if attr.operator_stack and attribute.operator_stack:
+                if attribute.operator_stack[-1] is TypeSpecifier.DeclaratorSpecifier.FUNC:
+                    if attr.operator_stack[-1] is TypeSpecifier.DeclaratorSpecifier.FUNC:
+                        return True
 
-            else:
-                return True
+            messages.error_redeclaration(lexeme, attribute)
+            attribute_prev = self._container[lexeme]
+            messages.note_prev_decl(lexeme, attribute_prev)
+            return False
+
+
 
         self._container[lexeme] = attribute
         return True

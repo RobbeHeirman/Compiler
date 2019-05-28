@@ -58,6 +58,21 @@ def error_func_initialized_like_var(lexeme, attribute):
           + BColors.ENDC)
 
 
+def error_subscript_not_array(attribute):
+    print(BColors.FAIL + "{0}subscripted value isn't an array".format(error(attribute))
+          + BColors.ENDC)
+
+
+def error_unary_not_ptr(attribute):
+    print(BColors.FAIL + "{0}Invalid type argument of unary '*'".format(error(attribute))
+          + BColors.ENDC)
+
+
+def error_lvalue_required_addr(attribute):
+    print(BColors.FAIL + "{0}lvalue required as unary'&' operand".format(error(attribute))
+          + BColors.ENDC)
+
+
 def note(attribute: "SymbolTable.Attributes"):
     return "{0}note: ".format(file_info(attribute))
 
