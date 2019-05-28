@@ -99,15 +99,11 @@ class DeclaratorNode(NonLeafNode):
         """
         # this node contained the identifier, so it can just return it
         if self._id_node is not None:
-            print(self._parent_node)
             self._parent_node.remove_child(self)
             return self._id_node
 
         elif self._declarator_node is not None:
             return self._declarator_node.find_id()
-
-        else:
-            print(self._declarator_type)
 
     def first_pass(self):
         """

@@ -97,6 +97,9 @@ class AbstractNode(ABC):
         AST cleanup.
         :return:
         """
+
+        # Some children remove themselves from parent list. This causes the iterator to skip elements. So we reverse
+        # it.
         for child in reversed(self._children):
             child.first_pass()
 

@@ -28,6 +28,7 @@ class NonLeafNode(AbstractNode.AbstractNode, ABC):
     def add_child(self, child: "AbstractNode"):
         """
         Add a child node to the AST.
+        :param reverse: Needed for first pass
         :param child: a ASTNode that functions as a child
         """
 

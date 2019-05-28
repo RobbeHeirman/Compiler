@@ -205,6 +205,10 @@ class DeclarationNode(NonLeafNode):
 
         if not self.add_to_scope_symbol_table(self._id, attr):
             ret = False
+
+        if self._rhs_node is not None and not self._rhs_node.semantic_analysis():
+            ret = False
+
         return ret
 
     """def generate_llvm(self) -> str:

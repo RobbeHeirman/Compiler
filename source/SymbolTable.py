@@ -17,7 +17,7 @@ class Attributes:
     """
 
     _base_type: TypeSpecifier.TypeSpecifier
-    _type_stack: List[TypeSpecifier.DeclaratorSpecifier]
+    _operator_stack: List[TypeSpecifier.DeclaratorSpecifier]
 
     _column: int
     _line: int
@@ -35,7 +35,7 @@ class Attributes:
         """
 
         self._base_type = base_type
-        self._Operator_stack = type_stack  # Stacks all the declared operators operators
+        self.operator_stack = type_stack  # Stacks all the declared operators operators
         self._filename = filename
         self._line = line
         self._column = column
@@ -90,10 +90,16 @@ class SymbolTable:
         """
 
         if lexeme in self._container.keys():
-            messages.error_redeclaration(lexeme, attribute)
-            attribute_prev = self._container[lexeme]
-            messages.note_prev_decl(lexeme, attribute_prev)
-            return False
+            attr = self._container[lexeme]
+            if attr.operator_stack[-1] is not TypeSpecifier.DeclaratorSpecifier.FUNC \
+                    or attribute.operator_stack[-1] is not TypeSpecifier.DeclaratorSpecifier.FUNC:
+                messages.error_redeclaration(lexeme, attribute)
+                attribute_prev = self._container[lexeme]
+                messages.note_prev_decl(lexeme, attribute_prev)
+                return False
+
+            else:
+                return True
 
         self._container[lexeme] = attribute
         return True
