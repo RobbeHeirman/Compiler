@@ -5,7 +5,7 @@ Academic Year: 2018-2019
 """
 from typing import List
 
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
+
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
@@ -23,7 +23,7 @@ class DeclListNode(NonLeafNode):
 
     _BASE_LABEL = "decl_list"
 
-    def __init__(self, parent_node: AbstractNode):
+    def __init__(self, parent_node: "AbstractNode"):
         super().__init__(parent_node)
 
         self._base_type_node = None
@@ -52,10 +52,9 @@ class DeclListNode(NonLeafNode):
     _ADD_OVERLOAD_MAP = {
         BaseTypeNode: _add_base_type,
         DeclarationNode: _add_declaration_node,
-        AbstractNode: None
     }
 
-    def add_child(self, child: AbstractNode):
+    def add_child(self, child: "AbstractNode"):
         self._ADD_OVERLOAD_MAP[type(child)](self, child)
         super().add_child(child)
 
@@ -78,3 +77,5 @@ class DeclListNode(NonLeafNode):
             decl_node.first_pass()
 
         self._parent_node.remove_child(self)
+
+        return -1

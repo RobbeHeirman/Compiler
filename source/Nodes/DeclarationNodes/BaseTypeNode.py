@@ -5,7 +5,7 @@ Academic Year: 2018-2019
 """
 from antlr4 import ParserRuleContext
 
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
+
 from Nodes.AbstractNodes.LeafNode import LeafNode
 from Specifiers import TypeSpecifier
 
@@ -17,7 +17,7 @@ class BaseTypeNode(LeafNode):
     """
     _value: TypeSpecifier
 
-    def __init__(self, parent_node: NonLeafNode, filename: str, ctx: ParserRuleContext):
+    def __init__(self, parent_node: "NonLeafNode", filename: str, ctx: ParserRuleContext):
         """
         Initializer
         :param parent_node: parent node.

@@ -100,8 +100,12 @@ class AbstractNode(ABC):
 
         # Some children remove themselves from parent list. This causes the iterator to skip elements. So we reverse
         # it.
-        for child in reversed(self._children):
-            child.first_pass()
+        it_counter = 0
+        while it_counter < len(self._children):
+            child = self._children[it_counter]
+
+            if child.first_pass() is not - 1:
+                it_counter += 1
 
     def semantic_analysis(self) -> bool:
         """

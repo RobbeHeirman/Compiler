@@ -51,7 +51,3 @@ class ScopedNode(ExpressionNode.NonLeafNode, ABC):
 
     def get_attribute(self, lexeme):
         return self._symbol_table.get_attribute(lexeme)
-
-    def first_pass(self):
-        super().first_pass()
-        self._children.reverse()

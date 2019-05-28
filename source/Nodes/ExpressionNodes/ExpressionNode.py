@@ -21,6 +21,15 @@ class ExpressionNodeType(Enum):
     ARRAY = "[]"
     FUNCTION = "()"
 
+    @property
+    def decl_specifier(self):
+        SPECIFIER_MAP = {
+            self.PTR: DeclaratorSpecifier.PTR,
+            self.ADDR: DeclaratorSpecifier.ADDRESS,
+            self.ARRAY: DeclaratorSpecifier.ARRAY,
+            self.FUNCTION: DeclaratorSpecifier.FUNC
+        }
+        return SPECIFIER_MAP[self]
 
 class ExpressionNode(NonLeafNode, ABC):
     _BASE_LABEL = "expression"
@@ -92,6 +101,7 @@ class ExpressionNode(NonLeafNode, ABC):
 
                 self._member_operator_node.rhs_node.parent = self
                 self.add_child(self._member_operator_node.rhs_node)
+                self._member_operator_node.rhs_node.parent_node = self
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
@@ -99,6 +109,7 @@ class ExpressionNode(NonLeafNode, ABC):
                 self.type = ExpressionNodeType.FUNCTION
                 self._member_operator_node.rhs_node.parent = self
                 self.add_child(self._member_operator_node.rhs_node)
+                self._member_operator_node.rhs_node.parent_node = self
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
@@ -129,6 +140,7 @@ class ExpressionNode(NonLeafNode, ABC):
         Note: We do not support implicit conversions.
         :return: 
         """
+
         ret = True
         type_stack = self.find_type_stack()
 
@@ -163,22 +175,23 @@ class ExpressionNode(NonLeafNode, ABC):
             stack = []
 
         if self.type in self._OPERATOR_TYPES:
-            stack.append(self.type)
+            stack.append(self.type.decl_specifier)
 
             if not isinstance(self._parent_node, ExpressionNode):
                 return stack
             else:
                 return self._parent_node.find_type_stack(stack)
         else:
-            return stack
+            return self._parent_node.find_type_stack(stack)
 
     def _stack_analysis(self, own_stack, attr_stack):
         """"
         Recursively calling this until all own stack symbols are matched.
         """
-        own_stack.reverse()  # More clearer operation on the stack
 
-        if len(own_stack is 0):
+        own_stack.reverse()  # More clearer operation on the stack
+        print(own_stack)
+        if len(own_stack) is 0:
             return
 
         if own_stack[-1] is DeclaratorSpecifier.ARRAY:
