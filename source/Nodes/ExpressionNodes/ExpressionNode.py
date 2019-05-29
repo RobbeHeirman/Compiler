@@ -23,13 +23,14 @@ class ExpressionNodeType(Enum):
 
     @property
     def decl_specifier(self):
-        SPECIFIER_MAP = {
+        specifier_map = {
             self.PTR: DeclaratorSpecifier.PTR,
             self.ADDR: DeclaratorSpecifier.ADDRESS,
             self.ARRAY: DeclaratorSpecifier.ARRAY,
             self.FUNCTION: DeclaratorSpecifier.FUNC
         }
-        return SPECIFIER_MAP[self]
+        return specifier_map[self]
+
 
 class ExpressionNode(NonLeafNode, ABC):
     _BASE_LABEL = "expression"
@@ -41,6 +42,8 @@ class ExpressionNode(NonLeafNode, ABC):
 
         self._identifier_node = None
         self._member_operator_node = None
+
+        self.base_type = None
         self.type = None
         self.identifier = None
 
@@ -143,7 +146,7 @@ class ExpressionNode(NonLeafNode, ABC):
 
         ret = True
         type_stack = self.find_type_stack()
-
+        attrib = Attributes(self.base_type, type_stack, self.filename, self.line, self.column)
         if self.type is ExpressionNodeType.IDENTIFIER:  # We need to check if the id is in the symbol table.
 
             if self.is_in_table(self.identifier):
@@ -152,11 +155,19 @@ class ExpressionNode(NonLeafNode, ABC):
                 # Now we need to check if the operations done on the identifier are legal
                 if not len(type_stack) is 0:
                     attr_stack = copy.copy(attr.operator_stack)
-                    self._stack_analysis(type_stack, attr_stack)
+                    type_stack_cp = copy.copy(type_stack)
+                    if not self._stack_analysis(type_stack_cp, attr_stack):
+                        ret = False
+                    if type_stack and type_stack[-1] is DeclaratorSpecifier.FUNC:  # Now check the signature
+                        if attr.rhs_same_signature(self._parent_node.get_function_signature(), attrib, attr,
+                                                   self.identifier):
+                            pass
+                        else:
+                            ret = False
 
             else:
-                attr = Attributes(self.base_type, type_stack, self.filename, self.line, self.column)
-                messages.error_undeclared_var(self.identifier, attr)
+
+                messages.error_undeclared_var(self.identifier, attrib)
 
         for child in self._children:
             if not child.semantic_analysis():
@@ -182,7 +193,9 @@ class ExpressionNode(NonLeafNode, ABC):
             else:
                 return self._parent_node.find_type_stack(stack)
         else:
-            return self._parent_node.find_type_stack(stack)
+            if isinstance(self._parent_node, ExpressionNode):
+                return self._parent_node.find_type_stack(stack)
+        return []
 
     def _stack_analysis(self, own_stack, attr_stack) -> bool:
         """"
@@ -223,6 +236,13 @@ class ExpressionNode(NonLeafNode, ABC):
 
                 messages.error_subscript_not_array(attr)
                 return False
+
+        elif own_stack[-1] is DeclaratorSpecifier.FUNC:
+            if attr_stack and attr_stack[-1] is DeclaratorSpecifier.FUNC:
+                pass
+            else:
+                messages.error_object_not_function(self.identifier, attr)
+
         if len(own_stack) > 0:
             own_stack.pop(-1)
         if len(attr_stack) > 0:

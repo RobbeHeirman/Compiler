@@ -20,10 +20,11 @@ class NonLeafNode(AbstractNode.AbstractNode, ABC):
     def __init__(self, parent_node=None):
         super().__init__(parent_node)
 
+    """    
     @property
     def base_type(self) -> TypeSpecifier:
         print(self.label)
-        return self._parent_node.base_type
+        return self._parent_node.base_type"""
 
     def add_child(self, child: "AbstractNode"):
         """

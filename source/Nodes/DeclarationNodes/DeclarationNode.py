@@ -65,7 +65,10 @@ class DeclarationNode(NonLeafNode):
         return self._base_type
 
     def to_attribute(self):
-        return Attributes(self.base_type, self._declarator_node.generate_type_operator_stack(),
+        op_stack = []
+        if self._declarator_node:
+            op_stack = self._declarator_node.generate_type_operator_stack()
+        return Attributes(self.base_type, op_stack,
                           self._filename, self._line, self._column)
 
     @base_type.setter

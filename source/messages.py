@@ -68,6 +68,26 @@ def error_unary_not_ptr(attribute):
           + BColors.ENDC)
 
 
+def error_object_not_function(lexeme, attribute):
+    print(BColors.FAIL + "{0}called object '{1}' is not a function or function pointer".format(error(attribute), lexeme)
+          + BColors.ENDC)
+
+
+def error_signature_does_not_match(lexeme, attribute):
+    print(BColors.FAIL + "{0} function '{1}' signature does not match".format(error(attribute), lexeme)
+          + BColors.ENDC)
+
+
+def error_func_to_few_arguments(lexeme, attribute):
+    print(BColors.FAIL + "{0}too few arguments to function '{1}' ".format(error(attribute), lexeme)
+          + BColors.ENDC)
+
+
+def error_func_to_many_arguments(lexeme, attribute):
+    print(BColors.FAIL + "{0}too many arguments to function '{1}' ".format(error(attribute), lexeme)
+          + BColors.ENDC)
+
+
 def error_lvalue_required_addr(attribute):
     print(BColors.FAIL + "{0}lvalue required as unary'&' operand".format(error(attribute))
           + BColors.ENDC)

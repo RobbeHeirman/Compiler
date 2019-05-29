@@ -15,7 +15,7 @@ class Attributes:
     """
     Container class used by SymbolTable to keep track of token Attributes
     """
-    function_signature: "Attributes"
+    function_signature: List["Attributes"]
 
     _base_type: TypeSpecifier.TypeSpecifier
     _operator_stack: List[TypeSpecifier.DeclaratorSpecifier]
@@ -40,7 +40,7 @@ class Attributes:
         self._filename = filename
         self._line = line
         self._column = column
-        self.function_signature = None
+        self.function_signature = []
 
     def __eq__(self, val: "Attributes") -> bool:
 
@@ -88,6 +88,23 @@ class Attributes:
             return True
         return False
 
+    def rhs_same_signature(self, type_specs, error_attr, error_attr2, id):
+
+        own_list = [attr.decl_type for attr in self.function_signature]
+
+        if own_list == type_specs:
+            return True
+
+        elif len(type_specs) < len(own_list):
+            messages.error_func_to_few_arguments(id, error_attr)
+
+        elif len(type_specs) > len(own_list):
+            messages.error_func_to_many_arguments(id, error_attr)
+
+        else:
+            messages.error_signature_does_not_match(id, error_attr)
+
+        return False
 
 class SymbolTable:
     """
@@ -121,8 +138,6 @@ class SymbolTable:
             attribute_prev = self._container[lexeme]
             messages.note_prev_decl(lexeme, attribute_prev)
             return False
-
-
 
         self._container[lexeme] = attribute
         return True

@@ -15,9 +15,21 @@ class ConstantNode(LeafNode):
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node, filename, ctx)
 
+        self.type = self._deduct_type()
+
     @property
     def label(self):
         return "{0}".format(str(self._value))
+
+    def _deduct_type(self):
+        if re.search("'.'", self.value) is not None:
+            return TypeSpecifier.CHAR
+
+        elif re.search("[0-9]+\.[0-9]+", self.value) is not None:
+            return TypeSpecifier.FLOAT
+
+        else:
+            return TypeSpecifier.INT
 
     def llvm_code_value(self):
 

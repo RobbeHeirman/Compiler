@@ -7,6 +7,7 @@ Academic Year: 2018-2019
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode, ExpressionNodeType
+from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Specifiers import Operator, TypeSpecifier
 
 
@@ -43,6 +44,8 @@ class RHSNode(ExpressionNode):
                 if self.type is ExpressionNodeType.IDENTIFIER:
                     ret += "{0}".format(self.identifier)
                 elif self.type is ExpressionNodeType.CONSTANT:
+                    if self.base_type:
+                        ret += "{0}\n".format(self.base_type.value)
                     ret += "{0}".format(self.constant)
         return ret
 
@@ -55,6 +58,9 @@ class RHSNode(ExpressionNode):
             self.line = child.line
             self.column = child.column
 
+        if isinstance(child, ParamListNode):
+            self._extra_node = child
+
         super().add_child(child)
 
     def first_pass(self):
@@ -63,10 +69,11 @@ class RHSNode(ExpressionNode):
 
             self.type = ExpressionNodeType.CONSTANT
             self.constant = self._constant_node.value
+            self.base_type = self._constant_node.type
 
-            self._filename = self._constant_node.filename
-            self._line = self._constant_node.line
-            self._column = self._constant_node.column
+            self.filename = self._constant_node.filename
+            self.line = self._constant_node.line
+            self.column = self._constant_node.column
 
             self.remove_child(self._constant_node)
             self._constant_node = None
@@ -97,6 +104,11 @@ class RHSNode(ExpressionNode):
                                                         self.base_type.llvm_type, index1, index2)
         return ret
 
+    """
     @property
     def base_type(self):
         return self._parent_node.base_type
+    """
+
+    def get_function_signature(self):
+        return self._extra_node.get_signature_list()

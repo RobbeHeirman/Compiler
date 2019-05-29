@@ -1,3 +1,4 @@
-int a(int* i);
-int a(int* i, int* b);
-int i;
+int a(int* i, int k);
+int b;
+char d;
+int i = a(12,d);
