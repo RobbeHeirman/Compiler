@@ -15,6 +15,7 @@ class Attributes:
     """
     Container class used by SymbolTable to keep track of token Attributes
     """
+    function_signature: "Attributes"
 
     _base_type: TypeSpecifier.TypeSpecifier
     _operator_stack: List[TypeSpecifier.DeclaratorSpecifier]
@@ -39,7 +40,14 @@ class Attributes:
         self._filename = filename
         self._line = line
         self._column = column
-        self.function_signature = []
+        self.function_signature = None
+
+    def __eq__(self, val: "Attributes") -> bool:
+
+        if self._base_type == val._base_type:
+            if self.operator_stack == val.operator_stack:
+                return True
+        return False
 
     @property
     def filename(self)->str:
@@ -69,6 +77,17 @@ class Attributes:
     def decl_type(self):
         return self._base_type
 
+    def same_signature(self, attr: "Attributes") -> bool:
+        """
+        Compares the function signatures of two attributes.
+        :param attr: the attribute this attributes signature has to be compared against
+        :return:
+        """
+
+        if self.function_signature == attr.function_signature:
+            return True
+        return False
+
 
 class SymbolTable:
     """
@@ -95,7 +114,8 @@ class SymbolTable:
             if attr.operator_stack and attribute.operator_stack:
                 if attribute.operator_stack[-1] is TypeSpecifier.DeclaratorSpecifier.FUNC:
                     if attr.operator_stack[-1] is TypeSpecifier.DeclaratorSpecifier.FUNC:
-                        return True
+                        if attr.same_signature(attribute):
+                            return True
 
             messages.error_redeclaration(lexeme, attribute)
             attribute_prev = self._container[lexeme]

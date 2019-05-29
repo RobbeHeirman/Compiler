@@ -13,4 +13,5 @@ class ParamListNode(NonLeafNode):
         super().__init__(parent_node)
 
     def get_function_signature(self):
-        return [child.to_attribute for child in self._children]
+        print([child.to_attribute() for child in self._children])
+        return
