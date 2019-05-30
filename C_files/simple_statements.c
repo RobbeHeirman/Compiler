@@ -1,8 +1,7 @@
-int b
-int a(int i){
+
+int *a(){
+    int i;
+    int k;
+
 }
 
-int c(int k){
-}
-
-int d;

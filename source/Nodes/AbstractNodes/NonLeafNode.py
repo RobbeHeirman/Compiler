@@ -34,9 +34,6 @@ class NonLeafNode(AbstractNode.AbstractNode, ABC):
 
         return ret
 
-    def is_in_table(self, lexeme: str) -> bool:
-        return self._parent_node.is_in_table(lexeme)
-
     def generate_llvm(self) -> str:
         """
         Generates the corresponding node into llvm instructions.

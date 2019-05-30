@@ -20,14 +20,8 @@ class AssignmentNode(NonLeafNode):
         self._id = None
         self._lhs_node = None
 
-        if not self._parent_node.is_in_table(self._id):
-            # attr = Attributes(TypeSpecifier.DEFAULT, filename, ctx.start.line, ctx.start.column)
-            self._fail_switch(True)
-            # messages.error_undeclared_var(self._id, attr)
-
-        else:
-            attr = self._parent_node.get_attribute(self._id)
-            self._base_type = attr.type_spec
+        attr = self._parent_node.get_attribute(self._id)
+        self._base_type = attr.type_spec
 
     @property
     def label(self):
@@ -38,7 +32,7 @@ class AssignmentNode(NonLeafNode):
 
         return ret
 
-    def add_child(self, child: AbstractNode):
+    def add_child(self, child: AbstractNode, index=None):
         if isinstance(child, LHSNode):
             self._lhs_node = child
         super().add_child(child)

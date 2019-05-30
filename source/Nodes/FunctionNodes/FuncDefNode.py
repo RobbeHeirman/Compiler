@@ -13,7 +13,6 @@ from Specifiers import DeclaratorSpecifier
 from SymbolTable import Attributes
 
 
-
 class FuncDefNode(ScopedNode):
     _id: str
     _parent_node: NonLeafNode
@@ -31,18 +30,17 @@ class FuncDefNode(ScopedNode):
         self._line = start.line
         self._column = start.column
 
-
     @property
     def label(self):
         ptr_label = "*" * self._ptr_count
         return 'Func def\nIdentifier: {0}\nReturn type {1}{2}'.format(self._id, self._base_type.value, ptr_label)
 
-    def add_child(self, child):
+    def add_child(self, child, index=None):
 
         if isinstance(child, BaseTypeNode):
             self._base_type_node = child
             self._base_type = child.value
-        super().add_child(child)
+        super().add_child(child, index)
 
     def first_pass(self):
 
@@ -70,5 +68,11 @@ class FuncDefNode(ScopedNode):
             ret = False
 
         # 2)
+        for child in self._children:
+            if not child.semantic_analysis():
+                ret = False
 
         return ret
+
+    def get_attribute(self, lexeme):
+        super().get_attribute(lexeme)

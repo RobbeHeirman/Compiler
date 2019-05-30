@@ -39,8 +39,11 @@ class ScopedNode(ExpressionNode.NonLeafNode, ABC):
         :param lexeme: The lexeme that needs to be returned
         :return: bool if successful = true else false
         """
+        if self._symbol_table.is_in_symbol_table(lexeme):
+            return True
 
-        return self._symbol_table.is_in_symbol_table(lexeme)
+        else:
+            return self._parent_node.is_in_table(lexeme)
 
     @property
     def register_index(self):
@@ -50,4 +53,8 @@ class ScopedNode(ExpressionNode.NonLeafNode, ABC):
         self._register_index += 1
 
     def get_attribute(self, lexeme):
-        return self._symbol_table.get_attribute(lexeme)
+        if self._symbol_table.get_attribute(lexeme):  # Is declared in this scope.
+            return True
+
+        else:
+            return self._parent_node.get_attribute(lexeme)  # Looking in higher scoped symbol tables.

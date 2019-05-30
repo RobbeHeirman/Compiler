@@ -168,7 +168,6 @@ class DeclarationNode(NonLeafNode):
         """
 
         ret = True
-
         # First we need to pack the identifier's attributes. We have the base type and id trough reference of
         # the remaining decelerators we can deduce the type stack.
         type_stack = []

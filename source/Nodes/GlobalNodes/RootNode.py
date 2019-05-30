@@ -16,9 +16,15 @@ class RootNode(ScopedNode.ScopedNode):
     def __init__(self):
         super().__init__()
 
-    def resolve_expression(self):
-        """ Doesn't doe anything, root is special"""
-        pass
+    def is_in_table(self, lexeme: str) -> bool:
+        """
+        Checks if a lexeme is already in the symbol table
+        :param lexeme: The lexeme that needs to be returned
+        :return: bool if successful = true else false
+        """
 
-    def handle_semantics(self):
-        pass
+        return self._symbol_table.is_in_symbol_table(lexeme)
+
+    def get_attribute(self, lexeme):
+        print("yo")
+        return self._symbol_table.get_attribute(lexeme)

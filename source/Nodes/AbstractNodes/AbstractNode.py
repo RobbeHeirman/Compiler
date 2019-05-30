@@ -69,6 +69,7 @@ class AbstractNode(ABC):
             self._children.append(child)
 
         else:
+
             self._children.insert(index, child)
 
     def remove_child(self, child):
@@ -77,6 +78,9 @@ class AbstractNode(ABC):
         """
 
         self._children.remove(child)
+
+    def is_in_table(self, lexeme: str) -> bool:
+        return self._parent_node.is_in_table(lexeme)
 
     def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes) -> bool:
         """
@@ -107,9 +111,9 @@ class AbstractNode(ABC):
 
         # Some children remove themselves from parent list. This causes the iterator to skip elements. So we reverse
         # it.
+
         for child in self._children:
             child.first_pass()
-
 
     def semantic_analysis(self) -> bool:
         """

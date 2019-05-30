@@ -126,7 +126,6 @@ class SymbolTable:
         :param lexeme: The lexeme, the name of the identifier
         :return: True if this action is allowed, False if not.
         """
-
         if lexeme in self._container.keys():
             attr = self._container[lexeme]
             if attr.operator_stack and attribute.operator_stack:
@@ -153,7 +152,7 @@ class SymbolTable:
         return lexeme in self._container.keys()
 
     def get_attribute(self, lexeme) -> Attributes:
-        return self._container[lexeme]
+        return self._container.get(lexeme, False)
 
 
 class GlobalSymbolTable(SymbolTable):

@@ -23,7 +23,7 @@ class DeclListNode(NonLeafNode):
 
     _BASE_LABEL = "decl_list"
 
-    def __init__(self, parent_node: "AbstractNode"):
+    def __init__(self, parent_node):
         super().__init__(parent_node)
 
         self._base_type_node = None
@@ -54,9 +54,10 @@ class DeclListNode(NonLeafNode):
         DeclarationNode: _add_declaration_node,
     }
 
-    def add_child(self, child: "AbstractNode"):
+    def add_child(self, child, index=None):
+
         self._ADD_OVERLOAD_MAP[type(child)](self, child)
-        super().add_child(child)
+        super().add_child(child, index)
 
     def first_pass(self):
         """
