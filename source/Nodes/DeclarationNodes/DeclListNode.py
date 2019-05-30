@@ -69,11 +69,13 @@ class DeclListNode(NonLeafNode):
         # Since we don't really need more info from this node. It will become obsolete in further code gen,
         # So we remove it.
 
+        index = self._parent_node.get_child_index(self)
         for decl_node in self._declaration_nodes:
             decl_node.base_type = self._base_type_node.value
             decl_node.parent_node = self._parent_node
 
-            self._parent_node.add_child(decl_node)
+            self._parent_node.add_child(decl_node, index)
+            index += 1
             decl_node.first_pass()
 
         self._parent_node.remove_child(self)

@@ -37,14 +37,7 @@ def main(argv):
     dot_name = dot_file[0: -4]
     dot_name += ".png"
     subprocess.call(["dot", "-Tpng", dot_file, "-o", dot_name])
-    if ast.failed:
-        print("Failed to compile.")
 
-    else:
-        # f = open(argv[1], 'w+')
-        f = open("result.llsv", 'w+')
-        # f.writelines(ast.generate_llvm())
-        f.close()
 
     ast.first_pass()
     dot_file = "AST2.dot"

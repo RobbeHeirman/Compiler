@@ -1,4 +1,8 @@
-int a(int* i, int k);
-int b;
-char d;
-int i = a(12,d);
+int b
+int a(int i){
+}
+
+int c(int k){
+}
+
+int d;

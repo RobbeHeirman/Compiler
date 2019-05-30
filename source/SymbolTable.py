@@ -106,6 +106,7 @@ class Attributes:
 
         return False
 
+
 class SymbolTable:
     """
     Represents the SymbolTable container used while parsing.

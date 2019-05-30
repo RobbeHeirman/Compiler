@@ -27,7 +27,6 @@ class AbstractNode(ABC):
         # Block for graphviz dot representation.
         self._index = AbstractNode._index_counter
         AbstractNode._index_counter += 1
-        self._failed = False
         self._parent_node = parent
         self._children = list()
 
@@ -56,20 +55,28 @@ class AbstractNode(ABC):
     def generate_llvm(self):
         return ""
 
-    @property
-    def failed(self) -> bool:
-        for child in self._children:
-            self._fail_switch(child.failed)
-        return self._failed
+    def get_child_index(self, child):
+        return self._children.index(child)
 
-    def _fail_switch(self, boolean: bool):
+    def add_child(self, child: "AbstractNode", index: int = None):
         """
-        used so that a node can tell parents there is a semantic error
-        :param boolean: the boolean that tells if the expression failed.
-        :return:
+        Add a child node to the AST.
+        :param index: is needs to be placed at a certain location
+        :param reverse: Needed for first pass
+        :param child: a ASTNode that functions as a child
         """
-        if boolean:
-            self._failed = True
+        if index is None:
+            self._children.append(child)
+
+        else:
+            self._children.insert(index, child)
+
+    def remove_child(self, child):
+        """
+        Removes a child by value (reference of child node)
+        """
+
+        self._children.remove(child)
 
     def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes) -> bool:
         """
@@ -100,12 +107,9 @@ class AbstractNode(ABC):
 
         # Some children remove themselves from parent list. This causes the iterator to skip elements. So we reverse
         # it.
-        it_counter = 0
-        while it_counter < len(self._children):
-            child = self._children[it_counter]
+        for child in self._children:
+            child.first_pass()
 
-            if child.first_pass() is not - 1:
-                it_counter += 1
 
     def semantic_analysis(self) -> bool:
         """

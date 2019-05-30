@@ -64,7 +64,7 @@ class CListenerExtend(CListener):
             counter += 1
 
         func_node = FuncDefNode(self._parent_node, ctx.getChild(counter + 1).getText(), counter, self._filename,
-                                ctx.getChild(1))
+                                ctx)
         self._parent_node.add_child(func_node)
         self._parent_node = func_node
 

@@ -20,28 +20,6 @@ class NonLeafNode(AbstractNode.AbstractNode, ABC):
     def __init__(self, parent_node=None):
         super().__init__(parent_node)
 
-    """    
-    @property
-    def base_type(self) -> TypeSpecifier:
-        print(self.label)
-        return self._parent_node.base_type"""
-
-    def add_child(self, child: "AbstractNode"):
-        """
-        Add a child node to the AST.
-        :param reverse: Needed for first pass
-        :param child: a ASTNode that functions as a child
-        """
-
-        self._children.append(child)
-
-    def remove_child(self, child):
-        """
-        Removes a child by value (reference of child node)
-        """
-
-        self._children.remove(child)
-
     def dot_string(self) -> str:
         """Generates the visual representation of the node in .dot"""
         ret = super().dot_string()

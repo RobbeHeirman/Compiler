@@ -3,35 +3,34 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from antlr4.tree.Tree import TerminalNodeImpl
+from antlr4 import ParserRuleContext
+
 
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.AbstractNodes.ScopedNode import ScopedNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
-from Specifiers import TypeSpecifier
+from Specifiers import DeclaratorSpecifier
 from SymbolTable import Attributes
-from messages import error_redeclared_diff_symbol, note_prev_decl
+
 
 
 class FuncDefNode(ScopedNode):
     _id: str
     _parent_node: NonLeafNode
 
-    def __init__(self, parent_node: NonLeafNode, id_l: str, ptr_count: int, filename: str, ctx: TerminalNodeImpl):
+    def __init__(self, parent_node: NonLeafNode, id_l: str, ptr_count: int, filename: str, ctx: ParserRuleContext):
         super().__init__(parent_node)
 
         self._id = id_l
         self._ptr_count = ptr_count
         self._base_type = None
         self._base_type_node = None
-        """attr = Attributes(TypeSpecifier.DEFAULT, filename, ctx.getSymbol().line, ctx.getSymbol().column,
-                          DeclType.FUNCTION)
-        if self._parent_node.is_in_table(self._id):  # Declared in global scope?
-            attr2 = self._parent_node.get_attribute(self._id)
-            if attr2.decl_type != DeclType.FUNCTION:  # Should be a forward declaration
-                self._fail_switch(True)
-                redeclared_diff_symbol(self._id, attr)
-                note_prev_decl(self._id, attr2)"""
+
+        self._filename = filename
+        start = ctx.start
+        self._line = start.line
+        self._column = start.column
+
 
     @property
     def label(self):
@@ -52,3 +51,24 @@ class FuncDefNode(ScopedNode):
         self._base_type_node = None
 
         super().first_pass()
+
+    def semantic_analysis(self) -> bool:
+        """
+        Semantic analysis of a function definition.
+        1)The function and his signature needs to be added to the symbol
+        Table of the upper scope.
+        2) The parameters are declared variables belonging to the scope of this function.
+        :return: If the semantic analysis is correct.
+        """
+        ret = True
+        # 1) Add to the symbol table of the upper scope
+        type_stack = [DeclaratorSpecifier.PTR for _ in range(self._ptr_count)]
+        attr = Attributes(self._base_type, type_stack, self._filename, self._line, self._column)
+        signature = self._children[0].get_function_signature()
+        attr.function_signature = signature
+        if not self._parent_node.add_to_scope_symbol_table(self._id, attr):
+            ret = False
+
+        # 2)
+
+        return ret
