@@ -25,3 +25,11 @@ class ParamListNode(NonLeafNode):
             if not child.semantic_analysis():
                 ret = False
         return ret
+
+    def generate_llvm(self):
+        ret = ""
+        for child in self._children:
+            ret += "{0}, ".format(child.base_type.llvm_type)
+
+        ret = ret[:-2]
+        return ret

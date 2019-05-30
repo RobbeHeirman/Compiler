@@ -25,6 +25,8 @@ class FuncDefNode(ScopedNode):
         self._base_type = None
         self._base_type_node = None
 
+        self._type_stack = None
+
         self._filename = filename
         start = ctx.start
         self._line = start.line
@@ -60,8 +62,8 @@ class FuncDefNode(ScopedNode):
         """
         ret = True
         # 1) Add to the symbol table of the upper scope
-        type_stack = [DeclaratorSpecifier.PTR for _ in range(self._ptr_count)]
-        attr = Attributes(self._base_type, type_stack, self._filename, self._line, self._column)
+        self._type_stack = [DeclaratorSpecifier.PTR for _ in range(self._ptr_count)]
+        attr = Attributes(self._base_type, self._type_stack, self._filename, self._line, self._column)
         signature = self._children[0].get_function_signature()
         attr.function_signature = signature
         if not self._parent_node.add_to_scope_symbol_table(self._id, attr):
@@ -76,3 +78,10 @@ class FuncDefNode(ScopedNode):
 
     def get_attribute(self, lexeme):
         super().get_attribute(lexeme)
+
+    def generate_llvm(self):
+        ret = "define {0} @{1}(".format(self._base_type.llvm_type, self._id)
+        ret += "{0}) {{\n".format(self._children[0].generate_llvm())
+        ret += "  ret {0} 0\n".format(self._base_type.llvm_type)
+        ret += "}\n"
+        return ret
