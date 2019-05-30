@@ -14,6 +14,7 @@ import CListenerExtend as CListenerExtend
 
 
 def main(argv):
+    # Lexical analysis
     # input_file = argv[0]
     input_file = "C_files/simple_statements.c"
     input_stream = FileStream(input_file)
@@ -25,11 +26,10 @@ def main(argv):
     tree = parser.statements()
     listener = CListenerExtend.CListenerExtend(input_file)
     walker = ParseTreeWalker()
-
     walker.walk(listener, tree)
 
+    # Initial AST (Used for debugging)
     ast = listener.ast
-
     dot_file = "AST.dot"
     if len(argv) == 3:
         dot_file = argv[2]
@@ -38,7 +38,7 @@ def main(argv):
     dot_name += ".png"
     subprocess.call(["dot", "-Tpng", dot_file, "-o", dot_name])
 
-
+    # Ast cleanup
     ast.first_pass()
     dot_file = "AST2.dot"
     ast.to_dot(dot_file)
@@ -46,7 +46,12 @@ def main(argv):
     dot_name += ".png"
     subprocess.call(["dot", "-Tpng", dot_file, "-o", dot_name])
 
-    ast.semantic_analysis()
+    if not ast.semantic_analysis():
+        print("I failed =(")
+    else:
+        file_name = "C_files/llvm.ll"
+        file = open(file_name, 'w+')
+        file.write(ast.generate_llvm())
 
     return 0
 

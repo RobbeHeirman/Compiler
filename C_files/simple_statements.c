@@ -1,7 +1,1 @@
-
-int *a(){
-    int i;
-    int k;
-
-}
-
+int a;

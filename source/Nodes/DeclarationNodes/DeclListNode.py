@@ -3,8 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from typing import List
-
+from typing import List, Union
 
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
@@ -54,7 +53,7 @@ class DeclListNode(NonLeafNode):
         DeclarationNode: _add_declaration_node,
     }
 
-    def add_child(self, child, index=None):
+    def add_child(self, child: Union[BaseTypeNode, DeclarationNode], index=None):
 
         self._ADD_OVERLOAD_MAP[type(child)](self, child)
         super().add_child(child, index)
