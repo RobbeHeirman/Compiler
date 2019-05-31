@@ -18,6 +18,7 @@ class AbstractNode(ABC):
     _children: List["AbstractNode"]
     _parent_node: NonLeafNode
     _index_counter = 0
+    _indent_level = 0
 
     def __init__(self, parent: "AbstractNode" = None):
         """
@@ -54,6 +55,10 @@ class AbstractNode(ABC):
     @abstractmethod
     def generate_llvm(self):
         return ""
+
+    def indent_string(self):
+
+        return "  " * self._indent_level
 
     def get_child_index(self, child):
         return self._children.index(child)

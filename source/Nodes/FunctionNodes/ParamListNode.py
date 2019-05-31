@@ -35,10 +35,12 @@ class ParamListNode(NonLeafNode):
     def generate_llvm(self):
         ret = ""
         for child in self._children:
+            self.increment_register_index()
             ret += "{0}".format(child.base_type.llvm_type)
             for d_type in child.type_stack:
                 if d_type is Specifiers.DeclaratorSpecifier.PTR:
                     ret += "*"
+
             ret += ", "
         ret = ret[:-2]
         return ret

@@ -74,7 +74,7 @@ class ExpressionNode(NonLeafNode, ABC):
                 ret += "{0}".format(self.identifier)
         return ret
 
-    def add_child(self, child: AbstractNode):
+    def add_child(self, child: AbstractNode, index=None):
 
         if isinstance(child, IdNode):
 

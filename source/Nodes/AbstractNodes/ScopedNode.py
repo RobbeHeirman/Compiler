@@ -21,7 +21,7 @@ class ScopedNode(ExpressionNode.NonLeafNode, ABC):
         """
         super().__init__(parent_node)
         self._symbol_table = SymbolTable()
-        self._register_index = -1  # little hack to start at 0
+        self._register_index = -1
 
     def add_to_scope_symbol_table(self, lexeme: str,  attribute: Attributes)->bool:
         """

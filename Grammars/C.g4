@@ -130,7 +130,7 @@ func_def
     ;
 
 ret_statement
-    : RETURN rhs
+    : RETURN (rhs)?
     ;
 
 selection_statements

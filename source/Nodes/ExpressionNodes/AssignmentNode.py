@@ -21,7 +21,8 @@ class AssignmentNode(NonLeafNode):
         self._lhs_node = None
 
         attr = self._parent_node.get_attribute(self._id)
-        self._base_type = attr.type_spec
+        if attr:
+            self._base_type = attr.type_spec
 
     @property
     def label(self):

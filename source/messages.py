@@ -93,6 +93,11 @@ def error_lvalue_required_addr(attribute):
           + BColors.ENDC)
 
 
+def error_non_void_return(lexeme, attribute):
+    print(BColors.FAIL + "{0}non-void function '{1}' should return a value".format(error(attribute), lexeme)
+          + BColors.ENDC)
+
+
 def note(attribute: "SymbolTable.Attributes"):
     return "{0}note: ".format(file_info(attribute))
 

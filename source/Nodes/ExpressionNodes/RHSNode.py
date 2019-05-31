@@ -49,7 +49,7 @@ class RHSNode(ExpressionNode):
                     ret += "{0}".format(self.constant)
         return ret
 
-    def add_child(self, child):
+    def add_child(self, child, index=None):
 
         if isinstance(child, ConstantNode):
             self._constant_node = child
@@ -66,7 +66,6 @@ class RHSNode(ExpressionNode):
     def first_pass(self):
 
         if self._constant_node is not None:
-
             self.type = ExpressionNodeType.CONSTANT
             self.constant = self._constant_node.value
             self.base_type = self._constant_node.type
@@ -81,6 +80,16 @@ class RHSNode(ExpressionNode):
 
     def generate_llvm(self):
         ret = ""
+        self.increment_register_index()
+        if self.type is ExpressionNodeType.CONSTANT:
+            llvm_type = self.base_type.llvm_type
+            alignment = self.base_type.llvm_alignment
+
+            ret += self.indent_string() + "%{0} = alloca {1}, align {2}\n".format(
+                self.register_index, llvm_type, alignment)
+            ret += self.indent_string() + "store {0} {1}, {2}* %{3}, align {4}\n".format(
+                llvm_type, self.constant, llvm_type, self.register_index, alignment)
+
         if len(self._children) == 1:  # Unary expression
             return self._children[0].generate_llvm()
 
@@ -102,6 +111,7 @@ class RHSNode(ExpressionNode):
             self.increment_register_index()
             ret += "%{0} = {1} {2} %{3}, %{4}\n".format(self.register_index, operating_word,
                                                         self.base_type.llvm_type, index1, index2)
+        print(ret)
         return ret
 
     """

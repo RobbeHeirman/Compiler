@@ -66,7 +66,9 @@ def main(argv):
         subprocess.call(["clang", "-Wno-override-module", "C_files/llvm.ll"])  # Test llvm generated language
         print("Done with llvm assembling")
         print("Running executable..")
-        subprocess.call(["a.exe"])
+        child = subprocess.Popen(["a.exe"])
+        stream = child.communicate()[0]
+        print(child.returncode)
         print("Done running executable")
 
     return 0

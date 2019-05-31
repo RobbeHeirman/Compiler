@@ -5,10 +5,12 @@ Academic Year: 2018-2019
 """
 from antlr4 import ParserRuleContext
 
-
+import messages
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.AbstractNodes.ScopedNode import ScopedNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
+from Nodes.FunctionNodes.ReturnNode import ReturnNode
 from Specifiers import DeclaratorSpecifier
 from SymbolTable import Attributes
 
@@ -24,6 +26,7 @@ class FuncDefNode(ScopedNode):
         self._ptr_count = ptr_count
         self._base_type = None
         self._base_type_node = None
+        self._return_node = None
 
         self._type_stack = None
 
@@ -37,11 +40,19 @@ class FuncDefNode(ScopedNode):
         ptr_label = "*" * self._ptr_count
         return 'Func def\nIdentifier: {0}\nReturn type {1}{2}'.format(self._id, self._base_type.value, ptr_label)
 
+    @property
+    def base_type(self):
+        return self._base_type
+
     def add_child(self, child, index=None):
 
         if isinstance(child, BaseTypeNode):
             self._base_type_node = child
             self._base_type = child.value
+
+        elif isinstance(child, ReturnNode):
+            self._return_node = child
+
         super().add_child(child, index)
 
     def first_pass(self):
@@ -74,14 +85,27 @@ class FuncDefNode(ScopedNode):
             if not child.semantic_analysis():
                 ret = False
 
+        if self._return_node and not self._return_node.has_return():
+            messages.error_non_void_return(self._id, attr)
+            ret = False
+
         return ret
 
     def get_attribute(self, lexeme):
         super().get_attribute(lexeme)
 
     def generate_llvm(self):
-        ret = "define {0} @{1}(".format(self._base_type.llvm_type, self._id)
+        self.increment_register_index()
+        ret = self.indent_string() + "define {0} @{1}(".format(self._base_type.llvm_type, self._id)
         ret += "{0}) {{\n".format(self._children[0].generate_llvm())
-        ret += "  ret {0} 0\n".format(self._base_type.llvm_type)
+        AbstractNode._indent_level += 1
+        # TODO: LLVM of the statements
+
+        if self._return_node:
+            ret += self._return_node.generate_llvm()
+
+        else:
+            ret += self.indent_string() + "  ret {0} 0\n".format(self._base_type.llvm_type)
+
         ret += "}\n"
         return ret
