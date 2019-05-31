@@ -51,6 +51,11 @@ class ExpressionNode(NonLeafNode, ABC):
         self.filename = None
         self.line = None
         self.column = None
+        self.type_stack = None
+
+    @property
+    def type_string_llvm(self):
+        return self.base_type.llvm_type + "*" * len(self.type_stack)
 
     def get_error_info(self):
         """
@@ -145,20 +150,20 @@ class ExpressionNode(NonLeafNode, ABC):
         """
 
         ret = True
-        type_stack = self.find_type_stack()
-        attrib = Attributes(self.base_type, type_stack, self.filename, self.line, self.column)
+        self.type_stack = self.find_type_stack()
+        attrib = Attributes(self.base_type, self.type_stack, self.filename, self.line, self.column)
         if self.type is ExpressionNodeType.IDENTIFIER:  # We need to check if the id is in the symbol table.
 
             if self.is_in_table(self.identifier):
                 attr = self.get_attribute(self.identifier)
 
                 # Now we need to check if the operations done on the identifier are legal
-                if not len(type_stack) is 0:
+                if not len(self.type_stack) is 0:
                     attr_stack = copy.copy(attr.operator_stack)
-                    type_stack_cp = copy.copy(type_stack)
+                    type_stack_cp = copy.copy(self.type_stack)
                     if not self._stack_analysis(type_stack_cp, attr_stack):
                         ret = False
-                    if type_stack and type_stack[-1] is DeclaratorSpecifier.FUNC:  # Now check the signature
+                    if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.FUNC:  # Now check the signature
                         if attr.rhs_same_signature(self._parent_node.get_function_signature(), attrib, attr,
                                                    self.identifier):
                             pass
@@ -170,7 +175,7 @@ class ExpressionNode(NonLeafNode, ABC):
                 messages.error_undeclared_var(self.identifier, attrib)
 
         for child in self._children:
-            if not child.semantic_analysis():
+            if not child.semantic_analysis:
                 ret = False
 
         return ret

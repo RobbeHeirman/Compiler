@@ -85,6 +85,9 @@ class RHSNode(ExpressionNode):
             llvm_type = self.base_type.llvm_type
             alignment = self.base_type.llvm_alignment
 
+            if self.base_type is TypeSpecifier.CHAR:
+                self.constant = ord(str(self.constant)[1])
+
             ret += self.indent_string() + "%{0} = alloca {1}, align {2}\n".format(
                 self.register_index, llvm_type, alignment)
             ret += self.indent_string() + "store {0} {1}, {2}* %{3}, align {4}\n".format(
@@ -111,7 +114,6 @@ class RHSNode(ExpressionNode):
             self.increment_register_index()
             ret += "%{0} = {1} {2} %{3}, %{4}\n".format(self.register_index, operating_word,
                                                         self.base_type.llvm_type, index1, index2)
-        print(ret)
         return ret
 
     """

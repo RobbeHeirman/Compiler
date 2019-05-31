@@ -24,7 +24,7 @@ class DeclarationNode(NonLeafNode):
     An optional initializer as 2d child.
     """
     _declarator_node: DeclaratorNode
-    _rhs_node: RHSNode
+    _rhs_node: Union[RHSNode, ArrayInitNode]
     _lexeme: str
 
     _BASE_LABEL = "Declaration"
@@ -66,6 +66,10 @@ class DeclarationNode(NonLeafNode):
     @property
     def base_type(self):
         return self._base_type
+
+    @property
+    def type_string_llvm(self):
+        return self.base_type.llvm_type + "*" * len(self.type_stack)
 
     def to_attribute(self):
         op_stack = []
@@ -170,7 +174,6 @@ class DeclarationNode(NonLeafNode):
         on this scope lvl. But it can overshadow higher scoped (global...) declared variables with the same identifier.
         :return: true if successfully added identifier and children are semantically correct.
         """
-
         ret = True
         # First we need to pack the identifier's attributes. We have the base type and id trough reference of
         # the remaining decelerators we can deduce the type stack.
@@ -230,16 +233,28 @@ class DeclarationNode(NonLeafNode):
         """"
         This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
         """
-        ret = ""
+        ptr = ""
+        ptr += "*" * len(self.type_stack[:-1])
+        secondary_type = ""
+        declare_str = ""
 
+        if self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
+            # Find the type
+            size = 0
+            if self._rhs_node:
+                size = self._rhs_node.size()
+            r_type = self._base_type.llvm_type + ptr
+            secondary_type = "[ " + str(size) + " x " + r_type + " ]"
+            if self._rhs_node is not None:
+                declare_str = self._rhs_node.generate_llvm()
         # lexeme = self._declarator.value
-        ret += "%{0} = alloca {1}, align {2}\n".format(self._id,
-                                                       self._base_type.llvm_type,
-                                                       self._base_type.llvm_alignment)
-        if self._rhs_node is not None:
+        ret = ""
+        """if self._rhs_node is not None:
             ret += self._rhs_node.generate_llvm()
             ret += 'store {0} %{1}, {2}* %{3}\n'.format(self._base_type.llvm_type,
                                                         self.register_index,
                                                         self._base_type.llvm_type,
-                                                        self._id)
+                                                        self._id)"""
+        ret = self.indent_string() + "%{0} = alloca {1}\n".format(self._id, secondary_type)
+        ret += declare_str
         return ret
