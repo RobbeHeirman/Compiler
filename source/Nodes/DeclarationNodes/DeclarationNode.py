@@ -221,6 +221,11 @@ class DeclarationNode(NonLeafNode):
 
         return ret
 
+    def implicit_param_ptr_conversion(self):
+        """ int main(int *rgv []) == int main(int **argv)"""
+        if self._declarator_node:
+            self._declarator_node.implicit_param_ptr_conversion()
+
     def generate_llvm(self) -> str:
         """"
         This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}

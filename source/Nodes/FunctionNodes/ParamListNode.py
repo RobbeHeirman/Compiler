@@ -19,6 +19,11 @@ class ParamListNode(NonLeafNode):
     def get_signature_list(self):
         return [child.base_type for child in self._children]
 
+    def first_pass(self):
+        for child in self._children:
+            child.implicit_param_ptr_conversion()
+            child.first_pass()
+
     def semantic_analysis(self):
 
         ret = True

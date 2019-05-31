@@ -36,15 +36,18 @@ class DeclaratorNode(NonLeafNode):
         self._id_node = None
         self._rhs_node = None
         self._param_list_node = None
-
         self._declarator_type = None
+        self._is_implicit_conversion = False
 
     @property
     def label(self):
 
         ret = self._BASE_LABEL
         if self._declarator_type is not None:
-            ret += "\nType: {0}".format(self._declarator_type.value)
+            ret += "\nType: {0}\n".format(self._declarator_type.value)
+
+        if self._is_implicit_conversion:
+            ret += "(implicit conversion)"
         return ret
 
     @property
@@ -66,7 +69,7 @@ class DeclaratorNode(NonLeafNode):
         IdNode: _add_id_node,
     }
 
-    def add_child(self, child):
+    def add_child(self, child, index=None):
 
         if isinstance(child, DeclaratorNode):
             self._add_declarator_node(child)
@@ -142,7 +145,21 @@ class DeclaratorNode(NonLeafNode):
                 return True
 
     def get_function_signature(self):
-        return self._param_list_node.get_function_signature()
+        if self._param_list_node:
+            return self._param_list_node.get_function_signature()
+
+    def implicit_param_ptr_conversion(self):
+
+        if self._declarator_type is DeclaratorSpecifier.ARRAY:
+            self._declarator_type = DeclaratorSpecifier.PTR
+            self._is_implicit_conversion = True
+            if self._rhs_node:
+                self._rhs_node = None
+            return
+        else:
+            if self._declarator_node:
+                self._declarator_node.implicit_param_ptr_conversion()
+        return
 
     def llvm_code_value(self):
         pass
