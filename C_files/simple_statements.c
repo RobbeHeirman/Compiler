@@ -1,7 +1,8 @@
-int main(int a, char** b){ // we don't translate char b[] to char* yet
-return 0;
+int main(int a, char **argv){ // we don't translate char b[] to char* yet
+
+return a;
 }
 
-int t (int b){
-    return b;
+int t (int b[]){
+    return 0;
 }

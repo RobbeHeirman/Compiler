@@ -51,7 +51,23 @@ def main(argv):
     else:
         file_name = "C_files/llvm.ll"
         file = open(file_name, 'w+')
+
+        target_triple = subprocess.check_output(["clang", "-print-target-triple"])
+        target_triple = str(target_triple[0:-1])
+        target_triple = 'target triple = "{0}"\n'.format(target_triple[2:])
+        file.write(target_triple)
         file.write(ast.generate_llvm())
+        file.close()
+
+        print("Normal clang compile...")
+        subprocess.call(["clang", input_file, "-S", "-emit-llvm"])  # Test compiler errors
+        print("Done with clang compiling.")
+        print("Assembling own IR llvm...")
+        subprocess.call(["clang", "-Wno-override-module", "C_files/llvm.ll"])  # Test llvm generated language
+        print("Done with llvm assembling")
+        print("Running executable..")
+        subprocess.call(["a.exe"])
+        print("Done running executable")
 
     return 0
 

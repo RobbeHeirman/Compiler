@@ -10,6 +10,7 @@ from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
+from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Specifiers import TypeSpecifier, DeclaratorSpecifier
 from SymbolTable import Attributes
 from typing import Union
@@ -39,6 +40,8 @@ class DeclarationNode(NonLeafNode):
         # Base info
         self._id = None  # Id can be deducted from children.
         self._base_type = None  # Base type gets passed from a decl_list node.
+
+        self.type_stack = []
 
         # Error message info
         self._filename = None
@@ -171,21 +174,21 @@ class DeclarationNode(NonLeafNode):
         ret = True
         # First we need to pack the identifier's attributes. We have the base type and id trough reference of
         # the remaining decelerators we can deduce the type stack.
-        type_stack = []
         if self._declarator_node is not None:
-            type_stack = self._declarator_node.generate_type_operator_stack()
+            self.type_stack = self._declarator_node.generate_type_operator_stack()
 
         # We have all the info for the corresponding attribute object
-        attr = Attributes(self._base_type, type_stack, self._filename, self._line, self._column)
+        attr = Attributes(self._base_type, self.type_stack, self._filename, self._line, self._column)
 
         # Now we need to check if there are no violations on the operators.
         # 1) Explicit list init if array has no init size if type is array .
-        if len(type_stack) > 0 and type_stack[-1] is DeclaratorSpecifier.ARRAY:  # Last element is top of the stack.
-
+        if len(self.type_stack) > 0 and self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
+            # Last element is top of the stack.
             if not self._declarator_node.array_has_length():  # If array size is not specified MUST have array init rhs.
                 if self._rhs_node is None:
-                    messages.error_array_size_missing(self._id, attr)
-                    ret = False
+                    if not isinstance(self._parent_node, ParamListNode):
+                        messages.error_array_size_missing(self._id, attr)
+                        ret = False
 
             if self._rhs_node is not None:  # The rhs of an array is an init list {0,1 ,2 3, 4}
                 if not isinstance(self._rhs_node, ArrayInitNode):
@@ -203,7 +206,7 @@ class DeclarationNode(NonLeafNode):
                     ret = False
 
         # Functions are allowed to be declared but definitions are not handled by this node
-        elif len(type_stack) > 0 and type_stack[-1] is DeclaratorSpecifier.FUNC:
+        elif len(self.type_stack) > 0 and self.type_stack[-1] is DeclaratorSpecifier.FUNC:
             if self._rhs_node is not None:
                 messages.error_func_initialized_like_var(self._id, attr)
                 ret = False

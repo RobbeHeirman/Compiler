@@ -3,6 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import Specifiers
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 
 
@@ -29,7 +30,10 @@ class ParamListNode(NonLeafNode):
     def generate_llvm(self):
         ret = ""
         for child in self._children:
-            ret += "{0}, ".format(child.base_type.llvm_type)
-
+            ret += "{0}".format(child.base_type.llvm_type)
+            for d_type in child.type_stack:
+                if d_type is Specifiers.DeclaratorSpecifier.PTR:
+                    ret += "*"
+            ret += ", "
         ret = ret[:-2]
         return ret
