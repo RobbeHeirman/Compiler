@@ -67,7 +67,6 @@ class AbstractNode(ABC):
         """
         Add a child node to the AST.
         :param index: is needs to be placed at a certain location
-        :param reverse: Needed for first pass
         :param child: a ASTNode that functions as a child
         """
         if index is None:

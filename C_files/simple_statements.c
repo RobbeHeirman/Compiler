@@ -1,6 +1,9 @@
-int main(int a, char **argv){
-    char ar[] = {'h','e','l','l','o',' ','w','o','r','l','d','!'};
 
-    return 12;
+#include <stdio.h>
+int main(int a, char **argv){
+    //char ar[] = {'h','e','l','l','o',' ','w','o','r','l','d','!'};
+    int i = 12;
+    return i;
+
 }
 

@@ -3,6 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import LlvmCode
 import messages
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
@@ -217,6 +218,7 @@ class DeclarationNode(NonLeafNode):
         # Add to the scopes symbol_table.
 
         if not self.add_to_scope_symbol_table(self._id, attr):
+
             ret = False
 
         if self._rhs_node is not None and not self._rhs_node.semantic_analysis():
@@ -234,27 +236,47 @@ class DeclarationNode(NonLeafNode):
         This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
         """
         ptr = ""
-        ptr += "*" * len(self.type_stack[:-1])
+        ptr += "*" * len(self.type_stack[:-1])  # TODO: This is not correct need ot handle this better
         secondary_type = ""
-        declare_str = ""
 
-        if self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
-            # Find the type
-            size = 0
-            if self._rhs_node:
-                size = self._rhs_node.size()
-            r_type = self._base_type.llvm_type + ptr
-            secondary_type = "[ " + str(size) + " x " + r_type + " ]"
-            if self._rhs_node is not None:
-                declare_str = self._rhs_node.generate_llvm()
-        # lexeme = self._declarator.value
-        ret = ""
-        """if self._rhs_node is not None:
+        # Special types need other llvm code first
+        if self.type_stack:
+            if self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
+                # Find the type
+                size = 0
+                if self._rhs_node:
+                    size = self._rhs_node.size()  # Size of array if declared trough list
+                r_type = self._base_type.llvm_type + ptr
+                secondary_type = "[ " + str(size) + " x " + r_type + " ]"  # This is how we init an array
+
+        else:
+            secondary_type = "{0}{1}".format(self.base_type.llvm_type, ptr)
+
+        ret = self.indent_string() + "%{0} = alloca {1}\n".format(
+            self._id, secondary_type, self.base_type.llvm_alignment)
+
+        if self._rhs_node is not None:
             ret += self._rhs_node.generate_llvm()
-            ret += 'store {0} %{1}, {2}* %{3}\n'.format(self._base_type.llvm_type,
-                                                        self.register_index,
-                                                        self._base_type.llvm_type,
-                                                        self._id)"""
-        ret = self.indent_string() + "%{0} = alloca {1}\n".format(self._id, secondary_type)
-        ret += declare_str
+            prev_register = self.register_index
+            self.increment_register_index()
+            ret += LlvmCode.llvm_load_instruction(
+                self._rhs_node.base_type,
+                str(prev_register),
+                self._rhs_node.type_stack,
+
+                self.base_type,
+                str(self.register_index),
+                self.type_stack,
+                self.indent_string()
+            )
+            ret += LlvmCode.llvm_store_instruction(
+                self._rhs_node.base_type,
+                str(self.register_index),
+                self._rhs_node.type_stack,
+
+                self.base_type,
+                self.id,
+                self.type_stack,
+                self.indent_string()
+            )
         return ret

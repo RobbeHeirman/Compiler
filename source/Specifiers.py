@@ -3,7 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from enum import Enum
+from enum import Enum, auto
 
 
 class TypeSpecifier(Enum):
@@ -15,6 +15,7 @@ class TypeSpecifier(Enum):
     INT = 'int'
     FLOAT = 'float'
     DEFAULT = ''  # Stub when dealing with incomplete info
+    ANY = auto()  # Used for type stack printf() scanf()
 
     @property
     def llvm_type(self) -> str:
