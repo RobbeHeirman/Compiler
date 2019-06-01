@@ -174,7 +174,7 @@ class ExpressionNode(NonLeafNode, ABC):
                 messages.error_undeclared_var(self.identifier, attrib)
 
         for child in self._children:
-            if not child.semantic_analysis:
+            if not child.semantic_analysis():
                 ret = False
 
         return ret

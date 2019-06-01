@@ -10,7 +10,7 @@ from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode, ExpressionNodeType
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
-from Specifiers import Operator, TypeSpecifier
+from Specifiers import Operator, TypeSpecifier, DeclaratorSpecifier
 
 
 class RHSNode(ExpressionNode):
@@ -95,6 +95,10 @@ class RHSNode(ExpressionNode):
                 self.constant = hex(struct.unpack('Q', struct.pack('d', self.constant))[0])
             if self.type is ExpressionNodeType.IDENTIFIER:
                 self.constant = self.identifier
+            take_address = False
+            if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.ADDRESS:
+                take_address = True
+                self.type_stack = self.type_stack[:-1]
 
             ret += self.indent_string() + ";... {0}\n".format(self.constant)
 
@@ -102,6 +106,15 @@ class RHSNode(ExpressionNode):
 
                 ret += LlvmCode.llvm_load_instruction(self.base_type, self.identifier, self.type_stack, self.base_type,
                                                       str(self.register_index), self.type_stack, self.indent_string())
+
+                if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.PTR:
+                    self.type_stack = self.type_stack[:-1]
+                    loading_from = self.register_index
+                    self.increment_register_index()
+                    ret += LlvmCode.llvm_load_instruction(self.base_type, loading_from, self.type_stack,
+                                                          self.base_type,
+                                                          str(self.register_index), self.type_stack,
+                                                          self.indent_string())
 
             else:
                 ret += LlvmCode.llvm_allocate_instruction(str(self.register_index), self.base_type, self.type_stack,
@@ -113,6 +126,16 @@ class RHSNode(ExpressionNode):
                 self.increment_register_index()
                 ret += LlvmCode.llvm_load_instruction(self.base_type, str(prev_index), self.type_stack, self.base_type,
                                                       str(self.register_index), self.type_stack, self.indent_string())
+
+            if take_address:
+                prev_index = self.register_index
+                self.increment_register_index()
+                ret += LlvmCode.llvm_allocate_instruction(str(self.register_index), self.base_type, self.type_stack,
+                                                          self.indent_string())
+
+                ret += LlvmCode.llvm_store_instruction(self.base_type, str(prev_index), self.type_stack,
+                                                       self.base_type, str(self.register_index), self.type_stack,
+                                                       self.indent_string())
 
         if len(self._children) == 1:  # Unary expression
             return self._children[0].generate_llvm()

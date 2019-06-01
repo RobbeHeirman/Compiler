@@ -259,7 +259,7 @@ class DeclarationNode(NonLeafNode):
             ret += self.indent_string() + "; = ...\n"
             ret += self._rhs_node.generate_llvm()
             ret += LlvmCode.llvm_store_instruction(
-                self._rhs_node.base_type,
+                self.base_type,
                 str(self.register_index),
                 self.type_stack,
 
