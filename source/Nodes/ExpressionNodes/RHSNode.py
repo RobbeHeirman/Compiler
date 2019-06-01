@@ -3,6 +3,8 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import struct
+
 import LlvmCode
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
@@ -83,11 +85,14 @@ class RHSNode(ExpressionNode):
 
         if self.type is ExpressionNodeType.CONSTANT or self.type is ExpressionNodeType.IDENTIFIER:
             self.increment_register_index()
-            llvm_type = self.base_type.llvm_type
-            alignment = self.base_type.llvm_alignment
 
             if self.base_type is TypeSpecifier.CHAR:
                 self.constant = ord(str(self.constant)[1])
+            if self.base_type is TypeSpecifier.FLOAT and self.type is ExpressionNodeType.CONSTANT:
+                self.constant = float(self.constant)
+
+                self.constant = struct.unpack('f', struct.pack('f', self.constant))[0]
+                self.constant = hex(struct.unpack('Q', struct.pack('d', self.constant))[0])
             if self.type is ExpressionNodeType.IDENTIFIER:
                 self.constant = self.identifier
 

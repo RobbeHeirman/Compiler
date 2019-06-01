@@ -51,7 +51,6 @@ class ExpressionNode(NonLeafNode, ABC):
         self.filename = None
         self.line = None
         self.column = None
-        self.type_stack = None
 
     @property
     def type_string_llvm(self):
@@ -156,7 +155,6 @@ class ExpressionNode(NonLeafNode, ABC):
 
             if self.is_in_table(self.identifier):
                 attr = self.get_attribute(self.identifier)
-                print(attr)
                 self.base_type = attr.decl_type
                 # Now we need to check if the operations done on the identifier are legal
                 if not len(self.type_stack) is 0:

@@ -20,6 +20,7 @@ class NonLeafNode(AbstractNode.AbstractNode, ABC):
     def __init__(self, parent_node=None):
         super().__init__(parent_node)
 
+        self.type_stack = None
     def dot_string(self) -> str:
         """Generates the visual representation of the node in .dot"""
         ret = super().dot_string()

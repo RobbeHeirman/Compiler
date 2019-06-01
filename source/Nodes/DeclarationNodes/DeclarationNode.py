@@ -185,7 +185,10 @@ class DeclarationNode(NonLeafNode):
         attr = Attributes(self._base_type, self.type_stack, self._filename, self._line, self._column)
 
         # Now we need to check if there are no violations on the operators.
-        # 1) Explicit list init if array has no init size if type is array .
+        # 1) Ptr type requires address of same type on the right side, NO IMPLICIT CONVERSIONS.
+        if len(self.type_stack) > 0 and self.type_stack[-1].PTR:
+            pass
+        # 2) Explicit list init if array has no init size if type is array .
         if len(self.type_stack) > 0 and self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
             # Last element is top of the stack.
             if not self._declarator_node.array_has_length():  # If array size is not specified MUST have array init rhs.
@@ -218,7 +221,6 @@ class DeclarationNode(NonLeafNode):
         # Add to the scopes symbol_table.
 
         if not self.add_to_scope_symbol_table(self._id, attr):
-
             ret = False
 
         if self._rhs_node is not None and not self._rhs_node.semantic_analysis():
@@ -240,16 +242,15 @@ class DeclarationNode(NonLeafNode):
         ret = self.indent_string() + "; Declaration: {0}{1} {2}\n".format(self.base_type.value, ptr, self.id)
         secondary_type = ""
         # Special types need other llvm code first
-        if self.type_stack:
-            if self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
-                # Find the type
-                size = 0
-                if self._rhs_node:
-                    size = self._rhs_node.size()  # Size of array if declared trough list
-                r_type = self._base_type.llvm_type + ptr
-                secondary_type = "[ " + str(size) + " x " + r_type + " ]"  # This is how we init an array
-                ret += self.indent_string() + "%{0} = alloca {1}\n".format(
-                    self._id, secondary_type, self.base_type.llvm_alignment)
+        if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
+            # Find the type
+            size = 0
+            if self._rhs_node:
+                size = self._rhs_node.size()  # Size of array if declared trough list
+            r_type = self._base_type.llvm_type + ptr
+            secondary_type = "[ " + str(size) + " x " + r_type + " ]"  # This is how we init an array
+            ret += self.indent_string() + "%{0} = alloca {1}\n".format(
+                self._id, secondary_type, self.base_type.llvm_alignment)
 
         else:
             ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self.type_stack, self.indent_string())
@@ -260,7 +261,7 @@ class DeclarationNode(NonLeafNode):
             ret += LlvmCode.llvm_store_instruction(
                 self._rhs_node.base_type,
                 str(self.register_index),
-                self._rhs_node.type_stack,
+                self.type_stack,
 
                 self.base_type,
                 self.id,

@@ -14,7 +14,7 @@ def convert_operator_stack_to_str(operator_stack: List[Specifiers.DeclaratorSpec
     :param operator_stack: The stack of declaratorSpecifiers
     :return: Operator stack in string notation
     """
-    return "*" * len(operator_stack[:-1])
+    return "*" * len(operator_stack)
 
 
 def llvm_allocate_instruction(target_register: str, spec_type: Specifiers.TypeSpecifier, operator_stack,
