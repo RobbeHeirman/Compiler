@@ -91,8 +91,6 @@ class FuncDefNode(ScopedNode):
 
         return ret
 
-    def get_attribute(self, lexeme):
-        super().get_attribute(lexeme)
 
     def generate_llvm(self):
         self.increment_register_index()

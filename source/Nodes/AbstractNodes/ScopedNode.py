@@ -53,8 +53,8 @@ class ScopedNode(ExpressionNode.NonLeafNode, ABC):
         self._register_index += 1
 
     def get_attribute(self, lexeme):
-        if self._symbol_table.get_attribute(lexeme):  # Is declared in this scope.
-            return True
+        if self._symbol_table.is_in_symbol_table(lexeme):  # Is declared in this scope.
+            return self._symbol_table.get_attribute(lexeme)
 
         else:
             return self._parent_node.get_attribute(lexeme)  # Looking in higher scoped symbol tables.

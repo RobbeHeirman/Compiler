@@ -3,7 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-
+import LlvmCode
 from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode, ExpressionNodeType
@@ -80,18 +80,34 @@ class RHSNode(ExpressionNode):
 
     def generate_llvm(self):
         ret = ""
-        self.increment_register_index()
-        if self.type is ExpressionNodeType.CONSTANT:
+
+        if self.type is ExpressionNodeType.CONSTANT or self.type is ExpressionNodeType.IDENTIFIER:
+            self.increment_register_index()
             llvm_type = self.base_type.llvm_type
             alignment = self.base_type.llvm_alignment
 
             if self.base_type is TypeSpecifier.CHAR:
                 self.constant = ord(str(self.constant)[1])
+            if self.type is ExpressionNodeType.IDENTIFIER:
+                self.constant = self.identifier
 
-            ret += self.indent_string() + "%{0} = alloca {1}, align {2}\n".format(
-                self.register_index, llvm_type, alignment)
-            ret += self.indent_string() + "store {0} {1}, {2}* %{3}, align {4}\n".format(
-                llvm_type, self.constant, llvm_type, self.register_index, alignment)
+            ret += self.indent_string() + ";... {0}\n".format(self.constant)
+
+            if self.type is ExpressionNodeType.IDENTIFIER:
+
+                ret += LlvmCode.llvm_load_instruction(self.base_type, self.identifier, self.type_stack, self.base_type,
+                                                      str(self.register_index), self.type_stack, self.indent_string())
+
+            else:
+                ret += LlvmCode.llvm_allocate_instruction(str(self.register_index), self.base_type, self.type_stack,
+                                                          self.indent_string())
+                ret += LlvmCode.llvm_store_instruction_c(self.base_type, str(self.constant), self.type_stack,
+                                                         self.base_type, str(self.register_index), self.type_stack,
+                                                         self.indent_string())
+                prev_index = self.register_index
+                self.increment_register_index()
+                ret += LlvmCode.llvm_load_instruction(self.base_type, str(prev_index), self.type_stack, self.base_type,
+                                                      str(self.register_index), self.type_stack, self.indent_string())
 
         if len(self._children) == 1:  # Unary expression
             return self._children[0].generate_llvm()
@@ -114,6 +130,7 @@ class RHSNode(ExpressionNode):
             self.increment_register_index()
             ret += "%{0} = {1} {2} %{3}, %{4}\n".format(self.register_index, operating_word,
                                                         self.base_type.llvm_type, index1, index2)
+        ret += self.indent_string() + "; end expression\n"
         return ret
 
     """

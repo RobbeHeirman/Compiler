@@ -237,8 +237,8 @@ class DeclarationNode(NonLeafNode):
         """
         ptr = ""
         ptr += "*" * len(self.type_stack[:-1])  # TODO: This is not correct need ot handle this better
+        ret = self.indent_string() + "; Declaration: {0}{1} {2}\n".format(self.base_type.value, ptr, self.id)
         secondary_type = ""
-
         # Special types need other llvm code first
         if self.type_stack:
             if self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
@@ -248,27 +248,15 @@ class DeclarationNode(NonLeafNode):
                     size = self._rhs_node.size()  # Size of array if declared trough list
                 r_type = self._base_type.llvm_type + ptr
                 secondary_type = "[ " + str(size) + " x " + r_type + " ]"  # This is how we init an array
+                ret += self.indent_string() + "%{0} = alloca {1}\n".format(
+                    self._id, secondary_type, self.base_type.llvm_alignment)
 
         else:
-            secondary_type = "{0}{1}".format(self.base_type.llvm_type, ptr)
-
-        ret = self.indent_string() + "%{0} = alloca {1}\n".format(
-            self._id, secondary_type, self.base_type.llvm_alignment)
+            ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self.type_stack, self.indent_string())
 
         if self._rhs_node is not None:
+            ret += self.indent_string() + "; = ...\n"
             ret += self._rhs_node.generate_llvm()
-            prev_register = self.register_index
-            self.increment_register_index()
-            ret += LlvmCode.llvm_load_instruction(
-                self._rhs_node.base_type,
-                str(prev_register),
-                self._rhs_node.type_stack,
-
-                self.base_type,
-                str(self.register_index),
-                self.type_stack,
-                self.indent_string()
-            )
             ret += LlvmCode.llvm_store_instruction(
                 self._rhs_node.base_type,
                 str(self.register_index),
@@ -279,4 +267,5 @@ class DeclarationNode(NonLeafNode):
                 self.type_stack,
                 self.indent_string()
             )
+        ret += self.indent_string() + "; end declaration\n"
         return ret

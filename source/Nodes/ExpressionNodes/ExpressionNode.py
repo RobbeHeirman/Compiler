@@ -156,7 +156,8 @@ class ExpressionNode(NonLeafNode, ABC):
 
             if self.is_in_table(self.identifier):
                 attr = self.get_attribute(self.identifier)
-
+                print(attr)
+                self.base_type = attr.decl_type
                 # Now we need to check if the operations done on the identifier are legal
                 if not len(self.type_stack) is 0:
                     attr_stack = copy.copy(attr.operator_stack)
