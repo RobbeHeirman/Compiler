@@ -7,7 +7,6 @@ from abc import ABC
 from typing import List
 
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
-from Specifiers import TypeSpecifier
 
 
 class NonLeafNode(AbstractNode.AbstractNode, ABC):
@@ -21,6 +20,7 @@ class NonLeafNode(AbstractNode.AbstractNode, ABC):
         super().__init__(parent_node)
 
         self.type_stack = []
+
     def dot_string(self) -> str:
         """Generates the visual representation of the node in .dot"""
         ret = super().dot_string()

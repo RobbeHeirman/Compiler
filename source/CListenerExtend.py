@@ -18,6 +18,7 @@ from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
 from Nodes.ExpressionNodes.FixNode import FixNode, FixType
 from Nodes.ExpressionNodes.LHSNode import LHSNode
+from Nodes.ExpressionNodes.RHSParamListNode import RHSParamListNode
 from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
 from Nodes.ExpressionNodes.IdNode import IdNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
@@ -278,7 +279,7 @@ class CListenerExtend(CListener):
 
     def enterRhs_param_list(self, ctx: CParser.Rhs_param_listContext):
 
-        node = ParamListNode(self._parent_node)
+        node = RHSParamListNode(self._parent_node)
         self._parent_node.add_child(node)
         self._parent_node = node
 

@@ -14,12 +14,5 @@ class IncludeStatementNode(LeafNode):
     def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
         super().__init__(parent_node, filename, ctx)
 
-    def semantic_analysis(self):
-        """
-        Needs to set printf and scanf into symbol table
-        :return:
-        """
-
-        # First of printf
-        id = "printf"
-        return True
+    def generate_llvm(self):
+        return "declare i32 @printf(i8*, ...)\ndeclare i32 @scanf(i8*, ...)\n"

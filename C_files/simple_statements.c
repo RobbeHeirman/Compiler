@@ -1,5 +1,5 @@
 
-
+#include <stdio.h>
 int main(int a, char **argv){
     //char ar[] = {'h','e','l','l','o',' ','w','o','r','l','d','!'};
 
@@ -13,7 +13,8 @@ int main(int a, char **argv){
     float floater2 = 17.2; */
     int integer = 40;
     int* pointer2 = &integer;
-    //int integer2 = *pointer2;
+    int integer2 = *pointer2;
+    printf(integer2);
 
 }
 

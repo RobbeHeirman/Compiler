@@ -14,6 +14,7 @@ statement
     | selection_statements
     | while_statement
     | include_statement
+    | rhs SEMICOLON
     ;
 
 decl_list
