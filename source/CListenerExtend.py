@@ -4,6 +4,8 @@
  Course: Compilers
  Academic Year: 2018-2019
 """
+from typing import Union
+
 from AST import AST
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ConditionalNodes.ConditionNode import ConditionNode
@@ -19,7 +21,6 @@ from Nodes.ExpressionNodes.FixNode import FixNode, FixType
 from Nodes.ExpressionNodes.LHSNode import LHSNode
 from Nodes.ExpressionNodes.RHSParamListNode import RHSParamListNode
 from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
-from Nodes.ExpressionNodes.IdNode import IdNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Nodes.FunctionNodes.ReturnNode import ReturnNode
@@ -167,8 +168,11 @@ class CListenerExtend(CListener):
         self._parent_node.declarator_type = DeclaratorSpecifier.ARRAY
 
     def enterId_decl(self, ctx: CParser.Id_declContext):
-        node = IdNode(self._parent_node, self._filename, ctx)
-        self._parent_node.add_child(node)
+
+        self._parent_node: Union[DeclarationNode, DeclaratorNode]
+        self._parent_node.add_id(ctx.getText())
+        # Is just a stub. We propagated the identifier. So the node is no necessary.
+        self._parent_node.parent_node.remove_child(self._parent_node)
 
     def enterArray_init(self, ctx: CParser.Array_initContext):
         node = ArrayInitNode(self._parent_node)
@@ -207,7 +211,7 @@ class CListenerExtend(CListener):
     def exitLhs(self, ctx: CParser.LhsContext):
         self._parent_node = self._parent_node.parent_node
 
-    def enterRhs(self, ctx: CParser.RhsContext):
+    def enterExpression(self, ctx: CParser.ExpressionContext):
         """
         Any (sub) expression need to handle the operator kind
         :param ctx:  ParserContextNode
@@ -237,7 +241,7 @@ class CListenerExtend(CListener):
                 operator = Operator(child.getText())
                 node.operator = operator
 
-    def exitRhs(self, ctx: CParser.RhsContext):
+    def exitExpression(self, ctx: CParser.ExpressionContext):
         """
         Need to pop the rhs nodes from the parent node
         :param ctx:
@@ -253,35 +257,36 @@ class CListenerExtend(CListener):
         c_node = ConstantNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(c_node)
 
-    def enterId_rhs(self, ctx: CParser.Id_rhsContext):
-        id_node = IdNode(self._parent_node, self._filename, ctx)
-        self._parent_node.add_child(id_node)
+    def enterId_expression(self, ctx: CParser.Id_expressionContext):
+        # id_node = IdNode(self._parent_node, self._filename, ctx)
+        # self._parent_node.add_child(id_node)
+        print("ID RHS is not fixed yet")
 
-    def enterRhs_prefix(self, ctx: CParser.Rhs_prefixContext):
+    def enterExpression_prefix(self, ctx: CParser.Expression_prefixContext):
         val = ctx.getChild(0).getText()
         node = FixNode(self._parent_node, FixType(val))
         self._parent_node.add_child(node)
         self._parent_node = node
 
-    def exitRhs_prefix(self, ctx: CParser.Rhs_prefixContext):
+    def exitExpression_prefix(self, ctx: CParser.Expression_prefixContext):
         self._parent_node = self._parent_node.parent_node
 
-    def enterRhs_postfix(self, ctx: CParser.Rhs_postfixContext):
+    def enterExpression_postfix(self, ctx: CParser.Expression_postfixContext):
         val = ctx.getChild(0).getChild(0).getText() + ctx.getChild(0).getChild(2).getText()
         node = FixNode(self._parent_node, FixType(val))
         self._parent_node.add_child(node)
         self._parent_node = node
 
-    def exitRhs_postfix(self, ctx: CParser.Rhs_postfixContext):
+    def exitExpression_postfix(self, ctx: CParser.Expression_postfixContext):
         self._parent_node = self._parent_node.parent_node
 
-    def enterRhs_param_list(self, ctx: CParser.Rhs_param_listContext):
+    def enterExpression_param_list(self, ctx: CParser.Expression_param_listContext):
 
         node = RHSParamListNode(self._parent_node)
         self._parent_node.add_child(node)
         self._parent_node = node
 
-    def exitRhs_param_list(self, ctx: CParser.Rhs_param_listContext):
+    def exitExpression_param_list(self, ctx: CParser.Expression_param_listContext):
         self._parent_node = self._parent_node.parent_node
 
     def enterInclude_statement(self, ctx: CParser.Include_statementContext):

@@ -14,7 +14,7 @@ statement
     | selection_statements
     | while_statement
     | include_statement
-    | rhs SEMICOLON
+    | expression SEMICOLON
     ;
 
 decl_list
@@ -22,11 +22,11 @@ decl_list
     ;
 
 simple_declaration // int a, char foo....
-    :  declarator (EQ (array_init | rhs))?
+    :  declarator (EQ (array_init | expression))?
     ;
 
 array_init
-    : LBRACES rhs (COMMA rhs)* RBRACES
+    : LBRACES expression (COMMA expression)* RBRACES
     ;
 
 base_type
@@ -58,7 +58,7 @@ postfix_operator
 
 array_operator
     :
-    LEFT_BRACKET rhs? RIGHT_BRACKET
+    LEFT_BRACKET expression? RIGHT_BRACKET
     ;
 function_operator
     : LPARANT parameter_list RPARANT
@@ -72,52 +72,52 @@ param
     : base_type declarator
     ;
 assignment // a = 4;, int b = a;
-    : lhs EQ rhs SEMICOLON
+    : lhs EQ expression SEMICOLON
     ;
 
 lhs // L value nodes
-    : lhs rhs_postfix
-    | rhs_prefix lhs
-    | id_rhs
+    : lhs expression_postfix
+    | expression_prefix lhs
+    | id_expression
     ;
 
-rhs // Possible R values
+expression // Possible R values
     : constant
-    | rhs rhs_postfix
-    | rhs_prefix rhs
-    | id_rhs
-    | SUB rhs
-    | LPARANT rhs RPARANT
-    | <assoc=right> rhs POWER rhs
-    | rhs (INCEREMENT | DECREMENT)
-    | rhs (ASTERIX | DIVIDE) rhs
-    | rhs (ADD | SUB) rhs
+    | expression expression_postfix
+    | expression_prefix expression
+    | id_expression
+    | SUB expression
+    | LPARANT expression RPARANT
+    | <assoc=right> expression POWER expression
+    | expression (INCEREMENT | DECREMENT)
+    | expression (ASTERIX | DIVIDE) expression
+    | expression (ADD | SUB) expression
     ;
 
-id_rhs
+id_expression
     : ID
     ;
 
-rhs_prefix
-    : rhs_addr
+expression_prefix
+    : expression_addr
     | ptr_decl
     ;
 
-rhs_addr
+expression_addr
     : ADDRESS
     ;
 
-rhs_postfix
-    : rhs_function_operator
+expression_postfix
+    : expression_function_operator
     | array_operator
     ;
 
-rhs_function_operator
-    : LPARANT rhs_param_list RPARANT
+expression_function_operator
+    : LPARANT expression_param_list RPARANT
     ;
 
-rhs_param_list
-    : (rhs (COMMA rhs)*)?
+expression_param_list
+    : (expression (COMMA expression)*)?
     ;
 
 constant
@@ -131,7 +131,7 @@ func_def
     ;
 
 ret_statement
-    : RETURN (rhs)?
+    : RETURN (expression)?
     ;
 
 selection_statements
@@ -158,7 +158,7 @@ cond_statement
     :LPARANT condition RPARANT LBRACES statements RBRACES
     ;
 condition
-    : rhs cond_operator rhs
+    : expression cond_operator expression
     ;
 
 cond_operator

@@ -6,7 +6,6 @@ from typing import List
 import messages
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ExpressionNodes.FixNode import FixType, FixNode
-from Nodes.ExpressionNodes.IdNode import IdNode
 from Specifiers import DeclaratorSpecifier
 from SymbolTable import Attributes
 
@@ -79,12 +78,7 @@ class ExpressionNode(AbstractNode, ABC):
 
     def add_child(self, child: AbstractNode, index=None):
 
-        if isinstance(child, IdNode):
-
-            self._identifier_node = child
-            self.type = ExpressionNodeType.IDENTIFIER
-
-        elif isinstance(child, FixNode):
+        if isinstance(child, FixNode):
             self._member_operator_node = child
 
         super().add_child(child)

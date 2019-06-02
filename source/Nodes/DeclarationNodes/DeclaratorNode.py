@@ -3,10 +3,10 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.ExpressionNodes.IdNode import IdNode
+
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
-from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Specifiers import DeclaratorSpecifier
 
 
@@ -16,10 +16,10 @@ class DeclaratorNode(AbstractNode):
     We can omit this in a future pass. This node has no actual info about the program.
     """
     _param_list_node: ParamListNode
-    _declarator_type: DeclaratorSpecifier
+    declarator_type: DeclaratorSpecifier
     _specifier_node: AbstractNode
     _declarator_node: "DeclaratorNode"
-    _id_node: IdNode
+    _parent_node: "DeclaratorNode"
 
     _BASE_LABEL = "Declarator"
 
@@ -35,55 +35,31 @@ class DeclaratorNode(AbstractNode):
         self._id_node = None
         self._rhs_node = None
         self._param_list_node = None
-        self._declarator_type = None
+        self.declarator_type = None
         self._is_implicit_conversion = False
 
     @property
     def label(self):
 
         ret = self._BASE_LABEL
-        if self._declarator_type is not None:
-            ret += "\nType: {0}\n".format(self._declarator_type.value)
+        if self.declarator_type is not None:
+            ret += "\nType: {0}\n".format(self.declarator_type.value)
 
         if self._is_implicit_conversion:
             ret += "(implicit conversion)"
         return ret
 
-    @property
-    def declarator_type(self):
-        return self._declarator_type
-
-    @declarator_type.setter
-    def declarator_type(self, value):
-        self._declarator_type = value
-
-    def _add_declarator_node(self, child):
-
-        self._declarator_node = child
-
     def _add_id_node(self, child):
         self._id_node = child
-
-    _OVERLOAD_MAP = {
-        IdNode: _add_id_node,
-    }
 
     def add_child(self, child, index=None):
 
         if isinstance(child, DeclaratorNode):
-            self._add_declarator_node(child)
-
-        elif isinstance(child, RHSNode):
-            if isinstance(child, IdNode):
-                self._add_id_node(child)
-
+            self._declarator_node = child
             self._rhs_node = child
 
         elif isinstance(child, ParamListNode):
             self._param_list_node = child
-
-        else:
-            self._OVERLOAD_MAP.get(type(child))(self, child)
 
         super().add_child(child)
 
@@ -92,31 +68,13 @@ class DeclaratorNode(AbstractNode):
             self._declarator_node = None
         super().remove_child(child)
 
-    def find_id(self) -> IdNode:
+    def add_id(self, identifier: str):
         """
-        We will search the identifier in the declarator tree. The declaration node wants this info for the symbol
-        table.
-        :return: the identifier
+        Will propagate an added id to the declaration node
+        :param identifier: The id to propagate
+        :return: None
         """
-        # this node contained the identifier, so it can just return it
-        if self._id_node is not None:
-            self._parent_node.remove_child(self)
-            return self._id_node
-
-        elif self._declarator_node is not None:
-            return self._declarator_node.find_id()
-
-    def first_pass(self):
-        """
-        We mainly want to remove this type of node in the Ast since it doesn't generate useful info.
-        We use this node to handle pre postfix hierarchy.
-        """
-
-        if self._id_node is None:
-            self._id_node = self.find_id()
-
-        for child in self._children:
-            child.first_pass()
+        self._parent_node.add_id(identifier)
 
     def generate_type_operator_stack(self, type_stack=None):
         """
@@ -127,8 +85,8 @@ class DeclaratorNode(AbstractNode):
         if type_stack is None:
             type_stack = []
 
-        if self._declarator_type is not None:
-            type_stack.append(self._declarator_type)
+        if self.declarator_type is not None:
+            type_stack.append(self.declarator_type)
 
         if self._declarator_node is not None:
             self._declarator_node.generate_type_operator_stack(type_stack)
@@ -149,8 +107,8 @@ class DeclaratorNode(AbstractNode):
 
     def implicit_param_ptr_conversion(self):
 
-        if self._declarator_type is DeclaratorSpecifier.ARRAY:
-            self._declarator_type = DeclaratorSpecifier.PTR
+        if self.declarator_type is DeclaratorSpecifier.ARRAY:
+            self.declarator_type = DeclaratorSpecifier.PTR
             self._is_implicit_conversion = True
             if self._rhs_node:
                 self._rhs_node = None
