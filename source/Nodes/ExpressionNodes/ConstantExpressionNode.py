@@ -37,6 +37,7 @@ class ConstantExpressionNode(ExpressionNode):
         return str(self.constant)
 
     def generate_llvm(self) -> str:
+        self.increment_register_index()
         ret = self.indent_string() + ";... {0}\n".format(self.constant)
         ret += LlvmCode.llvm_allocate_instruction(str(self.register_index), self.base_type, [],
                                                   self.indent_string())

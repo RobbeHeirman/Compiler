@@ -29,8 +29,8 @@ def llvm_allocate_instruction(target_register: str, spec_type: Specifiers.TypeSp
 
     operator_string = convert_operator_stack_to_str(operator_stack)
 
-    return indent_string + "%{0} = alloca {1}{2}, align {3}\n".format(
-        target_register, spec_type.llvm_type, operator_string, spec_type.llvm_alignment)
+    return indent_string + "%{0} = alloca {1}{2}\n".format(
+        target_register, spec_type.llvm_type, operator_string)
 
 
 def llvm_store_instruction(source_type: Specifiers.TypeSpecifier, source_register: str,
@@ -51,14 +51,14 @@ def llvm_store_instruction(source_type: Specifiers.TypeSpecifier, source_registe
     """
     s_operator_string = convert_operator_stack_to_str(source_operator_stack)
     t_operator_string = convert_operator_stack_to_str(target_operator_stack)
-    ret = indent_string + "store {0}{1} %{2}, {3}{4}* %{5}, align {6}\n".format(
+    ret = indent_string + "store {0}{1} %{2}, {3}{4}* %{5}\n".format(
         source_type.llvm_type,
         s_operator_string,
         source_register,
         target_type.llvm_type,
         t_operator_string,
         target_register,
-        source_type.llvm_alignment
+        # source_type.llvm_alignment
     )
     return ret
 
@@ -81,14 +81,14 @@ def llvm_store_instruction_c(source_type: Specifiers.TypeSpecifier, source_const
     """
     s_operator_string = convert_operator_stack_to_str(source_operator_stack)
     t_operator_string = convert_operator_stack_to_str(target_operator_stack)
-    ret = indent_string + "store {0}{1} {2}, {3}{4}* %{5}, align {6}\n".format(
+    ret = indent_string + "store {0}{1} {2}, {3}{4}* %{5}\n".format(
         source_type.llvm_type,
         s_operator_string,
         source_constant,
         target_type.llvm_type,
         t_operator_string,
-        target_register,
-        source_type.llvm_alignment
+        target_register
+        # source_type.llvm_alignment
     )
     return ret
 
@@ -112,7 +112,7 @@ def llvm_load_instruction(source_type: Specifiers.TypeSpecifier, source_register
     s_operator_string = convert_operator_stack_to_str(source_operator_stack)
     t_operator_string = convert_operator_stack_to_str(target_operator_stack)
 
-    ret = indent_string + "%{0} = load {1}{2}, {3}{4}* %{5}, align {6}\n".format(
+    ret = indent_string + "%{0} = load {1}{2}, {3}{4}* %{5}\n".format(
         target_register,
         target_type.llvm_type,
         t_operator_string,
@@ -120,7 +120,7 @@ def llvm_load_instruction(source_type: Specifiers.TypeSpecifier, source_register
         source_type.llvm_type,
         s_operator_string,
         source_register,
-        source_type.llvm_alignment
+        # source_type.llvm_alignment
     )
 
     return ret

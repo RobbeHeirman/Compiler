@@ -44,6 +44,8 @@ class ExpressionNode(AbstractNode):
         self.base_type = None
         self.type = None
 
+        self.type_stack = []
+
         # Book keeping info
         self.filename = None
         self.line = None

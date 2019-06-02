@@ -25,7 +25,7 @@ class DeclarationNode(AbstractNode):
     An optional initializer as 2d child.
     """
     _declarator_node: DeclaratorNode
-    _expression_node: Union[RHSNode, ArrayInitNode]
+    _expression_node: Union[RHSNode, "ArrayInitNode"]
     _lexeme: str
 
     _BASE_LABEL = "Declaration"
@@ -186,15 +186,16 @@ class DeclarationNode(AbstractNode):
         if self._expression_node is not None:
             ret += self.indent_string() + "; = ...\n"
             ret += self._expression_node.generate_llvm()
-            ret += LlvmCode.llvm_store_instruction(
-                self.base_type,
-                str(self.register_index),
-                self.type_stack,
+            if not (isinstance(self._expression_node, ArrayInitNode)):
+                ret += LlvmCode.llvm_store_instruction(
+                    self.base_type,
+                    str(self.register_index),
+                    self.type_stack,
 
-                self.base_type,
-                self.id,
-                self.type_stack,
-                self.indent_string()
-            )
+                    self.base_type,
+                    self.id,
+                    self.type_stack,
+                    self.indent_string()
+                )
         ret += self.indent_string() + "; end declaration\n"
         return ret

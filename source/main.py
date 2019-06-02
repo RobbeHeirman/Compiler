@@ -24,18 +24,19 @@ class TracePrints(object):
         traceback.print_stack(file=self.stdout)
 
 
-
+# sys.stdout = TracePrints()
 def main(argv):
     # Lexical analysis
     # input_file = argv[0]
-    input_file = "C_files/simple_statements.c"
+    input_file = argv[0]
     input_stream = FileStream(input_file)
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = CParser(stream)
+    tree = parser.statements()
     if parser.getNumberOfSyntaxErrors() is not 0:
         return 1
-    tree = parser.statements()
+
     listener = CListenerExtend.CListenerExtend(input_file)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
@@ -61,7 +62,7 @@ def main(argv):
     if not ast.semantic_analysis():
         print("I failed =(")
     else:
-        file_name = "C_files/llvm.ll"
+        file_name = argv[1]
         file = open(file_name, 'w+')
 
         target_triple = subprocess.check_output(["clang", "-print-target-triple"])
