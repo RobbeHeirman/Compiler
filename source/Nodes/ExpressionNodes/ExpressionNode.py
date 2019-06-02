@@ -54,6 +54,21 @@ class ExpressionNode(AbstractNode, ABC):
     def type_string_llvm(self):
         return self.base_type.llvm_type + "*" * len(self.type_stack)
 
+    @property
+    def label(self):
+        ret = self._BASE_LABEL + "\n"
+        if self.base_type:
+            ret += "Base type: " + self.base_type.value + "\n"
+
+        return ret
+
+    def add_child(self, child: AbstractNode, index=None):
+
+        if isinstance(child, FixNode):
+            self._member_operator_node = child
+
+        super().add_child(child)
+
     def get_error_info(self):
         """
         :return: A tuple filename, line, column
@@ -66,22 +81,6 @@ class ExpressionNode(AbstractNode, ABC):
         else:
             return self.filename, self.line, self.column
 
-    @property
-    def label(self):
-        ret = self._BASE_LABEL
-        if self.type is not None:
-            ret += "\n{0}".format(self.type.value)
-
-            if self.type is ExpressionNodeType.IDENTIFIER:
-                ret += "{0}".format(self.identifier)
-        return ret
-
-    def add_child(self, child: AbstractNode, index=None):
-
-        if isinstance(child, FixNode):
-            self._member_operator_node = child
-
-        super().add_child(child)
 
     def _handle_member_operator_node(self):
 

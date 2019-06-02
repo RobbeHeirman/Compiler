@@ -121,9 +121,21 @@ expression_param_list
     ;
 
 constant
+    : character_constant
+    | integer_constant
+    | floating_constant
+    ;
+
+character_constant
     : CHARACTER_C
-    | NUMERAL_C
-    | FLOAT_C
+    ;
+
+integer_constant
+    : NUMERAL_C
+    ;
+
+floating_constant
+    : FLOAT_C
     ;
 
 func_def

@@ -13,6 +13,7 @@ from Nodes.ConditionalNodes.IfElseNode import IfElseNode
 from Nodes.DeclarationNodes.IncludeStatementNode import IncludeStatementNode
 from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
+from Nodes.ExpressionNodes.ConstantExpressionNode import ConstantExpressionNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.DeclarationNodes.DeclListNode import DeclListNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
@@ -96,6 +97,8 @@ class CListenerExtend(CListener):
     def exitParam(self, ctx: CParser.ParamContext):
         self._parent_node = self._parent_node.parent_node
 
+    # Simple Declarations
+    # ======================================================================================================================
     def enterDecl_list(self, ctx: CParser.Decl_listContext):
         """
         Entering decl list example : int, a, b = 10, c..;
@@ -174,6 +177,9 @@ class CListenerExtend(CListener):
         # Is just a stub. We propagated the identifier. So the node is no necessary.
         self._parent_node.parent_node.remove_child(self._parent_node)
 
+    # Initialize a declaration
+    # ======================================================================================================================
+
     def enterArray_init(self, ctx: CParser.Array_initContext):
         node = ArrayInitNode(self._parent_node)
         self._parent_node.add_child(node)
@@ -211,6 +217,8 @@ class CListenerExtend(CListener):
     def exitLhs(self, ctx: CParser.LhsContext):
         self._parent_node = self._parent_node.parent_node
 
+    # Expressions
+    # ======================================================================================================================
     def enterExpression(self, ctx: CParser.ExpressionContext):
         """
         Any (sub) expression need to handle the operator kind
@@ -254,8 +262,22 @@ class CListenerExtend(CListener):
         self._parent_node = self._parent_node.parent_node
 
     def enterConstant(self, ctx: CParser.ConstantContext):
-        c_node = ConstantNode(self._parent_node, self._filename, ctx)
+        c_node = ConstantExpressionNode(self._parent_node, ctx.getText())
         self._parent_node.add_child(c_node)
+        self._parent_node = c_node
+
+    def exitConstant(self, ctx: CParser.ConstantContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterCharacter_constant(self, ctx: CParser.Character_constantContext):
+        self._parent_node: ConstantExpressionNode
+        self._parent_node.base_type = TypeSpecifier.CHAR
+
+    def enterFloating_constant(self, ctx: CParser.Floating_constantContext):
+        self._parent_node.base_type = TypeSpecifier.FLOAT
+
+    def enterInteger_constant(self, ctx: CParser.Integer_constantContext):
+        self._parent_node.base_type = TypeSpecifier.INT
 
     def enterId_expression(self, ctx: CParser.Id_expressionContext):
         # id_node = IdNode(self._parent_node, self._filename, ctx)

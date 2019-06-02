@@ -72,6 +72,7 @@ class FuncDefNode(ScopedNode):
         return ret
 
     def generate_llvm(self):
+
         self.increment_register_index()
         ret = self.indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self._id)
         ret += "{0}){{\n".format(self._children[0].generate_llvm())

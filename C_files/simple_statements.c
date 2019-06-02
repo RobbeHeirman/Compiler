@@ -12,8 +12,8 @@ int main(int a, char **argv){
     char character2 = 'a';
     float floater2 = 17.2; */
     int integer = 40;
-    int* pointer2 = &integer;
-    int integer2 = *pointer2;
+    //int* pointer2 = &integer;
+    //int integer2 = *pointer2;
 
 
 }
