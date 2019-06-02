@@ -3,15 +3,14 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Specifiers import TypeSpecifier
 
 
-class ReturnNode(NonLeafNode):
+class ReturnNode(AbstractNode):
     label = "return"
 
-    def __init__(self, parent_node: NonLeafNode):
+    def __init__(self, parent_node: AbstractNode):
         super().__init__(parent_node)
 
     @property

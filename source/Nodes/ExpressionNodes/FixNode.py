@@ -5,7 +5,7 @@ Academic Year: 2018-2019
 """
 from enum import Enum
 
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 
 
 class FixType(Enum):
@@ -15,7 +15,7 @@ class FixType(Enum):
     ADDRESS = "&"
 
 
-class FixNode(NonLeafNode):
+class FixNode(AbstractNode):
 
     def __init__(self, parent_node, f_type: FixType):
         super().__init__(parent_node)

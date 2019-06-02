@@ -3,10 +3,10 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 
 
-class RHSParamListNode(NonLeafNode):
+class RHSParamListNode(AbstractNode):
 
     @property
     def label(self):

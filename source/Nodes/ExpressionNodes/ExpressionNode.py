@@ -5,7 +5,6 @@ from typing import List
 
 import messages
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.ExpressionNodes.FixNode import FixType, FixNode
 from Nodes.ExpressionNodes.IdNode import IdNode
 from Specifiers import DeclaratorSpecifier
@@ -32,7 +31,7 @@ class ExpressionNodeType(Enum):
         return specifier_map[self]
 
 
-class ExpressionNode(NonLeafNode, ABC):
+class ExpressionNode(AbstractNode, ABC):
     _BASE_LABEL = "expression"
     _OPERATOR_TYPES = [ExpressionNodeType.ARRAY,
                        ExpressionNodeType.PTR, ExpressionNodeType.ADDR, ExpressionNodeType.FUNCTION]

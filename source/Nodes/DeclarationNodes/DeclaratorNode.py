@@ -3,22 +3,21 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ExpressionNodes.IdNode import IdNode
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Specifiers import DeclaratorSpecifier
 
 
-class DeclaratorNode(NonLeafNode):
+class DeclaratorNode(AbstractNode):
     """
     We use this node to handle prefix/postfix hierarchy.
     We can omit this in a future pass. This node has no actual info about the program.
     """
     _param_list_node: ParamListNode
     _declarator_type: DeclaratorSpecifier
-    _specifier_node: NonLeafNode
+    _specifier_node: AbstractNode
     _declarator_node: "DeclaratorNode"
     _id_node: IdNode
 

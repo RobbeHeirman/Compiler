@@ -6,7 +6,7 @@ Academic Year: 2018-2019
 import struct
 
 import LlvmCode
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode, ExpressionNodeType
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
@@ -16,11 +16,10 @@ from Specifiers import Operator, TypeSpecifier, DeclaratorSpecifier
 class RHSNode(ExpressionNode):
     type: ExpressionNodeType
     operator: Operator
-    _parent_node: NonLeafNode
 
     _BASE_LABEL = "RHS"
 
-    def __init__(self, parent_node: NonLeafNode, **kwargs):
+    def __init__(self, parent_node: AbstractNode, **kwargs):
 
         super().__init__(parent_node)
 
@@ -111,7 +110,7 @@ class RHSNode(ExpressionNode):
                     self.type_stack = self.type_stack[:-1]
                     loading_from = self.register_index
                     self.increment_register_index()
-                    ret += LlvmCode.llvm_load_instruction(self.base_type, loading_from, self.type_stack,
+                    ret += LlvmCode.llvm_load_instruction(self.base_type, str(loading_from), self.type_stack,
                                                           self.base_type,
                                                           str(self.register_index), self.type_stack,
                                                           self.indent_string())

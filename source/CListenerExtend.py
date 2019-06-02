@@ -5,6 +5,7 @@
  Academic Year: 2018-2019
 """
 from AST import AST
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ConditionalNodes.ConditionNode import ConditionNode
 from Nodes.ConditionalNodes.IfElseNode import IfElseNode
 from Nodes.DeclarationNodes.IncludeStatementNode import IncludeStatementNode
@@ -13,8 +14,6 @@ from Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
 from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.DeclarationNodes.DeclListNode import DeclListNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
-from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
 from Nodes.ExpressionNodes.FixNode import FixNode, FixType
 from Nodes.ExpressionNodes.LHSNode import LHSNode
@@ -25,7 +24,7 @@ from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Nodes.FunctionNodes.ReturnNode import ReturnNode
 from Nodes.GlobalNodes.RootNode import RootNode
-from Specifiers import Operator, ConditionType, DeclaratorSpecifier
+from Specifiers import Operator, ConditionType, DeclaratorSpecifier, TypeSpecifier
 from gen.CListener import CListener
 from gen.CParser import CParser
 
@@ -37,12 +36,11 @@ class CListenerExtend(CListener):
     """
     _filename: str
     _ast: AST
-    _parent_node: NonLeafNode
+    _parent_node: AbstractNode
 
     def __init__(self, filename: str):
         # Some info about the traversing will be recorded
 
-        self._parent_node = None  # Will always keep track of the parent AST node when traversing down
         self._ast = AST()
         self._filename = filename
         root_node = RootNode()
@@ -108,7 +106,7 @@ class CListenerExtend(CListener):
         self._parent_node = decl_l_node
 
     def exitDecl_list(self, ctx: CParser.Decl_listContext):
-
+        self._parent_node.cleanup()
         self._parent_node = self._parent_node.parent_node
 
     def enterSimple_declaration(self, ctx: CParser.Simple_declarationContext):
@@ -136,8 +134,8 @@ class CListenerExtend(CListener):
         :param ctx:
         :return:
         """
-        node = BaseTypeNode(self._parent_node, self._filename, ctx)
-        self._parent_node.add_child(node)
+        value = ctx.getText()
+        self._parent_node.base_type = TypeSpecifier(value)
 
     def enterDeclarator(self, ctx: CParser.DeclaratorContext):
         """
@@ -186,7 +184,7 @@ class CListenerExtend(CListener):
         :param ctx: ParserContextNode
         :return:
         """
-        id_name = ctx.getChild(0).getText()
+        # id_name = ctx.getChild(0).getText()
         assignment_node = AssignmentNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(assignment_node)
         self._parent_node = assignment_node
@@ -200,13 +198,13 @@ class CListenerExtend(CListener):
         """
         self._parent_node = self._parent_node.parent_node
 
-    def enterLhs(self, ctx:CParser.LhsContext):
+    def enterLhs(self, ctx: CParser.LhsContext):
 
         node = LHSNode(self._parent_node)
         self._parent_node.add_child(node)
         self._parent_node = node
 
-    def exitLhs(self, ctx:CParser.LhsContext):
+    def exitLhs(self, ctx: CParser.LhsContext):
         self._parent_node = self._parent_node.parent_node
 
     def enterRhs(self, ctx: CParser.RhsContext):

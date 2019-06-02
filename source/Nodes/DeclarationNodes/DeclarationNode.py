@@ -6,18 +6,16 @@ Academic Year: 2018-2019
 import LlvmCode
 import messages
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Specifiers import TypeSpecifier, DeclaratorSpecifier
 from SymbolTable import Attributes
 from typing import Union
 
 
-class DeclarationNode(NonLeafNode):
+class DeclarationNode(AbstractNode):
     """
     Represents a Declaration in our abstract syntax tree.
     Will deduct the base type of the declaration in the first pass.
@@ -30,13 +28,12 @@ class DeclarationNode(NonLeafNode):
 
     _BASE_LABEL = "Declaration"
 
-    def __init__(self, parent_node: NonLeafNode):
+    def __init__(self, parent_node: AbstractNode):
         super().__init__(parent_node)
 
         # The 2 child nodes
         self._declarator_node = None
         self._rhs_node = None
-        self._base_type_node = None
 
         # Base info
         self._id = None  # Id can be deducted from children.
@@ -87,11 +84,6 @@ class DeclarationNode(NonLeafNode):
         """Generates the visual representation of the node in .dot"""
         ret = AbstractNode.dot_string(self)
 
-        if self._base_type_node is not None:
-            ret += "{0}--{{".format(self._index)
-            ret += "{0} ".format(self._base_type_node.index)
-            ret += "}\n"
-
         if self._declarator_node is not None:
             ret += "{0}--{{".format(self._index)
             ret += "{0} ".format(self._declarator_node.index)
@@ -128,9 +120,6 @@ class DeclarationNode(NonLeafNode):
         elif isinstance(child, RHSNode) or isinstance(child, ArrayInitNode):
             self._add_rhs(child)
 
-        elif isinstance(child, BaseTypeNode):
-            self._base_type_node = child
-            self._base_type = child.value
         else:
             print(type(child))
             print("something went wrong")
@@ -140,9 +129,6 @@ class DeclarationNode(NonLeafNode):
 
         if isinstance(child, DeclaratorNode):
             self._declarator_node = None
-
-        if isinstance(child, BaseTypeNode):
-            self._base_type_node = None
 
         super().remove_child(child)
 
@@ -164,10 +150,6 @@ class DeclarationNode(NonLeafNode):
 
         if self._rhs_node is not None:
             self._rhs_node.first_pass()
-
-        if self._base_type_node is not None:
-            self._base_type = self._base_type_node.value
-            self.remove_child(self._base_type_node)
 
     def semantic_analysis(self) -> bool:
         """
@@ -240,7 +222,6 @@ class DeclarationNode(NonLeafNode):
         ptr = ""
         ptr += "*" * len(self.type_stack[:-1])  # TODO: This is not correct need ot handle this better
         ret = self.indent_string() + "; Declaration: {0}{1} {2}\n".format(self.base_type.value, ptr, self.id)
-        secondary_type = ""
         # Special types need other llvm code first
         if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
             # Find the type

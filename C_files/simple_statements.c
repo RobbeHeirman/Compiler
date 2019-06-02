@@ -14,7 +14,7 @@ int main(int a, char **argv){
     int integer = 40;
     int* pointer2 = &integer;
     int integer2 = *pointer2;
-    printf(integer2);
+
 
 }
 

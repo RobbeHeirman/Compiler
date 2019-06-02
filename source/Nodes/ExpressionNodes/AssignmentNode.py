@@ -7,10 +7,8 @@ from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ExpressionNodes.LHSNode import LHSNode
 from antlr4 import ParserRuleContext
 
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 
-
-class AssignmentNode(NonLeafNode):
+class AssignmentNode(AbstractNode):
 
     _BASE_LABEL = "="
 

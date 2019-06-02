@@ -3,11 +3,11 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Specifiers import ConditionalOperator
 
 
-class ConditionNode(NonLeafNode):
+class ConditionNode(AbstractNode):
 
     def __init__(self, parent_node, operator):
         super().__init__(parent_node)

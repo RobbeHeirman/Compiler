@@ -7,9 +7,7 @@ from antlr4 import ParserRuleContext
 
 import messages
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
 from Nodes.AbstractNodes.ScopedNode import ScopedNode
-from Nodes.DeclarationNodes.BaseTypeNode import BaseTypeNode
 from Nodes.FunctionNodes.ReturnNode import ReturnNode
 from Specifiers import DeclaratorSpecifier
 from SymbolTable import Attributes
@@ -17,15 +15,13 @@ from SymbolTable import Attributes
 
 class FuncDefNode(ScopedNode):
     _id: str
-    _parent_node: NonLeafNode
 
-    def __init__(self, parent_node: NonLeafNode, id_l: str, ptr_count: int, filename: str, ctx: ParserRuleContext):
+    def __init__(self, parent_node: AbstractNode, id_l: str, ptr_count: int, filename: str, ctx: ParserRuleContext):
         super().__init__(parent_node)
 
         self._id = id_l
         self._ptr_count = ptr_count
-        self._base_type = None
-        self._base_type_node = None
+        self.base_type = None
         self._return_node = None
 
         self._type_stack = None
@@ -38,30 +34,14 @@ class FuncDefNode(ScopedNode):
     @property
     def label(self):
         ptr_label = "*" * self._ptr_count
-        return 'Func def\nIdentifier: {0}\nReturn type {1}{2}'.format(self._id, self._base_type.value, ptr_label)
-
-    @property
-    def base_type(self):
-        return self._base_type
+        return 'Func def\nIdentifier: {0}\nReturn type {1}{2}'.format(self._id, self.base_type.value, ptr_label)
 
     def add_child(self, child, index=None):
 
-        if isinstance(child, BaseTypeNode):
-            self._base_type_node = child
-            self._base_type = child.value
-
-        elif isinstance(child, ReturnNode):
+        if isinstance(child, ReturnNode):
             self._return_node = child
 
         super().add_child(child, index)
-
-    def first_pass(self):
-
-        self._base_type = self._base_type_node.value
-        self.remove_child(self._base_type_node)
-        self._base_type_node = None
-
-        super().first_pass()
 
     def semantic_analysis(self) -> bool:
         """
@@ -74,7 +54,7 @@ class FuncDefNode(ScopedNode):
         ret = True
         # 1) Add to the symbol table of the upper scope
         self._type_stack = [DeclaratorSpecifier.PTR for _ in range(self._ptr_count)]
-        attr = Attributes(self._base_type, self._type_stack, self._filename, self._line, self._column)
+        attr = Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
         signature = self._children[0].get_function_signature()
         attr.function_signature = signature
         if not self._parent_node.add_to_scope_symbol_table(self._id, attr):
@@ -91,17 +71,16 @@ class FuncDefNode(ScopedNode):
 
         return ret
 
-
     def generate_llvm(self):
         self.increment_register_index()
-        ret = self.indent_string() + "define {0} @{1}(".format(self._base_type.llvm_type, self._id)
+        ret = self.indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self._id)
         ret += "{0}){{\n".format(self._children[0].generate_llvm())
         AbstractNode._indent_level += 1
         for child in self._children[1:]:
             ret += child.generate_llvm()
 
         if self._return_node is None:
-            ret += self.indent_string() + "  ret {0} 0\n".format(self._base_type.llvm_type)
+            ret += self.indent_string() + "  ret {0} 0\n".format(self.base_type.llvm_type)
 
         ret += "}\n"
         return ret

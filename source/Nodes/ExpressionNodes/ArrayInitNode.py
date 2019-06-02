@@ -3,10 +3,10 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from Nodes.AbstractNodes.NonLeafNode import NonLeafNode
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 
 
-class ArrayInitNode(NonLeafNode):
+class ArrayInitNode(AbstractNode):
     label = "Array Init"
 
     def __init__(self, parent_node):

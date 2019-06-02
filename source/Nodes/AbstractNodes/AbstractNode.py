@@ -6,7 +6,7 @@ Academic Year: 2018-2019
 from abc import ABC, abstractmethod
 from typing import List
 
-from Nodes.AbstractNodes import NonLeafNode
+
 from SymbolTable import Attributes
 
 
@@ -16,7 +16,7 @@ class AbstractNode(ABC):
     Should be overridden by specific nodes of the AST.
     """
     _children: List["AbstractNode"]
-    _parent_node: NonLeafNode
+    _parent_node: "AbstractNode"
     _index_counter = 0
     _indent_level = 0
 
@@ -48,13 +48,19 @@ class AbstractNode(ABC):
     def parent_node(self, value: "AbstractNode"):
         self._parent_node = value
 
-    def dot_string(self):
+    def dot_string(self) -> str:
+        """Generates the visual representation of the node in .dot"""
         ret = "{0}[label = \"{1}\"];\n".format(self._index, self.label)
-        return ret
+        ret += "{0}--{{".format(self._index)
+        for child in self._children:
+            ret += "{0} ".format(child.index)
 
-    @abstractmethod
-    def generate_llvm(self):
-        return ""
+        ret += "}\n"
+
+        for child in self._children:
+            ret += child.dot_string()
+
+        return ret
 
     def indent_string(self):
 
@@ -107,12 +113,18 @@ class AbstractNode(ABC):
     def get_attribute(self, lexeme) -> Attributes:
         return self._parent_node.get_attribute(lexeme)
 
+    def cleanup(self):
+        """
+        Some nodes need to clean stuff up
+        :return:
+        """
+        raise Exception("{0} type does not have cleanup implemented".format(type(self)))
+
     def first_pass(self):
         """
         AST cleanup.
         :return:
         """
-
         # Some children remove themselves from parent list. This causes the iterator to skip elements. So we reverse
         # it.
 
@@ -132,3 +144,14 @@ class AbstractNode(ABC):
                 ret_val = False
 
         return ret_val
+
+    def generate_llvm(self) -> str:
+        """
+        Generates the corresponding node into llvm instructions.
+        :return: generates the instructions as a string
+        """
+        ret = ""
+        for child in self._children:
+            ret += child.generate_llvm()
+
+        return ret

@@ -4,11 +4,12 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from abc import ABC
-import Nodes.AbstractNodes.NonLeafNode as ExpressionNode
+
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from SymbolTable import SymbolTable, Attributes
 
 
-class ScopedNode(ExpressionNode.NonLeafNode, ABC):
+class ScopedNode(AbstractNode, ABC):
     """
     This node is an abstract node that presents all nodes with their own scope.
     This means this node has it's own SymbolTable
@@ -23,7 +24,7 @@ class ScopedNode(ExpressionNode.NonLeafNode, ABC):
         self._symbol_table = SymbolTable()
         self._register_index = -1
 
-    def add_to_scope_symbol_table(self, lexeme: str,  attribute: Attributes)->bool:
+    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes) -> bool:
         """
         This is a ScopedNode with own symbolTable. We will attempt to add to the symbol table here.
         :param lexeme: The lexeme (id name) of the variable we add
@@ -33,7 +34,7 @@ class ScopedNode(ExpressionNode.NonLeafNode, ABC):
 
         return self._symbol_table.add_id(lexeme, attribute)
 
-    def is_in_table(self, lexeme:str)->bool:
+    def is_in_table(self, lexeme: str) -> bool:
         """
         Checks if a lexeme is already in the symbol table
         :param lexeme: The lexeme that needs to be returned
