@@ -7,7 +7,8 @@ import LlvmCode
 import messages
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
-from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
+from Nodes.DeclarationNodes.ArrayInitNode import ArrayInitNode
+from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
 from Nodes.ExpressionNodes.RHSNode import RHSNode
 
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
@@ -24,7 +25,7 @@ class DeclarationNode(AbstractNode):
     An optional initializer as 2d child.
     """
     _declarator_node: DeclaratorNode
-    _rhs_node: Union[RHSNode, ArrayInitNode]
+    _expression_node: Union[RHSNode, ArrayInitNode]
     _lexeme: str
 
     _BASE_LABEL = "Declaration"
@@ -34,7 +35,7 @@ class DeclarationNode(AbstractNode):
 
         # The 2 child nodes
         self._declarator_node = None
-        self._rhs_node = None
+        self._expression_node = None
 
         # Base info
         self.id = None  # Id can be deducted from children.
@@ -82,8 +83,8 @@ class DeclarationNode(AbstractNode):
         if isinstance(child, DeclaratorNode):
             self._declarator_node = child
 
-        elif isinstance(child, RHSNode) or isinstance(child, ArrayInitNode):
-            self._rhs_node = child
+        elif isinstance(child, ExpressionNode) or isinstance(child, ArrayInitNode):
+            self._expression_node = child
 
         else:
             print(type(child))
@@ -120,14 +121,14 @@ class DeclarationNode(AbstractNode):
         if len(self.type_stack) > 0 and self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
             # Last element is top of the stack.
             if not self._declarator_node.array_has_length():  # If array size is not specified MUST have array init rhs.
-                if self._rhs_node is None:
+                if self._expression_node is None:
                     if not isinstance(self._parent_node, ParamListNode):
                         messages.error_array_size_missing(self.id, attr)
                         ret = False
 
-            if self._rhs_node is not None:  # The rhs of an array is an init list {0,1 ,2 3, 4}
-                if not isinstance(self._rhs_node, ArrayInitNode):
-                    tpl = self._rhs_node.get_error_info()
+            if self._expression_node is not None:  # The rhs of an array is an init list {0,1 ,2 3, 4}
+                if not isinstance(self._expression_node, ArrayInitNode):
+                    tpl = self._expression_node.get_error_info()
                     t_file = attr.filename
                     attr.filename = tpl[0]
                     t_line = attr.line
@@ -142,7 +143,7 @@ class DeclarationNode(AbstractNode):
 
         # Functions are allowed to be declared but definitions are not handled by this node
         elif len(self.type_stack) > 0 and self.type_stack[-1] is DeclaratorSpecifier.FUNC:
-            if self._rhs_node is not None:
+            if self._expression_node is not None:
                 messages.error_func_initialized_like_var(self.id, attr)
                 ret = False
             attr.function_signature = self._declarator_node.get_function_signature()
@@ -151,7 +152,7 @@ class DeclarationNode(AbstractNode):
         if not self.add_to_scope_symbol_table(self.id, attr):
             ret = False
 
-        if self._rhs_node is not None and not self._rhs_node.semantic_analysis():
+        if self._expression_node is not None and not self._expression_node.semantic_analysis():
             ret = False
 
         return ret
@@ -172,8 +173,8 @@ class DeclarationNode(AbstractNode):
         if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
             # Find the type
             size = 0
-            if self._rhs_node:
-                size = self._rhs_node.size()  # Size of array if declared trough list
+            if self._expression_node:
+                size = self._expression_node.size()  # Size of array if declared trough list
             r_type = self.base_type.llvm_type + ptr
             secondary_type = "[ " + str(size) + " x " + r_type + " ]"  # This is how we init an array
             ret += self.indent_string() + "%{0} = alloca {1}\n".format(
@@ -182,9 +183,9 @@ class DeclarationNode(AbstractNode):
         else:
             ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self.type_stack, self.indent_string())
 
-        if self._rhs_node is not None:
+        if self._expression_node is not None:
             ret += self.indent_string() + "; = ...\n"
-            ret += self._rhs_node.generate_llvm()
+            ret += self._expression_node.generate_llvm()
             ret += LlvmCode.llvm_store_instruction(
                 self.base_type,
                 str(self.register_index),

@@ -1,4 +1,4 @@
-import copy
+
 from abc import ABC
 from enum import Enum, auto
 from typing import List
@@ -43,7 +43,6 @@ class ExpressionNode(AbstractNode, ABC):
 
         self.base_type = None
         self.type = None
-        self.identifier = None
 
         # Book keeping info
         self.filename = None
@@ -112,23 +111,10 @@ class ExpressionNode(AbstractNode, ABC):
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
-    def _handle_identifier_node(self):
-        if self._identifier_node is not None:
-            self.type = ExpressionNodeType.IDENTIFIER
-            self.identifier = self._identifier_node.value
 
-            self.filename = self._identifier_node.filename
-            self.line = self._identifier_node.line
-            self.column = self._identifier_node.column
-
-            self.remove_child(self._identifier_node)
-            self._identifier_node = None
 
     def first_pass(self):
-
         self._handle_member_operator_node()
-        self._handle_identifier_node()
-
         for child in self._children:
             child.first_pass()
 
@@ -141,30 +127,6 @@ class ExpressionNode(AbstractNode, ABC):
         """
 
         ret = True
-        self.type_stack = self.find_type_stack()
-        attrib = Attributes(self.base_type, self.type_stack, self.filename, self.line, self.column)
-        if self.type is ExpressionNodeType.IDENTIFIER:  # We need to check if the id is in the symbol table.
-
-            if self.is_in_table(self.identifier):
-                attr = self.get_attribute(self.identifier)
-                self.base_type = attr.decl_type
-                # Now we need to check if the operations done on the identifier are legal
-                if not len(self.type_stack) is 0:
-                    attr_stack = copy.copy(attr.operator_stack)
-                    type_stack_cp = copy.copy(self.type_stack)
-                    if not self._stack_analysis(type_stack_cp, attr_stack):
-                        ret = False
-                    if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.FUNC:  # Now check the signature
-                        if attr.rhs_same_signature(self._parent_node.get_function_signature(), attrib, attr,
-                                                   self.identifier):
-                            pass
-                        else:
-                            ret = False
-
-            else:
-
-                messages.error_undeclared_var(self.identifier, attrib)
-
         for child in self._children:
             if not child.semantic_analysis():
                 ret = False

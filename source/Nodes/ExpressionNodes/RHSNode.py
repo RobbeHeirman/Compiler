@@ -7,7 +7,6 @@ import struct
 
 import LlvmCode
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode, ExpressionNodeType
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Specifiers import Operator, TypeSpecifier, DeclaratorSpecifier
@@ -52,32 +51,10 @@ class RHSNode(ExpressionNode):
 
     def add_child(self, child, index=None):
 
-        if isinstance(child, ConstantNode):
-            self._constant_node = child
-            self.type = ExpressionNodeType.CONSTANT
-            self.filename = child.filename
-            self.line = child.line
-            self.column = child.column
-
         if isinstance(child, ParamListNode):
             self._extra_node = child
 
         super().add_child(child)
-
-    def first_pass(self):
-
-        if self._constant_node is not None:
-            self.type = ExpressionNodeType.CONSTANT
-            self.constant = self._constant_node.value
-            self.base_type = self._constant_node.type
-
-            self.filename = self._constant_node.filename
-            self.line = self._constant_node.line
-            self.column = self._constant_node.column
-
-            self.remove_child(self._constant_node)
-            self._constant_node = None
-        super().first_pass()
 
     def generate_llvm(self):
         ret = ""
@@ -87,34 +64,6 @@ class RHSNode(ExpressionNode):
 
             if self.type is ExpressionNodeType.IDENTIFIER:
                 self.constant = self.identifier
-            take_address = False
-            if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.ADDRESS:
-                take_address = True
-                self.type_stack = self.type_stack[:-1]
-
-            if self.type is ExpressionNodeType.IDENTIFIER:
-
-                ret += LlvmCode.llvm_load_instruction(self.base_type, self.identifier, self.type_stack, self.base_type,
-                                                      str(self.register_index), self.type_stack, self.indent_string())
-
-                if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.PTR:
-                    self.type_stack = self.type_stack[:-1]
-                    loading_from = self.register_index
-                    self.increment_register_index()
-                    ret += LlvmCode.llvm_load_instruction(self.base_type, str(loading_from), self.type_stack,
-                                                          self.base_type,
-                                                          str(self.register_index), self.type_stack,
-                                                          self.indent_string())
-
-            if take_address:
-                prev_index = self.register_index
-                self.increment_register_index()
-                ret += LlvmCode.llvm_allocate_instruction(str(self.register_index), self.base_type, self.type_stack,
-                                                          self.indent_string())
-
-                ret += LlvmCode.llvm_store_instruction(self.base_type, str(prev_index), self.type_stack,
-                                                       self.base_type, str(self.register_index), self.type_stack,
-                                                       self.indent_string())
 
         if len(self._children) == 1:  # Unary expression
             return self._children[0].generate_llvm()

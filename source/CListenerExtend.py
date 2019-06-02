@@ -11,22 +11,21 @@ from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ConditionalNodes.ConditionNode import ConditionNode
 from Nodes.ConditionalNodes.IfElseNode import IfElseNode
 from Nodes.DeclarationNodes.IncludeStatementNode import IncludeStatementNode
-from Nodes.ExpressionNodes.ArrayInitNode import ArrayInitNode
+from Nodes.DeclarationNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
 from Nodes.ExpressionNodes.ConstantExpressionNode import ConstantExpressionNode
-from Nodes.ExpressionNodes.ConstantNode import ConstantNode
 from Nodes.DeclarationNodes.DeclListNode import DeclListNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
 from Nodes.ExpressionNodes.FixNode import FixNode, FixType
+from Nodes.ExpressionNodes.IdentifierExpressionNode import IdentifierExpressionNode
 from Nodes.ExpressionNodes.LHSNode import LHSNode
 from Nodes.ExpressionNodes.RHSParamListNode import RHSParamListNode
 from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
-from Nodes.ExpressionNodes.RHSNode import RHSNode
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Nodes.FunctionNodes.ReturnNode import ReturnNode
 from Nodes.GlobalNodes.RootNode import RootNode
-from Specifiers import Operator, ConditionType, DeclaratorSpecifier, TypeSpecifier
+from Specifiers import ConditionType, DeclaratorSpecifier, TypeSpecifier
 from gen.CListener import CListener
 from gen.CParser import CParser
 
@@ -219,12 +218,12 @@ class CListenerExtend(CListener):
 
     # Expressions
     # ======================================================================================================================
-    def enterExpression(self, ctx: CParser.ExpressionContext):
-        """
+    """def enterExpression(self, ctx: CParser.ExpressionContext):
+        
         Any (sub) expression need to handle the operator kind
         :param ctx:  ParserContextNode
         :return:
-        """
+
 
         if ctx.getChild(0).getText() is '(':  # parenthesis RHS nodes can be ignored.
             return
@@ -250,17 +249,17 @@ class CListenerExtend(CListener):
                 node.operator = operator
 
     def exitExpression(self, ctx: CParser.ExpressionContext):
-        """
+
         Need to pop the rhs nodes from the parent node
         :param ctx:
         :return:
-        """
+
 
         if ctx.getChild(0).getText() is '(':  # parenthesis RHS nodes can be ignored.
             return
 
         self._parent_node = self._parent_node.parent_node
-
+    """
     def enterConstant(self, ctx: CParser.ConstantContext):
         c_node = ConstantExpressionNode(self._parent_node, ctx.getText())
         self._parent_node.add_child(c_node)
@@ -280,9 +279,10 @@ class CListenerExtend(CListener):
         self._parent_node.base_type = TypeSpecifier.INT
 
     def enterId_expression(self, ctx: CParser.Id_expressionContext):
-        # id_node = IdNode(self._parent_node, self._filename, ctx)
-        # self._parent_node.add_child(id_node)
-        print("ID RHS is not fixed yet")
+
+        id = ctx.getText()
+        id_node = IdentifierExpressionNode(self._parent_node, id)
+        self._parent_node.add_child(id_node)
 
     def enterExpression_prefix(self, ctx: CParser.Expression_prefixContext):
         val = ctx.getChild(0).getText()
