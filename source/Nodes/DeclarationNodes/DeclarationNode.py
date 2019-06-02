@@ -80,25 +80,6 @@ class DeclarationNode(AbstractNode):
     def base_type(self, value: TypeSpecifier):
         self._base_type = value
 
-    def dot_string(self) -> str:
-        """Generates the visual representation of the node in .dot"""
-        ret = AbstractNode.dot_string(self)
-
-        if self._declarator_node is not None:
-            ret += "{0}--{{".format(self._index)
-            ret += "{0} ".format(self._declarator_node.index)
-            ret += "}[label = \" Decl\" ]\n"
-
-        if self._rhs_node is not None:
-            ret += "{0}--{{".format(self._index)
-            ret += "{0} ".format(self._rhs_node.index)
-            ret += "}[label = \" = \" ]\n"
-
-        for child in self._children:
-            ret += child.dot_string()
-
-        return ret
-
     def _add_declarator(self, child: DeclaratorNode):
         self._declarator_node = child
 
