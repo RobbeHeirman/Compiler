@@ -1,5 +1,5 @@
 
-from abc import ABC
+
 from enum import Enum, auto
 from typing import List
 
@@ -30,7 +30,7 @@ class ExpressionNodeType(Enum):
         return specifier_map[self]
 
 
-class ExpressionNode(AbstractNode, ABC):
+class ExpressionNode(AbstractNode):
     _BASE_LABEL = "expression"
     _OPERATOR_TYPES = [ExpressionNodeType.ARRAY,
                        ExpressionNodeType.PTR, ExpressionNodeType.ADDR, ExpressionNodeType.FUNCTION]

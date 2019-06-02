@@ -17,6 +17,7 @@ from Nodes.ExpressionNodes.ConstantExpressionNode import ConstantExpressionNode
 from Nodes.DeclarationNodes.DeclListNode import DeclListNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
+from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
 from Nodes.ExpressionNodes.FixNode import FixNode, FixType
 from Nodes.ExpressionNodes.IdentifierExpressionNode import IdentifierExpressionNode
 from Nodes.ExpressionNodes.LHSNode import LHSNode
@@ -218,55 +219,32 @@ class CListenerExtend(CListener):
 
     # Expressions
     # ======================================================================================================================
-    """def enterExpression(self, ctx: CParser.ExpressionContext):
-        
+    def enterExpression(self, ctx: CParser.ExpressionContext):
+        """
         Any (sub) expression need to handle the operator kind
         :param ctx:  ParserContextNode
         :return:
-
-
-        if ctx.getChild(0).getText() is '(':  # parenthesis RHS nodes can be ignored.
-            return
-
-        else:
-            node = RHSNode(self._parent_node)
-            self._parent_node.add_child(node)
-            self._parent_node = node
-
-            if ctx.getChild(0).getText() == '-':
-                node.neg = True
-
-            if ctx.getChildCount() == 2:
-                child = ctx.getChild(1)
-                if ctx.getChild(1).getText() == "++" or ctx.getChild(1).getText() == "--":
-                    operator = Operator(child.getText())
-                    node.operator = operator
-
-            elif ctx.getChildCount() == 3:  # Looking for the operator token
-
-                child = ctx.getChild(1)
-                operator = Operator(child.getText())
-                node.operator = operator
+        """
+        node = ExpressionNode(self._parent_node)  # Using this as a stub
+        self._parent_node = node
 
     def exitExpression(self, ctx: CParser.ExpressionContext):
-
+        """
         Need to pop the rhs nodes from the parent node
         :param ctx:
         :return:
-
-
-        if ctx.getChild(0).getText() is '(':  # parenthesis RHS nodes can be ignored.
-            return
-
+        """
         self._parent_node = self._parent_node.parent_node
-    """
+
     def enterConstant(self, ctx: CParser.ConstantContext):
         c_node = ConstantExpressionNode(self._parent_node, ctx.getText())
-        self._parent_node.add_child(c_node)
+        self._parent_node.parent_node.add_child(c_node)
         self._parent_node = c_node
 
     def exitConstant(self, ctx: CParser.ConstantContext):
+        node = self._parent_node
         self._parent_node = self._parent_node.parent_node
+        node.parent_node = self._parent_node
 
     def enterCharacter_constant(self, ctx: CParser.Character_constantContext):
         self._parent_node: ConstantExpressionNode
@@ -280,9 +258,14 @@ class CListenerExtend(CListener):
 
     def enterId_expression(self, ctx: CParser.Id_expressionContext):
 
-        id = ctx.getText()
-        id_node = IdentifierExpressionNode(self._parent_node, id)
-        self._parent_node.add_child(id_node)
+        id_node = IdentifierExpressionNode(self._parent_node, ctx.getText())
+        self._parent_node.parent_node.add_child(id_node)
+        self._parent_node = id_node
+
+    def exitId_expression(self, ctx: CParser.Id_expressionContext):
+        node = self._parent_node
+        self._parent_node = self._parent_node.parent_node
+        node.parent_node = self._parent_node
 
     def enterExpression_prefix(self, ctx: CParser.Expression_prefixContext):
         val = ctx.getChild(0).getText()

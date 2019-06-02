@@ -55,7 +55,6 @@ class IdentifierExpressionNode(ExpressionNode):
         return ret
 
     def generate_llvm(self):
-        self.increment_register_index()
         ret = self.indent_string() + ";... {0}\n".format(self.id)
         ret += LlvmCode.llvm_load_instruction(self.base_type, self.id, self.type_stack, self.base_type,
                                               str(self.register_index), self.type_stack, self.indent_string())
