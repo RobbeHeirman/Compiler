@@ -28,7 +28,7 @@ class TracePrints(object):
 def main(argv):
     # Lexical analysis
     # input_file = argv[0]
-    input_file = argv[0]
+    input_file = argv[1]
     input_stream = FileStream(input_file)
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
@@ -62,7 +62,7 @@ def main(argv):
     if not ast.semantic_analysis():
         print("I failed =(")
     else:
-        file_name = argv[1]
+        file_name = argv[2]
         file = open(file_name, 'w+')
 
         target_triple = subprocess.check_output(["clang", "-print-target-triple"])

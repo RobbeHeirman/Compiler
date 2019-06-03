@@ -33,20 +33,11 @@ Bevat:
    er wordt ook een AST.dot en . png bestand gegeneeerd met de AST in.
 
 implementatie tot nu toe:
-Grammar: - types (ptrs en arrays ook) met simple_types (int, char, float) kunnen gedeclareerd worden.
-         - functies kunnen gedifinieerd worden
-         - Keywords if, else if, else, return worden herkend. Conditional statements worden ook syntactisch herkend
-         - assignments en expressies worden correct herkend (+, - * /) binary operators
+Grammar: - Done
 
-Semantische analyse: - Simple types worden herkend bij herdeclaratie,
-                     - Functies bij Id's gedeclareerd met ander type worden ook herkend
-
+Semantische analyse: - DOne
  llvm code generatie:
-                    - er wordt correcte llvm code gegenereerd met declaraties en expressies (assignment, +, -, *, /)
+                    - er wordt correcte llvm code gegenereerd met declaraties, Expressies en functies.
 
  mips code generatie:
                     - /
-
-further notes:
-    Het 'framework' staat op punt. Nu is het enkel nog de bestaande classes uitbreiden (af en toe nog extended classes
-    nodig). Er is ook gekeken dat mogelijk uitbreidingen gemakelijk kunnen toegevoegd worden aan de huidige code.

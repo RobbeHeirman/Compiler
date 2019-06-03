@@ -63,6 +63,13 @@ class ExpressionNode(AbstractNode):
 
         return ret
 
+    def is_address(self):
+
+        if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.ADDRESS:
+            return True
+
+        return False
+
     def add_child(self, child: AbstractNode, index=None):
 
         if isinstance(child, FixNode):

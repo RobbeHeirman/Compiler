@@ -4,6 +4,7 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 import SymbolTable
+from Specifiers import TypeSpecifier
 
 
 class BColors:
@@ -95,6 +96,12 @@ def error_lvalue_required_addr(attribute):
 
 def error_non_void_return(lexeme, attribute):
     print(BColors.FAIL + "{0}non-void function '{1}' should return a value".format(error(attribute), lexeme)
+          + BColors.ENDC)
+
+
+def error_no_conversion_int_ptr(attribute: "SymbolTable.Attributes", expression_type: TypeSpecifier):
+    print(BColors.FAIL + "{0}Error: incompatible pointer conversion initializing {1} * with an expression of type {2}"
+          .format(error(attribute), attribute.decl_type.value, attribute.decl_type.value)
           + BColors.ENDC)
 
 

@@ -16,6 +16,8 @@ from Specifiers import DeclaratorSpecifier
 from SymbolTable import Attributes
 from typing import Union
 
+from gen.CParser import CParser
+
 
 class DeclarationNode(AbstractNode):
     """
@@ -30,7 +32,7 @@ class DeclarationNode(AbstractNode):
 
     _BASE_LABEL = "Declaration"
 
-    def __init__(self, parent_node: AbstractNode):
+    def __init__(self, parent_node: AbstractNode, filename, ctx: CParser.Simple_declarationContext):
         super().__init__(parent_node)
 
         # The 2 child nodes
@@ -44,9 +46,10 @@ class DeclarationNode(AbstractNode):
         self.type_stack = []
 
         # Error message info
-        self._filename = None
-        self._line = None
-        self._column = None
+        self._filename = filename
+        start = ctx.start
+        self._line = start.line
+        self._column = start.column
 
     @property
     def label(self):
@@ -113,10 +116,16 @@ class DeclarationNode(AbstractNode):
         # We have all the info for the corresponding attribute object
         attr = Attributes(self.base_type, self.type_stack, self._filename, self._line, self._column)
 
+        # We first check of the expression is semanticly correct
+        if self._expression_node is not None and not self._expression_node.semantic_analysis():
+            ret = False
+
         # Now we need to check if there are no violations on the operators.
         # 1) Ptr type requires address of same type on the right side, NO IMPLICIT CONVERSIONS.
         if len(self.type_stack) > 0 and self.type_stack[-1].PTR:
-            pass
+            if self._expression_node and not self._expression_node.is_address():
+                ret = False
+                messages.error_no_conversion_int_ptr(attr, self._expression_node.base_type)
         # 2) Explicit list init if array has no init size if type is array .
         if len(self.type_stack) > 0 and self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
             # Last element is top of the stack.
@@ -150,9 +159,6 @@ class DeclarationNode(AbstractNode):
         # Add to the scopes symbol_table.
 
         if not self.add_to_scope_symbol_table(self.id, attr):
-            ret = False
-
-        if self._expression_node is not None and not self._expression_node.semantic_analysis():
             ret = False
 
         return ret
