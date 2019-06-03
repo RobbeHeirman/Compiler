@@ -100,8 +100,14 @@ def error_non_void_return(lexeme, attribute):
 
 
 def error_no_conversion_int_ptr(attribute: "SymbolTable.Attributes", expression_type: TypeSpecifier):
-    print(BColors.FAIL + "{0}Error: incompatible pointer conversion initializing {1} * with an expression of type {2}"
-          .format(error(attribute), attribute.decl_type.value, attribute.decl_type.value)
+    print(BColors.FAIL + "{0}incompatible pointer conversion initializing {1} * with an expression of type {2}"
+          .format(error(attribute), attribute.decl_type.value, expression_type.value)
+          + BColors.ENDC)
+
+
+def error_no_conversion_base_types(attribute: "SymbolTable.Attributes", expression_type: TypeSpecifier):
+    print(BColors.FAIL + "{0}Cannot convert base types, initializing {1}  with an expression of type {2}"
+          .format(error(attribute), attribute.decl_type.value, expression_type.value)
           + BColors.ENDC)
 
 

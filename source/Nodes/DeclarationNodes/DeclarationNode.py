@@ -116,48 +116,54 @@ class DeclarationNode(AbstractNode):
         # We have all the info for the corresponding attribute object
         attr = Attributes(self.base_type, self.type_stack, self._filename, self._line, self._column)
 
-        # We first check of the expression is semanticly correct
-        if self._expression_node is not None and not self._expression_node.semantic_analysis():
-            ret = False
-
-        # Now we need to check if there are no violations on the operators.
-        # 1) Ptr type requires address of same type on the right side, NO IMPLICIT CONVERSIONS.
-        if len(self.type_stack) > 0 and self.type_stack[-1].PTR:
-            if self._expression_node and not self._expression_node.is_address():
+        # We first check of the expression is semantically correct
+        if self._expression_node:
+            if not self._expression_node.semantic_analysis():
                 ret = False
-                messages.error_no_conversion_int_ptr(attr, self._expression_node.base_type)
-        # 2) Explicit list init if array has no init size if type is array .
-        if len(self.type_stack) > 0 and self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
-            # Last element is top of the stack.
-            if not self._declarator_node.array_has_length():  # If array size is not specified MUST have array init rhs.
-                if self._expression_node is None:
-                    if not isinstance(self._parent_node, ParamListNode):
-                        messages.error_array_size_missing(self.id, attr)
+
+            if self.base_type is not self._expression_node.base_type:
+                messages.error_no_conversion_base_types(attr, self._expression_node.base_type)
+                ret = False
+
+            if len(self.type_stack) > 0:
+                # Now we need to check if there are no violations on the operators.
+                # 1) Ptr type requires address of same type on the right side, NO IMPLICIT CONVERSIONS.
+                if len(self.type_stack) > 0 and self.type_stack[-1].PTR:
+                    if not self._expression_node.is_address():
+                        ret = False
+                        messages.error_no_conversion_int_ptr(attr, self._expression_node.base_type)
+
+                # 2) Explicit list init if array has no init size if type is array .
+                if self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
+                    # Last element is top of the stack.
+                    # If array size is not specified MUST have array init rhs.
+                    if not self._declarator_node.array_has_length():
+                        if self._expression_node is None:
+                            if not isinstance(self._parent_node, ParamListNode):
+                                messages.error_array_size_missing(self.id, attr)
+                                ret = False
+
+                    if not isinstance(self._expression_node, ArrayInitNode):
+                        tpl = self._expression_node.get_error_info()
+                        t_file = attr.filename
+                        attr.filename = tpl[0]
+                        t_line = attr.line
+                        attr.line = tpl[1]
+                        t_column = attr.column
+                        attr.column = tpl[2]
+                        messages.error_invalid_initializer(self.id, attr)
+                        attr.filename = t_file
+                        attr.line = t_line
+                        attr.column = t_column
                         ret = False
 
-            if self._expression_node is not None:  # The rhs of an array is an init list {0,1 ,2 3, 4}
-                if not isinstance(self._expression_node, ArrayInitNode):
-                    tpl = self._expression_node.get_error_info()
-                    t_file = attr.filename
-                    attr.filename = tpl[0]
-                    t_line = attr.line
-                    attr.line = tpl[1]
-                    t_column = attr.column
-                    attr.column = tpl[2]
-                    messages.error_invalid_initializer(self.id, attr)
-                    attr.filename = t_file
-                    attr.line = t_line
-                    attr.column = t_column
+                # Functions are allowed to be declared but definitions are not handled by this node
+                elif self.type_stack[-1] is DeclaratorSpecifier.FUNC:
+                    messages.error_func_initialized_like_var(self.id, attr)
                     ret = False
+                    attr.function_signature = self._declarator_node.get_function_signature()
 
-        # Functions are allowed to be declared but definitions are not handled by this node
-        elif len(self.type_stack) > 0 and self.type_stack[-1] is DeclaratorSpecifier.FUNC:
-            if self._expression_node is not None:
-                messages.error_func_initialized_like_var(self.id, attr)
-                ret = False
-            attr.function_signature = self._declarator_node.get_function_signature()
         # Add to the scopes symbol_table.
-
         if not self.add_to_scope_symbol_table(self.id, attr):
             ret = False
 
