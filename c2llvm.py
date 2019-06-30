@@ -1,41 +1,66 @@
 #!/usr/bin/env python3
+import argparse
+import subprocess
 import sys
 import os
-sys.path.insert(0, 'source/')
-import source.main
 
-
-def test():
-    path = "C_files"
-    res_dir = "test_results"
-    if not os.path.exists(res_dir):
-        os.mkdir('test_results')
-
-    for file in os.listdir(path):
-        strip_name = file[0:-2]
-
-        test_dir = "{0}/{1}".format(res_dir, strip_name)
-        if not os.path.exists(test_dir):
-            os.mkdir(test_dir)
-
-        llvm_name = "{0}.llvm".format(strip_name)
-        log_name = "{0}.log".format(strip_name)
-        file_l = open("{0}/{1}".format(test_dir, log_name), 'w+')
-        sys.stdout = file_l
-
-        dot_name = "{0}.dot".format(strip_name)
-        full_dot = "{0}/{1}".format(test_dir, dot_name)
-        try:
-            source.main.main(["{0}/{1}".format(path, file), "{0}/{1}".format(test_dir, llvm_name), full_dot])
-        except:
-            pass
-
+import main
+import shutil
+import unittest
 
 if __name__ == "__main__":
+    # Cleaning up previous run
+    if os.path.exists("result/"):
+        shutil.rmtree("result/")
 
-    if sys.argv[1] == 'test':
-        test()
+    # Argument parsing
+    cmd_parser = argparse.ArgumentParser(description="Compiles C file to LLVM intermediate language")
+    cmd_parser.add_argument("input_file", help="The required C file to compile")
+    cmd_parser.add_argument("-visual_ast", help="Generate a png that visualizes the ast. DOT required",
+                            action="store_true")
+    cmd_parser.add_argument("-no_code", help="If flag is specified there will be no code generation",
+                            action="store_true")
+    cmd_parser.add_argument("-ref_test", action="store_true")
+    cmd_parser.add_argument("-executable_test", action="store_true")
 
-    else:
-        if os.path.exists("gen"):
-            print("Running parser builder")
+    args = cmd_parser.parse_args()
+
+    # Slug is useful for naming consistency of output files
+    slug = os.path.basename(args.input_file)[:-2]
+
+    # Setting up target directory
+    path = "result/" + slug + "/"
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    # Creating AST
+    ast = main.create_ast(args.input_file)
+
+    # Visuals
+    if args.visual_ast:
+        main.generate_ast_visuals(ast, path + slug)
+        ast.first_pass()  # Some cleanup hope to deprecate this
+        main.generate_ast_visuals(ast, path + slug + "2")
+
+    # If the semantic analysis fails
+    if ast.semantic_analysis() is False:
+        sys.exit(1)
+
+    # generate the ll code
+    if not args.no_code:
+        main.generate_llvm(ast, path + slug)
+
+    if args.ref_test:
+        name_reference = path + slug + "_ref.ll"
+        subprocess.call(["clang", args.input_file, "-S", "-emit-llvm", "-o", name_reference])  # Test compiler errors
+
+    if args.executable_test:
+        ll_file = path + slug + ".ll"
+        # Test llvm generated language
+        runner = subprocess.run(["clang", "-Wno-override-module", ll_file, "-o", path + slug + ".exe"])
+        if runner.returncode is 0:
+            subprocess.call(["./a.exe"])
+
+    subprocess.call(["python3", "-m", "unittest", "discover", "-p", "*_test.py"])
+
+    sys.exit(0)
