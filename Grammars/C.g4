@@ -2,6 +2,15 @@ grammar C;
 
 // Rules
 // =====================================================================================================================
+    root
+    : global_statement* EOF
+    ;
+
+    global_statement
+    : decl_list SEMICOLON
+    | func_def
+    ;
+
     statements
     : statement*
     ;

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import subprocess
 import sys
 import os
 sys.path.insert(0, 'source/')
@@ -38,7 +37,5 @@ if __name__ == "__main__":
         test()
 
     else:
-        output = subprocess.check_output(
-            ["python3","source/main.py", str(sys.argv[1]), str(sys.argv[2])]
-        )
-
+        if os.path.exists("gen"):
+            print("Running parser builder")

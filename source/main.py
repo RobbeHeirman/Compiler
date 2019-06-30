@@ -7,8 +7,14 @@
 import subprocess
 import sys
 import traceback
+import importlib
 
 from antlr4 import *
+
+import build
+
+if importlib.util.find_spec("gen") is None:
+    build.main()
 
 from gen.CLexer import CLexer
 from gen.CParser import CParser
@@ -64,27 +70,28 @@ def main(argv):
     else:
         file_name = argv[2]
         file = open(file_name, 'w+')
+        try:
+            target_triple = subprocess.check_output(["clang", "-print-target-triple"])
+            target_triple = str(target_triple[0:-1])
+            target_triple = 'target triple = "{0}"\n'.format(target_triple[2:])
+            file.write(target_triple)
+            file.write(ast.generate_llvm())
+            file.close()
+            print("Normal clang compile...")
+            subprocess.call(["clang", input_file, "-S", "-emit-llvm"])  # Test compiler errors
+            print("Done with clang compiling.")
+            print("Assembling own IR llvm...")
+            subprocess.call(["clang", "-Wno-override-module", "C_files/llvm.ll"])  # Test llvm generated language
+            print("Done with llvm assembling")
+            print("Running executable..")
+            child = subprocess.Popen(["a.exe"])
+            stream = child.communicate()[0]
+            print(child.returncode)
+            print("Done running executable")
+        except:
+            pass
 
-        target_triple = subprocess.check_output(["clang", "-print-target-triple"])
-        target_triple = str(target_triple[0:-1])
-        target_triple = 'target triple = "{0}"\n'.format(target_triple[2:])
-        file.write(target_triple)
-        file.write(ast.generate_llvm())
-        file.close()
-
-        print("Normal clang compile...")
-        subprocess.call(["clang", input_file, "-S", "-emit-llvm"])  # Test compiler errors
-        print("Done with clang compiling.")
-        print("Assembling own IR llvm...")
-        subprocess.call(["clang", "-Wno-override-module", "C_files/llvm.ll"])  # Test llvm generated language
-        print("Done with llvm assembling")
-        print("Running executable..")
-        child = subprocess.Popen(["a.exe"])
-        stream = child.communicate()[0]
-        print(child.returncode)
-        print("Done running executable")
-
-    return 0
+        return 0
 
 
 if __name__ == '__main__':
