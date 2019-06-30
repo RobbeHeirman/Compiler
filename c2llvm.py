@@ -6,7 +6,7 @@ import os
 
 import main
 import shutil
-import unittest
+
 
 if __name__ == "__main__":
     # Cleaning up previous run
@@ -15,15 +15,24 @@ if __name__ == "__main__":
 
     # Argument parsing
     cmd_parser = argparse.ArgumentParser(description="Compiles C file to LLVM intermediate language")
-    cmd_parser.add_argument("input_file", help="The required C file to compile")
+    cmd_parser.add_argument("input_file", nargs="?", default=-1, help="The required C file to compile")
     cmd_parser.add_argument("-visual_ast", help="Generate a png that visualizes the ast. DOT required",
                             action="store_true")
     cmd_parser.add_argument("-no_code", help="If flag is specified there will be no code generation",
                             action="store_true")
     cmd_parser.add_argument("-ref_test", action="store_true")
     cmd_parser.add_argument("-executable_test", action="store_true")
+    cmd_parser.add_argument("-test", action="store_true")
 
     args = cmd_parser.parse_args()
+
+    if args.test:
+        subprocess.call(["python3", "-m", "unittest", "discover", "-p", "*_test.py"])
+        sys.exit(0)
+
+    if args.input_file is -1:
+        print("Please specify input file")
+        sys.exit(1)
 
     # Slug is useful for naming consistency of output files
     slug = os.path.basename(args.input_file)[:-2]
@@ -60,7 +69,5 @@ if __name__ == "__main__":
         runner = subprocess.run(["clang", "-Wno-override-module", ll_file, "-o", path + slug + ".exe"])
         if runner.returncode is 0:
             subprocess.call(["./a.exe"])
-
-    subprocess.call(["python3", "-m", "unittest", "discover", "-p", "*_test.py"])
 
     sys.exit(0)
