@@ -3,10 +3,9 @@ import argparse
 import subprocess
 import sys
 import os
-
-import main
 import shutil
 
+import main
 
 if __name__ == "__main__":
     # Cleaning up previous run
