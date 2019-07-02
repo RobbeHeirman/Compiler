@@ -167,6 +167,9 @@ class DeclarationNode(AbstractNode):
         if not self.add_to_scope_symbol_table(self.id, attr):
             ret = False
 
+        if ret is False:
+            self._error_counter += 1
+
         return ret
 
     def implicit_param_ptr_conversion(self):

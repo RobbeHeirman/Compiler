@@ -10,7 +10,7 @@ class STestDeclaration(unittest.TestCase):
     def run_analysis(self, filename):
         file_name = self.path + filename
         ast = main.create_ast(file_name)
-        self.assertTrue(ast.semantic_analysis())
+        self.assertEqual(ast.semantic_analysis(), 0)
 
     def test_integer_happy_day(self):
         """

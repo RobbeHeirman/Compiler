@@ -19,6 +19,7 @@ class AbstractNode(ABC):
     _parent_node: "AbstractNode"
     _index_counter = 0
     _indent_level = 0
+    _error_counter = 0
 
     def __init__(self, parent: "AbstractNode" = None):
         """
@@ -77,16 +78,13 @@ class AbstractNode(ABC):
         """
         if index is None:
             self._children.append(child)
-
         else:
-
             self._children.insert(index, child)
 
     def remove_child(self, child):
         """
         Removes a child by value (reference of child node)
         """
-
         self._children.remove(child)
 
     def is_in_table(self, lexeme: str) -> bool:
@@ -125,25 +123,20 @@ class AbstractNode(ABC):
         AST cleanup.
         :return:
         """
-        # Some children remove themselves from parent list. This causes the iterator to skip elements. So we reverse
-        # it.
-
         for child in self._children:
             child.first_pass()
 
-    def semantic_analysis(self) -> bool:
+    def semantic_analysis(self) -> int:
         """
         Not all nodes check for semantic correctness. Those who do not just forward the check to their children.
         this function NEEDS to be overwritten by nodes who do check on semantics.
-        :return: true if the program if all children evaluate that the the (sub) program is semantically correct.
+        :return: Returns the amount of errors generated.
         """
 
-        ret_val = True
         for child in self._children:
-            if not child.semantic_analysis():
-                ret_val = False
+            child.semantic_analysis()
 
-        return ret_val
+        return self._error_counter
 
     def generate_llvm(self) -> str:
         """

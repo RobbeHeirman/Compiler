@@ -83,4 +83,8 @@ class FuncDefNode(ScopedNode):
             ret += self.indent_string() + "  ret {0} 0\n".format(self.base_type.llvm_type)
 
         ret += "}\n"
+
+        if ret is False:
+            self._error_counter += 1
+
         return ret
