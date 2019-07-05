@@ -4,7 +4,6 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 import LlvmCode
-import messages
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.DeclarationNodes.ArrayInitNode import ArrayInitNode
@@ -122,7 +121,7 @@ class DeclarationNode(AbstractNode):
                 counter += 1
 
             if self.base_type is not self._expression_node.base_type:
-                messages.error_no_conversion_base_types(attr, self._expression_node.base_type)
+                DeclarationNode._messages.error_no_conversion_base_types(attr, self._expression_node.base_type)
                 counter += 1
 
             if len(self.type_stack) > 0:
@@ -131,7 +130,7 @@ class DeclarationNode(AbstractNode):
                 if len(self.type_stack) > 0 and self.type_stack[-1].PTR:
                     if not self._expression_node.is_address():
                         counter += 1
-                        messages.error_no_conversion_int_ptr(attr, self._expression_node.base_type)
+                        DeclarationNode._messages.error_no_conversion_int_ptr(attr, self._expression_node.base_type)
 
                 # 2) Explicit list init if array has no init size if type is array .
                 if self.type_stack[-1] is DeclaratorSpecifier.ARRAY:
@@ -140,7 +139,7 @@ class DeclarationNode(AbstractNode):
                     if not self._declarator_node.array_has_length():
                         if self._expression_node is None:
                             if not isinstance(self._parent_node, ParamListNode):
-                                messages.error_array_size_missing(self.id, attr)
+                                DeclarationNode._messages.error_array_size_missing(self.id, attr)
                                 counter += 1
 
                     if not isinstance(self._expression_node, ArrayInitNode):
@@ -151,7 +150,7 @@ class DeclarationNode(AbstractNode):
                         attr.line = tpl[1]
                         t_column = attr.column
                         attr.column = tpl[2]
-                        messages.error_invalid_initializer(self.id, attr)
+                        DeclarationNode._messages.error_invalid_initializer(self.id, attr)
                         attr.filename = t_file
                         attr.line = t_line
                         attr.column = t_column
@@ -159,7 +158,7 @@ class DeclarationNode(AbstractNode):
 
                 # Functions are allowed to be declared but definitions are not handled by this node
                 elif self.type_stack[-1] is DeclaratorSpecifier.FUNC:
-                    messages.error_func_initialized_like_var(self.id, attr)
+                    DeclarationNode._messages.error_func_initialized_like_var(self.id, attr)
                     attr.function_signature = self._declarator_node.get_function_signature()
                     counter += 1
 

@@ -6,6 +6,7 @@ Academic Year: 2018-2019
 from abc import ABC, abstractmethod
 from typing import List
 
+import messages
 from SymbolTable import Attributes
 
 
@@ -16,6 +17,8 @@ class AbstractNode(ABC):
     """
     _children: List["AbstractNode"]
     _parent_node: "AbstractNode"
+
+    _messages = messages.MessageGenerator()
     _index_counter = 0
     _indent_level = 0
 
