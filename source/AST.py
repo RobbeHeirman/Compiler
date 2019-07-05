@@ -16,6 +16,9 @@ class AST:
         """
         self._root = None
 
+    def error_count(self) -> int:
+        return self._root.error_count()
+
     @property
     def root(self):
         return self._root
@@ -40,7 +43,7 @@ class AST:
         file.write(graph_string)
         file.close()
 
-    def generate_llvm(self)->str:
+    def generate_llvm(self) -> str:
         """
         Generates the LLVM instruction code
         :return: a string with the llvm instructions of this ast.

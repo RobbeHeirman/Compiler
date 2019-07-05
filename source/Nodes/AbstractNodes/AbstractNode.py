@@ -37,6 +37,10 @@ class AbstractNode(ABC):
     def index(self):
         return self._index
 
+    @classmethod
+    def error_count(cls):
+        return cls._messages.error_counter
+
     @property
     @abstractmethod
     def label(self):  # Enforcing every node defines a label
@@ -127,17 +131,18 @@ class AbstractNode(ABC):
         for child in self._children:
             child.first_pass()
 
-    def semantic_analysis(self) -> int:
+    def semantic_analysis(self) -> bool:
         """
         Not all nodes check for semantic correctness. Those who do not just forward the check to their children.
         this function NEEDS to be overwritten by nodes who do check on semantics.
         :return: Returns the amount of errors generated.
         """
-        counter = 0
+        ret = True
         for child in self._children:
-            counter += child.semantic_analysis()
+            if child.semantic_analysis():
+                ret = False
 
-        return counter
+        return ret
 
     def generate_llvm(self) -> str:
         """

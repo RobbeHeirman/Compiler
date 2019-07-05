@@ -23,6 +23,10 @@ class MessageGenerator:
         self.color_scheme = ColorScheme
         self._error_counter = 0
 
+    @property
+    def error_counter(self):
+        return self._error_counter
+
     @staticmethod
     def file_info(attribute: "SymbolTable.Attributes"):
         """Starter prints all info of where something should be told about"""

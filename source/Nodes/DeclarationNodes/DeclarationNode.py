@@ -100,13 +100,13 @@ class DeclarationNode(AbstractNode):
 
         super().remove_child(child)
 
-    def semantic_analysis(self) -> int:
+    def semantic_analysis(self) -> bool:
         """
         On a declaration, a new identifier is introduced into the scope. This has to be an unique identifier
         on this scope lvl. But it can overshadow higher scoped (global...) declared variables with the same identifier.
         :return: Amount of errors encountered in node and children.
         """
-        counter = 0
+        ret = False
         # First we need to pack the identifier's attributes. We have the base type and id trough reference of
         # the remaining decelerators we can deduce the type stack.
         if self._declarator_node is not None:
@@ -118,18 +118,18 @@ class DeclarationNode(AbstractNode):
         # We first check of the expression is semantically correct
         if self._expression_node:
             if not self._expression_node.semantic_analysis():
-                counter += 1
+                ret = False
 
             if self.base_type is not self._expression_node.base_type:
                 DeclarationNode._messages.error_no_conversion_base_types(attr, self._expression_node.base_type)
-                counter += 1
+                ret = False
 
             if len(self.type_stack) > 0:
                 # Now we need to check if there are no violations on the operators.
                 # 1) Ptr type requires address of same type on the right side, NO IMPLICIT CONVERSIONS.
                 if len(self.type_stack) > 0 and self.type_stack[-1].PTR:
                     if not self._expression_node.is_address():
-                        counter += 1
+                        ret = False
                         DeclarationNode._messages.error_no_conversion_int_ptr(attr, self._expression_node.base_type)
 
                 # 2) Explicit list init if array has no init size if type is array .
@@ -140,7 +140,7 @@ class DeclarationNode(AbstractNode):
                         if self._expression_node is None:
                             if not isinstance(self._parent_node, ParamListNode):
                                 DeclarationNode._messages.error_array_size_missing(self.id, attr)
-                                counter += 1
+                                ret = False
 
                     if not isinstance(self._expression_node, ArrayInitNode):
                         tpl = self._expression_node.get_error_info()
@@ -154,19 +154,19 @@ class DeclarationNode(AbstractNode):
                         attr.filename = t_file
                         attr.line = t_line
                         attr.column = t_column
-                        counter += 1
+                        ret = False
 
                 # Functions are allowed to be declared but definitions are not handled by this node
                 elif self.type_stack[-1] is DeclaratorSpecifier.FUNC:
                     DeclarationNode._messages.error_func_initialized_like_var(self.id, attr)
                     attr.function_signature = self._declarator_node.get_function_signature()
-                    counter += 1
+                    ret = False
 
         # Add to the scopes symbol_table.
         if not self.add_to_scope_symbol_table(self.id, attr):
-            counter += 1
+            ret = False
 
-        return counter
+        return ret
 
     def implicit_param_ptr_conversion(self):
         """ int main(int *rgv []) == int main(int **argv)"""

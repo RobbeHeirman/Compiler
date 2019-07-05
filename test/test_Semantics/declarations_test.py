@@ -29,15 +29,15 @@ class STestDeclaration(unittest.TestCase):
         sys.stdout = f
         file_name = self.path + filename
         ast = main.create_ast(file_name)
+        ast.semantic_analysis()
+        f.close()
+        sys.stdout = orig_stdout
         try:
-            self.assertEqual(ast.semantic_analysis(), errors)
-
+            self.assertEqual(ast.error_count(), errors)
         except Exception:
             main.generate_ast_visuals(ast, self.result_path + filename[:-2])
             raise
 
-        f.close()
-        sys.stdout = orig_stdout
 
     def test_integer_happy_day(self):
         """
