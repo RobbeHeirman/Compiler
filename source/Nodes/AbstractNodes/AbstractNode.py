@@ -6,7 +6,6 @@ Academic Year: 2018-2019
 from abc import ABC, abstractmethod
 from typing import List
 
-
 from SymbolTable import Attributes
 
 
@@ -19,7 +18,6 @@ class AbstractNode(ABC):
     _parent_node: "AbstractNode"
     _index_counter = 0
     _indent_level = 0
-    _error_counter = 0
 
     def __init__(self, parent: "AbstractNode" = None):
         """
@@ -132,11 +130,11 @@ class AbstractNode(ABC):
         this function NEEDS to be overwritten by nodes who do check on semantics.
         :return: Returns the amount of errors generated.
         """
-
+        counter = 0
         for child in self._children:
-            child.semantic_analysis()
+            counter += child.semantic_analysis()
 
-        return self._error_counter
+        return counter
 
     def generate_llvm(self) -> str:
         """

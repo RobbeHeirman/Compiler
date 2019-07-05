@@ -1,16 +1,43 @@
+import os
+import shutil
+import sys
 import unittest
 import main
 
 
 class STestDeclaration(unittest.TestCase):
+    """
+    Testing the semantic analysis of declarations. Consists in multiple parts.
+
+    1) Happy day scenario's: No errors should be generated.
+    2) Wrong type initializer. (No implicit conversion yet)
+    3) Re declaration of a simple type.
+    """
 
     def setUp(self):
+        self.result_path = "test/test_results/semantic/declarations/"
         self.path = "C_files/semantic/Declaration/"
 
-    def run_analysis(self, filename):
+        if os.path.exists(self.result_path):
+            shutil.rmtree(self.result_path)
+
+    def run_analysis(self, filename, errors=0):
+        orig_stdout = sys.stdout
+        if not os.path.exists(self.result_path):
+            os.makedirs(self.result_path)
+        f = open(self.result_path + filename[:-2] + "_error.log", "w+")
+        sys.stdout = f
         file_name = self.path + filename
         ast = main.create_ast(file_name)
-        self.assertEqual(ast.semantic_analysis(), 0)
+        try:
+            self.assertEqual(ast.semantic_analysis(), errors)
+
+        except Exception:
+            main.generate_ast_visuals(ast, self.result_path + filename[:-2])
+            raise
+
+        f.close()
+        sys.stdout = orig_stdout
 
     def test_integer_happy_day(self):
         """
@@ -26,3 +53,6 @@ class STestDeclaration(unittest.TestCase):
 
     def test_ptr_happy_day(self):
         self.run_analysis("happy_day_ptr.c")
+
+    def test_wrong_type_init_int(self):
+        self.run_analysis("wrong_type_init_int.c", 3)
