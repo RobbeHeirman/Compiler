@@ -10,8 +10,7 @@ import importlib
 
 from antlr4 import *
 import build
-from AST import AST
-
+import AST
 # Auto runs build to get dependant gen files
 if importlib.util.find_spec("gen") is None:
     build.main()
@@ -21,7 +20,7 @@ from gen.CParser import CParser
 import CListenerExtend as CListenerExtend
 
 
-def create_ast(input_file: str) -> AST:
+def create_ast(input_file: str) -> AST.AST:
     """
     Function will create the AST from the listener and returns the ast
     :param: input_file is the name of the input C file

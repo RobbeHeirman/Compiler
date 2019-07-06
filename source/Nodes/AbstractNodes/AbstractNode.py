@@ -3,19 +3,19 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from abc import ABC, abstractmethod
-from typing import List
+import abc
+import typing
 
+import Attributes
 import messages
-from SymbolTable import Attributes
 
 
-class AbstractNode(ABC):
+class AbstractNode(abc.ABC):
     """
     Abstract class of a node of the AST.
     Should be overridden by specific nodes of the AST.
     """
-    _children: List["AbstractNode"]
+    _children: typing.List["AbstractNode"]
     _parent_node: "AbstractNode"
 
     _messages = messages.MessageGenerator()
@@ -42,7 +42,7 @@ class AbstractNode(ABC):
         return cls._messages.error_counter
 
     @property
-    @abstractmethod
+    @abc.abstractmethod
     def label(self):  # Enforcing every node defines a label
         pass
 
@@ -95,7 +95,7 @@ class AbstractNode(ABC):
     def is_in_table(self, lexeme: str) -> bool:
         return self._parent_node.is_in_table(lexeme)
 
-    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes) -> bool:
+    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes.Attributes) -> bool:
         """
         Hook to add a lexeme to symbol table. Child classes may need to implement this.
         We will just call the parents add symbol to scope. Scoped nodes contain SymbolTables and will look
@@ -113,7 +113,7 @@ class AbstractNode(ABC):
     def increment_register_index(self):
         self._parent_node.increment_register_index()
 
-    def get_attribute(self, lexeme) -> Attributes:
+    def get_attribute(self, lexeme) -> Attributes.Attributes:
         return self._parent_node.get_attribute(lexeme)
 
     def cleanup(self):

@@ -3,11 +3,11 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Specifiers
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
 
 
-class ParamListNode(AbstractNode):
+class ParamListNode(AbstractNode.AbstractNode):
     label = "Param list"
 
     def __init__(self, parent_node):

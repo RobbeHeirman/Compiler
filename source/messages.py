@@ -3,8 +3,8 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-import SymbolTable
-from Specifiers import TypeSpecifier
+
+import Specifiers
 
 
 class ColorScheme:
@@ -104,14 +104,16 @@ class MessageGenerator:
                                                                                                  lexeme)
               + self.color_scheme.ENDC)
 
-    def error_no_conversion_int_ptr(self, attribute: "SymbolTable.Attributes", expression_type: TypeSpecifier):
+    def error_no_conversion_int_ptr(self, attribute: "SymbolTable.Attributes",
+                                    expression_type: Specifiers.TypeSpecifier):
         print(
             self.color_scheme.FAIL + "{0}incompatible pointer conversion initializing {1} * with an expression of "
                                      "type {2} "
             .format(self.error(attribute), attribute.decl_type.value, expression_type.value)
             + self.color_scheme.ENDC)
 
-    def error_no_conversion_base_types(self, attribute: "SymbolTable.Attributes", expression_type: TypeSpecifier):
+    def error_no_conversion_base_types(self, attribute: "SymbolTable.Attributes",
+                                       expression_type: Specifiers.TypeSpecifier):
         print(self.color_scheme.FAIL + "{0}Cannot convert base types, initializing {1}  with an expression of type {2}"
               .format(self.error(attribute), attribute.decl_type.value, expression_type.value)
               + self.color_scheme.ENDC)

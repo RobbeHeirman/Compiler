@@ -1,5 +1,3 @@
 
-    int i = 12;
-    int k ;
-
-
+int a = 42;
+int *i  = &a;

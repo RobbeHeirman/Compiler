@@ -9,8 +9,8 @@ import messages
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.AbstractNodes.ScopedNode import ScopedNode
 from Nodes.FunctionNodes.ReturnNode import ReturnNode
-from Specifiers import DeclaratorSpecifier
-from SymbolTable import Attributes
+from Specifiers import TypeModifier
+from Attributes import Attributes
 
 
 class FuncDefNode(ScopedNode):
@@ -53,8 +53,9 @@ class FuncDefNode(ScopedNode):
         """
         ret = True
         # 1) Add to the symbol table of the upper scope
-        self._type_stack = [DeclaratorSpecifier.PTR for _ in range(self._ptr_count)]
-        attr = Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
+        self._type_stack = [TypeModifier.PTR for _ in range(self._ptr_count)]
+        attr = Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column,
+                          self.__class__._messages)
         signature = self._children[0].get_function_signature()
         attr.function_signature = signature
         if not self._parent_node.add_to_scope_symbol_table(self._id, attr):

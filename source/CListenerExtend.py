@@ -15,7 +15,7 @@ from Nodes.DeclarationNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.AssignmentNode import AssignmentNode
 from Nodes.ExpressionNodes.ConstantExpressionNode import ConstantExpressionNode
 from Nodes.DeclarationNodes.DeclListNode import DeclListNode
-from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
+from Nodes.DeclarationNodes.TypeModifierNode import TypeModifierNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
 from Nodes.ExpressionNodes.FixNode import FixNode, FixType
@@ -26,7 +26,7 @@ from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
 from Nodes.FunctionNodes.ReturnNode import ReturnNode
 from Nodes.GlobalNodes.RootNode import RootNode
-from Specifiers import ConditionType, DeclaratorSpecifier, TypeSpecifier
+from Specifiers import ConditionType, TypeModifier, TypeSpecifier
 from gen.CListener import CListener
 from gen.CParser import CParser
 
@@ -134,7 +134,7 @@ class CListenerExtend(CListener):
 
     def enterBase_type(self, ctx: CParser.Base_typeContext):
         """
-        Leaf of base_type, adds base_type leaf to parent node.
+        Leaf of base_type, adds base_type to parent node.
         :param ctx:
         :return:
         """
@@ -150,7 +150,7 @@ class CListenerExtend(CListener):
 
         # column = start.column
         if ctx.getChild(0).getText() is not "(":  # parenthesis are just used to order
-            node = DeclaratorNode(self._parent_node)
+            node = TypeModifierNode(self._parent_node)
             self._parent_node.add_child(node)
             self._parent_node = node
 
@@ -161,18 +161,18 @@ class CListenerExtend(CListener):
 
     def enterPtr_decl(self, ctx: CParser.Ptr_declContext):
 
-        self._parent_node.declarator_type = DeclaratorSpecifier.PTR
+        self._parent_node.declarator_type = TypeModifier.PTR
 
     def enterFunction_operator(self, ctx: CParser.Function_operatorContext):
-        self._parent_node.declarator_type = DeclaratorSpecifier.FUNC
+        self._parent_node.declarator_type = TypeModifier.FUNC
 
     def enterArray_operator(self, ctx: CParser.Array_operatorContext):
 
-        self._parent_node.declarator_type = DeclaratorSpecifier.ARRAY
+        self._parent_node.declarator_type = TypeModifier.ARRAY
 
     def enterId_decl(self, ctx: CParser.Id_declContext):
 
-        self._parent_node: Union[DeclarationNode, DeclaratorNode]
+        self._parent_node: Union[DeclarationNode, TypeModifierNode]
         self._parent_node.add_id(ctx.getText())
         # Is just a stub. We propagated the identifier. So the node is no necessary.
         self._parent_node.parent_node.remove_child(self._parent_node)

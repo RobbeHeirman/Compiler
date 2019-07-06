@@ -9,7 +9,7 @@ import LlvmCode
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode, ExpressionNodeType
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
-from Specifiers import Operator, TypeSpecifier, DeclaratorSpecifier
+from Specifiers import Operator, TypeSpecifier
 
 
 class RHSNode(ExpressionNode):

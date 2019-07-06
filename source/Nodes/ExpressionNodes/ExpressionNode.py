@@ -1,12 +1,12 @@
 
-
 from enum import Enum, auto
 from typing import List
 
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
+from Nodes.AbstractNodes.TypedNode import TypedNode
 from Nodes.ExpressionNodes.FixNode import FixType, FixNode
-from Specifiers import DeclaratorSpecifier
-from SymbolTable import Attributes
+from Specifiers import TypeModifier
+from Attributes import Attributes
 
 
 class ExpressionNodeType(Enum):
@@ -21,15 +21,15 @@ class ExpressionNodeType(Enum):
     @property
     def decl_specifier(self):
         specifier_map = {
-            self.PTR: DeclaratorSpecifier.PTR,
-            self.ADDR: DeclaratorSpecifier.ADDRESS,
-            self.ARRAY: DeclaratorSpecifier.ARRAY,
-            self.FUNCTION: DeclaratorSpecifier.FUNC
+            self.PTR: TypeModifier.PTR,
+            self.ADDR: TypeModifier.ADDRESS,
+            self.ARRAY: TypeModifier.ARRAY,
+            self.FUNCTION: TypeModifier.FUNC
         }
         return specifier_map[self]
 
 
-class ExpressionNode(AbstractNode):
+class ExpressionNode(TypedNode):
     _BASE_LABEL = "expression"
     _OPERATOR_TYPES = [ExpressionNodeType.ARRAY,
                        ExpressionNodeType.PTR, ExpressionNodeType.ADDR, ExpressionNodeType.FUNCTION]
@@ -40,9 +40,7 @@ class ExpressionNode(AbstractNode):
         self._identifier_node = None
         self._member_operator_node = None
 
-        self.base_type = None
         self.type = None
-        self.type_stack = []
 
         # Book keeping info
         self.filename = None
@@ -51,7 +49,7 @@ class ExpressionNode(AbstractNode):
 
     @property
     def type_string_llvm(self):
-        return self.base_type.llvm_type + "*" * len(self.type_stack)
+        return self.base_type.llvm_type + "*" * len(self._type_stack)
 
     @property
     def label(self):
@@ -63,7 +61,7 @@ class ExpressionNode(AbstractNode):
 
     def is_address(self):
 
-        if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.ADDRESS:
+        if self._type_stack and self._type_stack[-1] is TypeModifier.ADDRESS:
             return True
 
         return False
@@ -117,19 +115,18 @@ class ExpressionNode(AbstractNode):
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
-    def first_pass(self):
-        self._handle_member_operator_node()
-        for child in self._children:
-            child.first_pass()
+    # def first_pass(self):
+    #     self._handle_member_operator_node()
+    #     for child in self._children:
+    #         child.first_pass()
 
     def semantic_analysis(self) -> bool:
         """
         Semantic analysis in expressive nodes is looking up if the signature of the identifier matches the
         one in the symbol table.
         Note: We do not support implicit conversions.
-        :return: 
+        :return:
         """
-
         ret = True
         for child in self._children:
             if not child.semantic_analysis():
@@ -137,7 +134,7 @@ class ExpressionNode(AbstractNode):
 
         return ret
 
-    def find_type_stack(self, stack=None) -> List[DeclaratorSpecifier]:
+    def find_type_stack(self, stack=None) -> List[TypeModifier]:
         """
         The expression node has an operator type stack. We need to find this type stack to check if we can handle
         the expression
@@ -169,12 +166,12 @@ class ExpressionNode(AbstractNode):
         if len(own_stack) is 0:
             return True
 
-        attr = Attributes(self.base_type, own_stack, self.filename, self.line, self.column)
+        attr = Attributes(self.base_type, own_stack, self.filename, self.line, self.column, AbstractNode._messenger)
 
-        if own_stack[-1] is DeclaratorSpecifier.ADDRESS:  # Need to check if applied on Lvalue
+        if own_stack[-1] is TypeModifier.ADDRESS:  # Need to check if applied on Lvalue
             own_stack.pop(-1)
 
-            if not own_stack or own_stack[-1] is DeclaratorSpecifier.PTR:
+            if not own_stack or own_stack[-1] is TypeModifier.PTR:
                 pass
 
             else:
@@ -184,23 +181,23 @@ class ExpressionNode(AbstractNode):
         if not own_stack:
             return True
 
-        if own_stack[-1] is DeclaratorSpecifier.PTR:
-            if len(attr_stack) > 0 and attr_stack[-1] is DeclaratorSpecifier.PTR:
+        if own_stack[-1] is TypeModifier.PTR:
+            if len(attr_stack) > 0 and attr_stack[-1] is TypeModifier.PTR:
                 pass
             else:
                 AbstractNode._messages.error_unary_not_ptr(attr)
                 return False
 
-        elif own_stack[-1] is DeclaratorSpecifier.ARRAY:
-            if len(attr_stack) > 0 and attr_stack[-1] is DeclaratorSpecifier.ARRAY:
+        elif own_stack[-1] is TypeModifier.ARRAY:
+            if len(attr_stack) > 0 and attr_stack[-1] is TypeModifier.ARRAY:
                 pass
             else:
 
                 AbstractNode._messages.error_subscript_not_array(attr)
                 return False
 
-        elif own_stack[-1] is DeclaratorSpecifier.FUNC:
-            if attr_stack and attr_stack[-1] is DeclaratorSpecifier.FUNC:
+        elif own_stack[-1] is TypeModifier.FUNC:
+            if attr_stack and attr_stack[-1] is TypeModifier.FUNC:
                 pass
             else:
                 AbstractNode._messages.error_object_not_function(self._identifier_node.id, attr)

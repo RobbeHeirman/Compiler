@@ -3,40 +3,8 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import enum
 from enum import Enum, auto
-
-
-class TypeSpecifier(Enum):
-    """
-    TypeSpecifier Attribute as Enum.
-    Specifies a type for a identifier token.
-    """
-    CHAR = 'char'
-    INT = 'int'
-    FLOAT = 'float'
-    DEFAULT = ''  # Stub when dealing with incomplete info
-    ANY = auto()  # Used for type stack printf() scanf()
-
-    @property
-    def llvm_type(self) -> str:
-        _LLVM_TYPE = {
-            self.CHAR: 'i8',
-            self.INT: 'i32',
-            self.FLOAT: 'float',
-            self.DEFAULT: ''
-        }
-
-        return _LLVM_TYPE[self]
-
-    @property
-    def llvm_alignment(self) -> int:
-        _LLVM_ALIGN = {
-            self.CHAR: 1,
-            self.INT: 4,
-            self.FLOAT: 4
-        }
-        return _LLVM_ALIGN[self]
-
 
 class Operator(Enum):
     ADD = '+'
@@ -74,8 +42,40 @@ class ConditionType(Enum):
     WHILE = 'while'
 
 
-class DeclaratorSpecifier(Enum):
+class TypeModifier(enum.Enum):
     PTR = "*"
     ARRAY = "[]"
     FUNC = "()"
     ADDRESS = "&"
+
+
+class TypeSpecifier(enum.Enum):
+    """
+    TypeSpecifier Attribute as Enum.
+    Specifies a type for a identifier token.
+    """
+    CHAR = 'char'
+    INT = 'int'
+    FLOAT = 'float'
+    DEFAULT = ''  # Stub when dealing with incomplete info
+    ANY = enum.auto()  # Used for type stack printf() scanf()
+
+    @property
+    def llvm_type(self) -> str:
+        _LLVM_TYPE = {
+            self.CHAR: 'i8',
+            self.INT: 'i32',
+            self.FLOAT: 'float',
+            self.DEFAULT: ''
+        }
+
+        return _LLVM_TYPE[self]
+
+    @property
+    def llvm_alignment(self) -> int:
+        _LLVM_ALIGN = {
+            self.CHAR: 1,
+            self.INT: 4,
+            self.FLOAT: 4
+        }
+        return _LLVM_ALIGN[self]
