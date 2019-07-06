@@ -3,7 +3,6 @@
 from enum import Enum, auto
 from typing import List
 
-import messages
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ExpressionNodes.FixNode import FixType, FixNode
 from Specifiers import DeclaratorSpecifier
@@ -43,7 +42,6 @@ class ExpressionNode(AbstractNode):
 
         self.base_type = None
         self.type = None
-
         self.type_stack = []
 
         # Book keeping info
@@ -82,16 +80,15 @@ class ExpressionNode(AbstractNode):
         :return: A tuple filename, line, column
         """
         if self.filename is None:
-            for child in self._children:
-                val = child.get_error_info()
+            for _ in self._children:
+                # val = child.get_error_info()
+                val = ""
                 if val is not None:
                     return val
         else:
             return self.filename, self.line, self.column
 
-
     def _handle_member_operator_node(self):
-
         if self._member_operator_node is not None:
             if self._member_operator_node.f_type == FixType.PTR:
                 self.type = ExpressionNodeType.PTR
@@ -119,8 +116,6 @@ class ExpressionNode(AbstractNode):
                 self._member_operator_node.rhs_node.parent_node = self
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
-
-
 
     def first_pass(self):
         self._handle_member_operator_node()
@@ -183,7 +178,7 @@ class ExpressionNode(AbstractNode):
                 pass
 
             else:
-                messages.error_lvalue_required_addr(attr)
+                AbstractNode._messages.error_lvalue_required_addr(attr)
                 return False
 
         if not own_stack:
@@ -193,7 +188,7 @@ class ExpressionNode(AbstractNode):
             if len(attr_stack) > 0 and attr_stack[-1] is DeclaratorSpecifier.PTR:
                 pass
             else:
-                messages.error_unary_not_ptr(attr)
+                AbstractNode._messages.error_unary_not_ptr(attr)
                 return False
 
         elif own_stack[-1] is DeclaratorSpecifier.ARRAY:
@@ -201,14 +196,14 @@ class ExpressionNode(AbstractNode):
                 pass
             else:
 
-                messages.error_subscript_not_array(attr)
+                AbstractNode._messages.error_subscript_not_array(attr)
                 return False
 
         elif own_stack[-1] is DeclaratorSpecifier.FUNC:
             if attr_stack and attr_stack[-1] is DeclaratorSpecifier.FUNC:
                 pass
             else:
-                messages.error_object_not_function(self.identifier, attr)
+                AbstractNode._messages.error_object_not_function(self._identifier_node.id, attr)
 
         if len(own_stack) > 0:
             own_stack.pop(-1)

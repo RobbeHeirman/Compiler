@@ -5,6 +5,7 @@ Academic Year: 2018-2019
 """
 import LlvmCode
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
+from Nodes.AbstractNodes.TypedNode import TypedNode
 from Nodes.DeclarationNodes.DeclaratorNode import DeclaratorNode
 from Nodes.DeclarationNodes.ArrayInitNode import ArrayInitNode
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
@@ -18,7 +19,7 @@ from typing import Union
 from gen.CParser import CParser
 
 
-class DeclarationNode(AbstractNode):
+class DeclarationNode(TypedNode):
     """
     Represents a Declaration in our abstract syntax tree.
     Will deduct the base type of the declaration in the first pass.
@@ -37,12 +38,6 @@ class DeclarationNode(AbstractNode):
         # The 2 child nodes
         self._declarator_node = None
         self._expression_node = None
-
-        # Base info
-        self.id = None  # Id can be deducted from children.
-        self.base_type = None  # Base type gets passed from a decl_list node.
-
-        self.type_stack = []
 
         # Error message info
         self._filename = filename
@@ -127,7 +122,7 @@ class DeclarationNode(AbstractNode):
             if len(self.type_stack) > 0:
                 # Now we need to check if there are no violations on the operators.
                 # 1) Ptr type requires address of same type on the right side, NO IMPLICIT CONVERSIONS.
-                if len(self.type_stack) > 0 and self.type_stack[-1].PTR:
+                if self.type_stack[-1].PTR:
                     if not self._expression_node.is_address():
                         ret = False
                         DeclarationNode._messages.error_no_conversion_int_ptr(attr, self._expression_node.base_type)
