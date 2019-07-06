@@ -1,19 +1,12 @@
 import abc
-from typing import List
 
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
-import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
-from Specifiers import TypeSpecifier, TypeModifier
 
 
 class TypedNode(AbstractNode.AbstractNode, abc.ABC):
     """
     Superclass for all classes who have knowledge about their type. (Declarations right side id's expressions...)
     """
-
-    _type_modifier_node: TypeModifierNode
-    base_type: TypeSpecifier
-    _type_stack: List[TypeModifier]
 
     def __init__(self, parent_node):
         super().__init__(parent_node)

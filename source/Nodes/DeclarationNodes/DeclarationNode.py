@@ -7,7 +7,7 @@ import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
-import Nodes.ExpressionNodes.RHSNode as RHSNode
+
 
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 import Specifiers
@@ -66,7 +66,7 @@ class DeclarationNode(TypedNode.TypedNode):
 
         self.id = identifier
 
-    def add_child(self, child: typing.Union[TypeModifierNode.TypeModifierNode, RHSNode.RHSNode], index: int = None):
+    def add_child(self, child: typing.Union[TypeModifierNode.TypeModifierNode], index: int = None):
         """
         extends add_child of abstractNode. To quick filter useful information for DeclarationNode
         :param index: index where to add

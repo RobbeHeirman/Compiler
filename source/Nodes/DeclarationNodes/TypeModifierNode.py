@@ -6,6 +6,8 @@ Academic Year: 2018-2019
 import typing
 
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
+import Nodes.FunctionNodes.ParamListNode as ParamListNode
+import Specifiers
 
 
 class TypeModifierNode(AbstractNode.AbstractNode):
@@ -15,11 +17,11 @@ class TypeModifierNode(AbstractNode.AbstractNode):
     """
     _specifier_node: AbstractNode
     _declarator_node: "TypeModifierNode"
-    _parent_node: typing.Union["TypeModifierNode", "DeclarationNode.DeclarationNode"]
+    _parent_node: typing.Union["TypeModifierNode"]
 
     _BASE_LABEL = "TypeModifier"
 
-    def __init__(self, parent_node):
+    def __init__(self, parent_node, mod_type: Specifiers.TypeModifier = None):
         """
         Initializer
         :param parent_node: the parent node
@@ -30,15 +32,15 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         self._id_node = None
         self._rhs_node = None
         self._param_list_node = None
-        self.declarator_type = None
+        self.modifier_type = mod_type
         self._is_implicit_conversion = False
 
     @property
     def label(self):
 
         ret = self._BASE_LABEL
-        if self.declarator_type is not None:
-            ret += "\nType: {0}\n".format(self.declarator_type.value)
+        if self.modifier_type is not None:
+            ret += "\nType: {0}\n".format(self.modifier_type.value)
 
         if self._is_implicit_conversion:
             ret += "(implicit conversion)"
@@ -80,8 +82,8 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         if type_stack is None:
             type_stack = []
 
-        if self.declarator_type is not None:
-            type_stack.append(self.declarator_type)
+        if self.modifier_type is not None:
+            type_stack.append(self.modifier_type)
 
         if self._declarator_node is not None:
             self._declarator_node.generate_type_operator_stack(type_stack)

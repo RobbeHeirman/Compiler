@@ -18,7 +18,6 @@ from Nodes.DeclarationNodes.DeclListNode import DeclListNode
 from Nodes.DeclarationNodes.TypeModifierNode import TypeModifierNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
-from Nodes.ExpressionNodes.FixNode import FixNode, FixType
 from Nodes.ExpressionNodes.IdentifierExpressionNode import IdentifierExpressionNode
 from Nodes.ExpressionNodes.LHSNode import LHSNode
 from Nodes.ExpressionNodes.RHSParamListNode import RHSParamListNode
@@ -269,7 +268,7 @@ class CListenerExtend(CListener):
 
     def enterExpression_prefix(self, ctx: CParser.Expression_prefixContext):
         val = ctx.getChild(0).getText()
-        node = FixNode(self._parent_node, FixType(val))
+        node = TypeModifierNode(self._parent_node, TypeModifier(val))
         self._parent_node.add_child(node)
         self._parent_node = node
 
@@ -278,7 +277,7 @@ class CListenerExtend(CListener):
 
     def enterExpression_postfix(self, ctx: CParser.Expression_postfixContext):
         val = ctx.getChild(0).getChild(0).getText() + ctx.getChild(0).getChild(2).getText()
-        node = FixNode(self._parent_node, FixType(val))
+        node = TypeModifierNode(self._parent_node, TypeModifier(val))
         self._parent_node.add_child(node)
         self._parent_node = node
 

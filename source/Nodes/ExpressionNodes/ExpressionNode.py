@@ -1,11 +1,9 @@
-
 from enum import Enum, auto
 from typing import List
 
-import Nodes.AbstractNodes.AbstractNode as AbstractNode
-from Nodes.AbstractNodes.TypedNode import TypedNode
-from Nodes.ExpressionNodes.FixNode import FixType, FixNode
-from Specifiers import TypeModifier
+import Nodes.AbstractNodes.TypedNode as TypedNode
+import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
+import Specifiers
 from Attributes import Attributes
 
 
@@ -21,15 +19,15 @@ class ExpressionNodeType(Enum):
     @property
     def decl_specifier(self):
         specifier_map = {
-            self.PTR: TypeModifier.PTR,
-            self.ADDR: TypeModifier.ADDRESS,
-            self.ARRAY: TypeModifier.ARRAY,
-            self.FUNCTION: TypeModifier.FUNC
+            self.PTR: Specifiers.TypeModifier.PTR,
+            self.ADDR: Specifiers.TypeModifier.ADDRESS,
+            self.ARRAY: Specifiers.TypeModifier.ARRAY,
+            self.FUNCTION: Specifiers.TypeModifier.FUNC
         }
         return specifier_map[self]
 
 
-class ExpressionNode(TypedNode):
+class ExpressionNode(TypedNode.TypedNode):
     _BASE_LABEL = "expression"
     _OPERATOR_TYPES = [ExpressionNodeType.ARRAY,
                        ExpressionNodeType.PTR, ExpressionNodeType.ADDR, ExpressionNodeType.FUNCTION]
@@ -61,14 +59,14 @@ class ExpressionNode(TypedNode):
 
     def is_address(self):
 
-        if self._type_stack and self._type_stack[-1] is TypeModifier.ADDRESS:
+        if self._type_stack and self._type_stack[-1] is Specifiers.TypeModifier.ADDRESS:
             return True
 
         return False
 
-    def add_child(self, child: AbstractNode, index=None):
+    def add_child(self, child, index=None):
 
-        if isinstance(child, FixNode):
+        if isinstance(child, TypeModifierNode.TypeModifierNode):
             self._member_operator_node = child
 
         super().add_child(child)
@@ -88,17 +86,17 @@ class ExpressionNode(TypedNode):
 
     def _handle_member_operator_node(self):
         if self._member_operator_node is not None:
-            if self._member_operator_node.f_type == FixType.PTR:
+            if self._member_operator_node.f_type == Specifiers.TypeModifier.PTR:
                 self.type = ExpressionNodeType.PTR
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
-            elif self._member_operator_node.f_type == FixType.ADDRESS:
+            elif self._member_operator_node.f_type == Specifiers.TypeModifier.ADDRESS:
                 self.type = ExpressionNodeType.ADDR
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
-            elif self._member_operator_node.f_type == FixType.ARRAY:
+            elif self._member_operator_node.f_type == Specifiers.TypeModifier.ARRAY:
                 self.type = ExpressionNodeType.ARRAY
 
                 self._member_operator_node.rhs_node.parent = self
@@ -107,7 +105,7 @@ class ExpressionNode(TypedNode):
                 self.remove_child(self._member_operator_node)
                 self._member_operator_node = None
 
-            elif self._member_operator_node.f_type == FixType.FUNCTION:
+            elif self._member_operator_node.f_type == Specifiers.TypeModifier.FUNCTION:
                 self.type = ExpressionNodeType.FUNCTION
                 self._member_operator_node.rhs_node.parent = self
                 self.add_child(self._member_operator_node.rhs_node)
@@ -134,7 +132,7 @@ class ExpressionNode(TypedNode):
 
         return ret
 
-    def find_type_stack(self, stack=None) -> List[TypeModifier]:
+    def find_type_stack(self, stack=None) -> List[Specifiers.TypeModifier]:
         """
         The expression node has an operator type stack. We need to find this type stack to check if we can handle
         the expression
@@ -166,41 +164,41 @@ class ExpressionNode(TypedNode):
         if len(own_stack) is 0:
             return True
 
-        attr = Attributes(self.base_type, own_stack, self.filename, self.line, self.column, AbstractNode._messenger)
+        attr = Attributes(self.base_type, own_stack, self.filename, self.line, self.column, self.__class__._messages)
 
-        if own_stack[-1] is TypeModifier.ADDRESS:  # Need to check if applied on Lvalue
+        if own_stack[-1] is Specifiers.TypeModifier.ADDRESS:  # Need to check if applied on Lvalue
             own_stack.pop(-1)
 
-            if not own_stack or own_stack[-1] is TypeModifier.PTR:
+            if not own_stack or own_stack[-1] is Specifiers.TypeModifier.PTR:
                 pass
 
             else:
-                AbstractNode._messages.error_lvalue_required_addr(attr)
+                self.__class__._messages.error_lvalue_required_addr(attr)
                 return False
 
         if not own_stack:
             return True
 
-        if own_stack[-1] is TypeModifier.PTR:
-            if len(attr_stack) > 0 and attr_stack[-1] is TypeModifier.PTR:
+        if own_stack[-1] is Specifiers.TypeModifier.PTR:
+            if len(attr_stack) > 0 and attr_stack[-1] is Specifiers.TypeModifier.PTR:
                 pass
             else:
-                AbstractNode._messages.error_unary_not_ptr(attr)
+                self.__class__._messages.error_unary_not_ptr(attr)
                 return False
 
-        elif own_stack[-1] is TypeModifier.ARRAY:
-            if len(attr_stack) > 0 and attr_stack[-1] is TypeModifier.ARRAY:
+        elif own_stack[-1] is Specifiers.TypeModifier.ARRAY:
+            if len(attr_stack) > 0 and attr_stack[-1] is Specifiers.TypeModifier.ARRAY:
                 pass
             else:
 
-                AbstractNode._messages.error_subscript_not_array(attr)
+                self.__class__._messages.error_subscript_not_array(attr)
                 return False
 
-        elif own_stack[-1] is TypeModifier.FUNC:
-            if attr_stack and attr_stack[-1] is TypeModifier.FUNC:
+        elif own_stack[-1] is Specifiers.TypeModifier.FUNC:
+            if attr_stack and attr_stack[-1] is Specifiers.TypeModifier.FUNC:
                 pass
             else:
-                AbstractNode._messages.error_object_not_function(self._identifier_node.id, attr)
+                self.__class__._messages.error_object_not_function(self._identifier_node.id, attr)
 
         if len(own_stack) > 0:
             own_stack.pop(-1)

@@ -3,8 +3,9 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-import enum
+
 from enum import Enum, auto
+
 
 class Operator(Enum):
     ADD = '+'
@@ -42,14 +43,14 @@ class ConditionType(Enum):
     WHILE = 'while'
 
 
-class TypeModifier(enum.Enum):
+class TypeModifier(Enum):
     PTR = "*"
     ARRAY = "[]"
     FUNC = "()"
     ADDRESS = "&"
 
 
-class TypeSpecifier(enum.Enum):
+class TypeSpecifier(Enum):
     """
     TypeSpecifier Attribute as Enum.
     Specifies a type for a identifier token.
@@ -58,7 +59,7 @@ class TypeSpecifier(enum.Enum):
     INT = 'int'
     FLOAT = 'float'
     DEFAULT = ''  # Stub when dealing with incomplete info
-    ANY = enum.auto()  # Used for type stack printf() scanf()
+    ANY = auto()  # Used for type stack printf() scanf()
 
     @property
     def llvm_type(self) -> str:
