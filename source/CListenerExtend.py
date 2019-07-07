@@ -17,7 +17,6 @@ from Nodes.ExpressionNodes.ConstantExpressionNode import ConstantExpressionNode
 from Nodes.DeclarationNodes.DeclListNode import DeclListNode
 from Nodes.DeclarationNodes.TypeModifierNode import TypeModifierNode
 from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
-from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
 from Nodes.ExpressionNodes.IdentifierExpressionNode import IdentifierExpressionNode
 from Nodes.ExpressionNodes.LHSNode import LHSNode
 from Nodes.ExpressionNodes.RHSParamListNode import RHSParamListNode
@@ -160,14 +159,14 @@ class CListenerExtend(CListener):
 
     def enterPtr_decl(self, ctx: CParser.Ptr_declContext):
 
-        self._parent_node.declarator_type = TypeModifier.PTR
+        self._parent_node.modifier_type = TypeModifier.PTR
 
     def enterFunction_operator(self, ctx: CParser.Function_operatorContext):
-        self._parent_node.declarator_type = TypeModifier.FUNC
+        self._parent_node.modifier_type = TypeModifier.FUNC
 
     def enterArray_operator(self, ctx: CParser.Array_operatorContext):
 
-        self._parent_node.declarator_type = TypeModifier.ARRAY
+        self._parent_node.modifier_type = TypeModifier.ARRAY
 
     def enterId_decl(self, ctx: CParser.Id_declContext):
 
@@ -218,32 +217,40 @@ class CListenerExtend(CListener):
 
     # Expressions
     # ======================================================================================================================
-    def enterExpression(self, ctx: CParser.ExpressionContext):
-        """
-        Any (sub) expression need to handle the operator kind
-        :param ctx:  ParserContextNode
-        :return:
-        """
-        node = ExpressionNode(self._parent_node)  # Using this as a stub
-        self._parent_node = node
+    # def enterExpression(self, ctx: CParser.ExpressionContext):
+    #     """
+    #     Any (sub) expression need to handle the operator kind
+    #     :param ctx:  ParserContextNode
+    #     :return:
+    #     """
+    #     node = ExpressionNode(self._parent_node)  # Using this as a stub
+    #     self._parent_node = node
+    #
+    # def exitExpression(self, ctx: CParser.ExpressionContext):
+    #     """
+    #     Need to pop the rhs nodes from the parent node
+    #     :param ctx:
+    #     :return:
+    #     """
+    #     self._parent_node = self._parent_node.parent_node
 
-    def exitExpression(self, ctx: CParser.ExpressionContext):
-        """
-        Need to pop the rhs nodes from the parent node
-        :param ctx:
-        :return:
-        """
+    def enterPrefix_expression(self, ctx: CParser.Prefix_expressionContext):
+        prfx_node = TypeModifierNode(self._parent_node)
+        self._parent_node.add_child(prfx_node)
+        prfx_node.parent_node = self._parent_node
+        self._parent_node = prfx_node
+
+    def exitPrefix_expression(self, ctx: CParser.Prefix_expressionContext):
         self._parent_node = self._parent_node.parent_node
 
     def enterConstant(self, ctx: CParser.ConstantContext):
         c_node = ConstantExpressionNode(self._parent_node, ctx.getText())
-        self._parent_node.parent_node.add_child(c_node)
+        self._parent_node.add_child(c_node)
+        c_node.parent_node = self._parent_node
         self._parent_node = c_node
 
     def exitConstant(self, ctx: CParser.ConstantContext):
-        node = self._parent_node
         self._parent_node = self._parent_node.parent_node
-        node.parent_node = self._parent_node
 
     def enterCharacter_constant(self, ctx: CParser.Character_constantContext):
         self._parent_node: ConstantExpressionNode
@@ -256,9 +263,8 @@ class CListenerExtend(CListener):
         self._parent_node.base_type = TypeSpecifier.INT
 
     def enterId_expression(self, ctx: CParser.Id_expressionContext):
-
         id_node = IdentifierExpressionNode(self._parent_node, ctx.getText())
-        self._parent_node.parent_node.add_child(id_node)
+        self._parent_node.add_child(id_node)
         self._parent_node = id_node
 
     def exitId_expression(self, ctx: CParser.Id_expressionContext):
@@ -268,21 +274,11 @@ class CListenerExtend(CListener):
 
     def enterExpression_prefix(self, ctx: CParser.Expression_prefixContext):
         val = ctx.getChild(0).getText()
-        node = TypeModifierNode(self._parent_node, TypeModifier(val))
-        self._parent_node.add_child(node)
-        self._parent_node = node
-
-    def exitExpression_prefix(self, ctx: CParser.Expression_prefixContext):
-        self._parent_node = self._parent_node.parent_node
+        self._parent_node.modifier_type = TypeModifier(val)
 
     def enterExpression_postfix(self, ctx: CParser.Expression_postfixContext):
         val = ctx.getChild(0).getChild(0).getText() + ctx.getChild(0).getChild(2).getText()
-        node = TypeModifierNode(self._parent_node, TypeModifier(val))
-        self._parent_node.add_child(node)
-        self._parent_node = node
-
-    def exitExpression_postfix(self, ctx: CParser.Expression_postfixContext):
-        self._parent_node = self._parent_node.parent_node
+        self._parent_node.type_modifier = TypeModifier(val)
 
     def enterExpression_param_list(self, ctx: CParser.Expression_param_listContext):
 

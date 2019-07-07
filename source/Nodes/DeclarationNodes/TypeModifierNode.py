@@ -41,6 +41,8 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         ret = self._BASE_LABEL
         if self.modifier_type is not None:
             ret += "\nType: {0}\n".format(self.modifier_type.value)
+        else:
+            ret += "??"
 
         if self._is_implicit_conversion:
             ret += "(implicit conversion)"

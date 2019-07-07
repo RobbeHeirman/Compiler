@@ -1,3 +1,5 @@
 
 int a = 42;
-int *i  = &a;
+int b = a;
+int * c;
+int * d[] = *&b;
