@@ -69,8 +69,10 @@ class ExpressionNode(TypedNode.TypedNode):
         if isinstance(child, TypeModifierNode.TypeModifierNode):
             temp = self._type_modifier_node
             self._type_modifier_node = child
-            self._type_modifier_node.add_child(temp)
-            temp.parent_node = self._type_modifier_node
+            if temp is not None:
+                self.remove_child(temp)
+                self._type_modifier_node.add_child(temp)
+                temp.parent_node = self._type_modifier_node
 
         super().add_child(child)
 

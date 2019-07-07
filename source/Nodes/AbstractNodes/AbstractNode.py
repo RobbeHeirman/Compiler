@@ -92,6 +92,15 @@ class AbstractNode(abc.ABC):
         """
         self._children.remove(child)
 
+    def pop_child(self, index: int = -1) -> "AbstractNode":
+        """
+        Follows list pop syntax. Removes child at index and returns it
+        :param index: index where we want to remove
+        :return: THe removed Node
+        """
+        return self._children.pop(index)
+
+
     def is_in_table(self, lexeme: str) -> bool:
         return self._parent_node.is_in_table(lexeme)
 

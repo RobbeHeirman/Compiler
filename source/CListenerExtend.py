@@ -6,7 +6,7 @@
 """
 from typing import Union
 
-from AST import AST
+import AST
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.ConditionalNodes.ConditionNode as ConditionNode
 import Nodes.ConditionalNodes.IfElseNode as IfElseNode
@@ -35,13 +35,13 @@ class CListenerExtend(CListener):
     Responsible for building the AST
     """
     _filename: str
-    _ast: AST
+    _ast: AST.AST
     _parent_node: AbstractNode.AbstractNode
 
     def __init__(self, filename: str):
         # Some info about the traversing will be recorded
 
-        self._ast = AST()
+        self._ast = AST.AST()
         self._filename = filename
         root_node = RootNode.RootNode()
         self._ast.root = root_node
@@ -234,7 +234,13 @@ class CListenerExtend(CListener):
         """
         We want to place the prefixes as children of other expressions.
         """
-        expression_node = self._parent_node
+        expressive_node = self._parent_node.pop_child()
+        expressive_node.add_child(self._parent_node)  # parent node is the type modifier
+
+        self._parent_node.parent_node.add_child(expressive_node)
+        self._parent_node.parent_node.remove_child(self._parent_node)
+        expressive_node.parent_node = self._parent_node.parent_node
+
         self._parent_node = self._parent_node.parent_node
 
     def enterConstant(self, ctx: CParser.ConstantContext):
