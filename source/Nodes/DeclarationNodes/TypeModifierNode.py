@@ -16,8 +16,9 @@ class TypeModifierNode(AbstractNode.AbstractNode):
     We can omit this in a future pass. This node has no actual info about the program.
     """
     _specifier_node: AbstractNode
-    _declarator_node: "TypeModifierNode"
-    _parent_node: typing.Union["TypeModifierNode"]
+    _type_modifier_node: "TypeModifierNode"
+    # noinspection PyUnresolvedReferences
+    _parent_node: typing.Union["TypeModifierNode", "DeclarationNode.DeclarationNode", "ExpressionNode"]
 
     _BASE_LABEL = "TypeModifier"
 
@@ -28,10 +29,10 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         """
         super().__init__(parent_node)
 
-        self._declarator_node = None
-        self._id_node = None
+        self._type_modifier_node = None  # Child type_modifier_node. Used for nested type modifiers
         self._rhs_node = None
         self._param_list_node = None
+
         self.modifier_type = mod_type
         self._is_implicit_conversion = False
 
@@ -54,7 +55,7 @@ class TypeModifierNode(AbstractNode.AbstractNode):
     def add_child(self, child, index=None):
 
         if isinstance(child, TypeModifierNode):
-            self._declarator_node = child
+            self._type_modifier_node = child
             self._rhs_node = child
 
         elif isinstance(child, ParamListNode.ParamListNode):
@@ -87,14 +88,14 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         if self.modifier_type is not None:
             type_stack.append(self.modifier_type)
 
-        if self._declarator_node is not None:
-            self._declarator_node.generate_type_operator_stack(type_stack)
+        if self._type_modifier_node is not None:
+            self._type_modifier_node.generate_type_operator_stack(type_stack)
 
         return type_stack
 
     def array_has_length(self) -> bool:
-        if self._declarator_node is not None:
-            return self._declarator_node.array_has_length()
+        if self._type_modifier_node is not None:
+            return self._type_modifier_node.array_has_length()
         else:  # This is the last of the nodes.
             if self._rhs_node is None:
                 return False

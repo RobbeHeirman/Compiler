@@ -5,20 +5,20 @@ Academic Year: 2018-2019
 """
 import struct
 
-import LlvmCode
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode, ExpressionNodeType
-from Nodes.FunctionNodes.ParamListNode import ParamListNode
+# import LlvmCode
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
+import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
+import Nodes.FunctionNodes.ParamListNode as ParamListNode
 from Specifiers import Operator, TypeSpecifier
 
 
-class RHSNode(ExpressionNode):
-    type: ExpressionNodeType
+class RHSNode(ExpressionNode.ExpressionNode):
+    type: ExpressionNode.ExpressionNodeType
     operator: Operator
 
     _BASE_LABEL = "RHS"
 
-    def __init__(self, parent_node: AbstractNode, **kwargs):
+    def __init__(self, parent_node: AbstractNode.AbstractNode, **kwargs):
 
         super().__init__(parent_node)
 
@@ -41,9 +41,9 @@ class RHSNode(ExpressionNode):
             if self.type is not None:
                 ret += "\n{0}".format(self.type.value)
 
-                if self.type is ExpressionNodeType.IDENTIFIER:
+                if self.type is ExpressionNode.ExpressionNodeType.IDENTIFIER:
                     ret += "{0}".format(self.identifier)
-                elif self.type is ExpressionNodeType.CONSTANT:
+                elif self.type is ExpressionNode.ExpressionNodeType.CONSTANT:
                     if self.base_type:
                         ret += "{0}\n".format(self.base_type.value)
                     ret += "{0}".format(self.constant)
@@ -51,7 +51,7 @@ class RHSNode(ExpressionNode):
 
     def add_child(self, child, index=None):
 
-        if isinstance(child, ParamListNode):
+        if isinstance(child, ParamListNode.ParamListNode):
             self._extra_node = child
 
         super().add_child(child)
@@ -59,10 +59,10 @@ class RHSNode(ExpressionNode):
     def generate_llvm(self):
         ret = ""
 
-        if self.type is ExpressionNodeType.CONSTANT or self.type is ExpressionNodeType.IDENTIFIER:
+        if self.type is ExpressionNode.ExpressionNodeType.CONSTANT or self.type is ExpressionNode.ExpressionNodeType.IDENTIFIER:
             self.increment_register_index()
 
-            if self.type is ExpressionNodeType.IDENTIFIER:
+            if self.type is ExpressionNode.ExpressionNodeType.IDENTIFIER:
                 self.constant = self.identifier
 
         if len(self._children) == 1:  # Unary expression

@@ -5,10 +5,10 @@ Academic Year: 2018-2019
 """
 from antlr4 import ParserRuleContext
 
-from Nodes.AbstractNodes.LeafNode import LeafNode
+import Nodes.AbstractNodes.LeafNode as LeafNode
 
 
-class IncludeStatementNode(LeafNode):
+class IncludeStatementNode(LeafNode.LeafNode):
     label = "include \\n stdio.h"
 
     def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):

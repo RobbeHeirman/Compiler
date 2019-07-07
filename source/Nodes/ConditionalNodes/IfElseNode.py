@@ -4,11 +4,11 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 
-from Nodes.AbstractNodes.ScopedNode import ScopedNode
+import Nodes.AbstractNodes.ScopedNode as ScopedNode
 from Specifiers import ConditionType
 
 
-class IfElseNode(ScopedNode):
+class IfElseNode(ScopedNode.ScopedNode):
 
     def __init__(self, parent_node, c_type: ConditionType):
         super().__init__(parent_node)

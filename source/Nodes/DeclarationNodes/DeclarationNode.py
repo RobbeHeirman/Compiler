@@ -22,7 +22,7 @@ class DeclarationNode(TypedNode.TypedNode):
     Has 1 or 2 children a declarator (will become a stack of pre and postfix type specifiers after first pass)
     An optional initializer as 2d child.
     """
-    _type_modifier_node: TypeModifierNode
+    _type_modifier_node: "TypeModifierNode"
     _lexeme: str
 
     _BASE_LABEL = "Declaration"

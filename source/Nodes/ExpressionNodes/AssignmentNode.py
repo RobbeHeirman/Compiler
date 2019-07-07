@@ -3,12 +3,12 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.ExpressionNodes.LHSNode import LHSNode
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
+import Nodes.ExpressionNodes.LHSNode as LhsNode
 from antlr4 import ParserRuleContext
 
 
-class AssignmentNode(AbstractNode):
+class AssignmentNode(AbstractNode.AbstractNode):
 
     _BASE_LABEL = "="
 
@@ -31,8 +31,8 @@ class AssignmentNode(AbstractNode):
 
         return ret
 
-    def add_child(self, child: AbstractNode, index=None):
-        if isinstance(child, LHSNode):
+    def add_child(self, child: AbstractNode.AbstractNode, index=None):
+        if isinstance(child, LhsNode.LHSNode):
             self._lhs_node = child
         super().add_child(child)
 

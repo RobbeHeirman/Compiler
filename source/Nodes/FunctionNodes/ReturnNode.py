@@ -3,19 +3,19 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Specifiers import TypeSpecifier
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
+import Specifiers
 
 
-class ReturnNode(AbstractNode):
+class ReturnNode(AbstractNode.AbstractNode):
     label = "return"
 
-    def __init__(self, parent_node: AbstractNode):
+    def __init__(self, parent_node: AbstractNode.AbstractNode):
         super().__init__(parent_node)
 
     @property
     def base_type(self):
-        return TypeSpecifier.DEFAULT
+        return Specifiers.TypeSpecifier.DEFAULT
 
     def generate_llvm(self):
         ret = self._children[0].generate_llvm()

@@ -6,18 +6,18 @@ Academic Year: 2018-2019
 import copy
 
 # import LlvmCode
-from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
-from Specifiers import TypeSpecifier  # , TypeModifier
-from Attributes import Attributes
+import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
+import Specifiers
+import Attributes
 
 
-class IdentifierExpressionNode(ExpressionNode):
+class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     id: str
 
     def __init__(self, parent_node, identifier: str):
         super().__init__(parent_node)
         self.id = identifier
-        self.base_type = TypeSpecifier.DEFAULT
+        self.base_type = Specifiers.TypeSpecifier.DEFAULT
         self.type_stack = []
 
     @property
@@ -29,8 +29,8 @@ class IdentifierExpressionNode(ExpressionNode):
 
     def semantic_analysis(self):
         self.type_stack = self.find_type_stack()
-        attrib = Attributes(self.base_type, self.type_stack, self.filename, self.line, self.column,
-                            self.__class__._messages)
+        attrib = Attributes.Attributes(self.base_type, self.type_stack, self.filename, self.line, self.column,
+                                       self.__class__._messages)
         ret = True
         if self.is_in_table(self.id):
             attr = self.get_attribute(self.id)

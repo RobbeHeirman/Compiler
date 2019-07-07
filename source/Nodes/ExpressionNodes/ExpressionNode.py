@@ -36,7 +36,7 @@ class ExpressionNode(TypedNode.TypedNode):
         super().__init__(parent_node)
 
         self._identifier_node = None
-        self._member_operator_node = None
+        self._type_modifier_node = None
 
         self.type = None
 
@@ -67,7 +67,10 @@ class ExpressionNode(TypedNode.TypedNode):
     def add_child(self, child, index=None):
 
         if isinstance(child, TypeModifierNode.TypeModifierNode):
-            self._member_operator_node = child
+            temp = self._type_modifier_node
+            self._type_modifier_node = child
+            self._type_modifier_node.add_child(temp)
+            temp.parent_node = self._type_modifier_node
 
         super().add_child(child)
 
@@ -85,33 +88,33 @@ class ExpressionNode(TypedNode.TypedNode):
             return self.filename, self.line, self.column
 
     def _handle_member_operator_node(self):
-        if self._member_operator_node is not None:
-            if self._member_operator_node.f_type == Specifiers.TypeModifier.PTR:
+        if self._type_modifier_node is not None:
+            if self._type_modifier_node.f_type == Specifiers.TypeModifier.PTR:
                 self.type = ExpressionNodeType.PTR
-                self.remove_child(self._member_operator_node)
-                self._member_operator_node = None
+                self.remove_child(self._type_modifier_node)
+                self._type_modifier_node = None
 
-            elif self._member_operator_node.f_type == Specifiers.TypeModifier.ADDRESS:
+            elif self._type_modifier_node.f_type == Specifiers.TypeModifier.ADDRESS:
                 self.type = ExpressionNodeType.ADDR
-                self.remove_child(self._member_operator_node)
-                self._member_operator_node = None
+                self.remove_child(self._type_modifier_node)
+                self._type_modifier_node = None
 
-            elif self._member_operator_node.f_type == Specifiers.TypeModifier.ARRAY:
+            elif self._type_modifier_node.f_type == Specifiers.TypeModifier.ARRAY:
                 self.type = ExpressionNodeType.ARRAY
 
-                self._member_operator_node.rhs_node.parent = self
-                self.add_child(self._member_operator_node.rhs_node)
-                self._member_operator_node.rhs_node.parent_node = self
-                self.remove_child(self._member_operator_node)
-                self._member_operator_node = None
+                self._type_modifier_node.rhs_node.parent = self
+                self.add_child(self._type_modifier_node.rhs_node)
+                self._type_modifier_node.rhs_node.parent_node = self
+                self.remove_child(self._type_modifier_node)
+                self._type_modifier_node = None
 
-            elif self._member_operator_node.f_type == Specifiers.TypeModifier.FUNCTION:
+            elif self._type_modifier_node.f_type == Specifiers.TypeModifier.FUNCTION:
                 self.type = ExpressionNodeType.FUNCTION
-                self._member_operator_node.rhs_node.parent = self
-                self.add_child(self._member_operator_node.rhs_node)
-                self._member_operator_node.rhs_node.parent_node = self
-                self.remove_child(self._member_operator_node)
-                self._member_operator_node = None
+                self._type_modifier_node.rhs_node.parent = self
+                self.add_child(self._type_modifier_node.rhs_node)
+                self._type_modifier_node.rhs_node.parent_node = self
+                self.remove_child(self._type_modifier_node)
+                self._type_modifier_node = None
 
     # def first_pass(self):
     #     self._handle_member_operator_node()

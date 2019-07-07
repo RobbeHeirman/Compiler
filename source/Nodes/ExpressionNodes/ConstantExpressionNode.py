@@ -6,11 +6,11 @@ Academic Year: 2018-2019
 import struct
 
 import LlvmCode
-from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
+import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 from Specifiers import TypeSpecifier
 
 
-class ConstantExpressionNode(ExpressionNode):
+class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
     def __init__(self, parent_node, constant):
         super().__init__(parent_node)

@@ -6,17 +6,18 @@ Academic Year: 2018-2019
 from antlr4 import ParserRuleContext
 
 import messages
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.AbstractNodes.ScopedNode import ScopedNode
-from Nodes.FunctionNodes.ReturnNode import ReturnNode
-from Specifiers import TypeModifier
-from Attributes import Attributes
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
+import Nodes.AbstractNodes.ScopedNode as ScopedNode
+import Nodes.FunctionNodes.ReturnNode as ReturnNode
+import Specifiers
+import Attributes
 
 
-class FuncDefNode(ScopedNode):
+class FuncDefNode(ScopedNode.ScopedNode):
     _id: str
 
-    def __init__(self, parent_node: AbstractNode, id_l: str, ptr_count: int, filename: str, ctx: ParserRuleContext):
+    def __init__(self, parent_node: AbstractNode.AbstractNode, id_l: str, ptr_count: int, filename: str,
+                 ctx: ParserRuleContext):
         super().__init__(parent_node)
 
         self._id = id_l
@@ -38,7 +39,7 @@ class FuncDefNode(ScopedNode):
 
     def add_child(self, child, index=None):
 
-        if isinstance(child, ReturnNode):
+        if isinstance(child, ReturnNode.ReturnNode):
             self._return_node = child
 
         super().add_child(child, index)
@@ -53,9 +54,9 @@ class FuncDefNode(ScopedNode):
         """
         ret = True
         # 1) Add to the symbol table of the upper scope
-        self._type_stack = [TypeModifier.PTR for _ in range(self._ptr_count)]
-        attr = Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column,
-                          self.__class__._messages)
+        self._type_stack = [Specifiers.TypeModifier.PTR for _ in range(self._ptr_count)]
+        attr = Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column,
+                                     self.__class__._messages)
         signature = self._children[0].get_function_signature()
         attr.function_signature = signature
         if not self._parent_node.add_to_scope_symbol_table(self._id, attr):
@@ -76,7 +77,7 @@ class FuncDefNode(ScopedNode):
         self.increment_register_index()
         ret = self.indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self._id)
         ret += "{0}){{\n".format(self._children[0].generate_llvm())
-        AbstractNode._indent_level += 1
+        AbstractNode.AbstractNode._indent_level += 1
         for child in self._children[1:]:
             ret += child.generate_llvm()
 
