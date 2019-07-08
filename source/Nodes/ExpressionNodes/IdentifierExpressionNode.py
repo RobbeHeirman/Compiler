@@ -3,12 +3,10 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-import copy
 
 # import LlvmCode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 import Specifiers
-import Attributes
 
 
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
@@ -18,7 +16,8 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         super().__init__(parent_node)
         self.id = identifier
         self.base_type = Specifiers.TypeSpecifier.DEFAULT
-        self.type_stack = []
+
+        self._l_value = True  # As it's base form an identifier is an Lvalue
 
     @property
     def label(self) -> str:
@@ -28,18 +27,16 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         return ret
 
     def semantic_analysis(self):
-        self.type_stack = self.find_type_stack()
-        attrib = Attributes.Attributes(self.base_type, self.type_stack, self.filename, self.line, self.column,
-                                       self.__class__._messages)
+
+        self._generate_type_modifier_stack()  # the modifiers applied in the expression
         ret = True
         if self.is_in_table(self.id):
             attr = self.get_attribute(self.id)
-            self.base_type = attr.decl_type
+            self.base_type = attr.decl_type  # this is the base type
+
             # Now we need to check if the operations done on the identifier are legal
-            if not len(self.type_stack) is 0:
-                attr_stack = copy.copy(attr.operator_stack)
-                type_stack_cp = copy.copy(self.type_stack)
-                if not self._stack_analysis(type_stack_cp, attr_stack):
+            if not len(self._type_stack) is 0:
+                if not self._stack_analysis(attr.operator_stack):
                     ret = False
 
                 # if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.FUNC:  # Now check the signature
@@ -50,9 +47,43 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 #    ret = False
 
         else:
-            self.__class__._messages.error_undeclared_var(self.id, attrib)
+            self.__class__._messages.error_undeclared_var(self.id, self.filename, self.line, self.column)
 
         return ret
+
+    def _stack_analysis(self, attr_stack) -> bool:
+        """"
+        Checks the type modifier corresponding to the expression vs the modifier's corresponding to the attributes.
+        Modifies the expression's modifier stack to correspond the correct type.
+        :param attr_stack. The stack found in the symbol table corresponding to the identifier
+        :return: True if successful without semantic errors
+        """
+
+        # This is the attributes we retrieved from the symbol table. Note that the operators stored
+        # in the symbol correspond to other operation on the right side of an assignment.
+        # * means dereference while on lhs this declares that the variable will contain an address.
+        # For comparison purposes we will make the meaning on rhs uniform so * lhs becoms & (address of) rhs.
+
+        nw_stack = list(attr_stack)
+        for element in enumerate(reversed(self._type_stack)):
+
+            # if it's a * we dereference the value, meaning that we need to deref a ptr type.
+            if element == Specifiers.TypeModifier.PTR:
+                if nw_stack[-1] == Specifiers.TypeModifier.PTR:  # Impicit convertion to R value in an id node
+                    nw_stack.pop()
+                    self._l_value = True
+
+            if element == Specifiers.TypeModifier.ADDRESS:
+                if not self._l_value:  # We need an L value to take an address from
+                    print("Stub for expected an Lvalue got an Rvalue instead")
+                    return False
+
+                else:
+                    nw_stack.append(Specifiers.TypeModifier.PTR)  # Denoting this is address of R value
+                    self._l_value = False
+
+        self.type_stack = nw_stack
+        return True
 
     def generate_llvm(self):
         # self.increment_register_index()

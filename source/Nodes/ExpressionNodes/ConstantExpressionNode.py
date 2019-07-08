@@ -20,8 +20,8 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
     @property
     def label(self) -> str:
         ret = super().label
-        ret += "Constant\n"
-        ret += "{0}".format(self.constant)
+        ret += "Constant: "
+        ret += "{0}\n".format(self.constant)
         return ret
 
     @property

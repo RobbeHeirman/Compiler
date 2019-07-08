@@ -1,13 +1,11 @@
 from enum import Enum, auto
-from typing import List
-
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 import Specifiers
-from Attributes import Attributes
 
 
 class ExpressionNodeType(Enum):
+
     BINARY_OPERATOR = auto()
     CONSTANT = "Constant: "
     IDENTIFIER = "Identifier: "
@@ -39,6 +37,8 @@ class ExpressionNode(TypedNode.TypedNode):
         self._type_modifier_node = None
 
         self.type = None
+
+        self._l_value = True
 
         # Book keeping info
         self.filename = None
@@ -137,77 +137,3 @@ class ExpressionNode(TypedNode.TypedNode):
 
         return ret
 
-    def find_type_stack(self, stack=None) -> List[Specifiers.TypeModifier]:
-        """
-        The expression node has an operator type stack. We need to find this type stack to check if we can handle
-        the expression
-        :param stack:
-        :return:
-        """
-        if stack is None:
-            stack = []
-
-        if self.type in self._OPERATOR_TYPES:
-            stack.append(self.type.decl_specifier)
-
-            if not isinstance(self._parent_node, ExpressionNode):
-                return stack
-            else:
-                return self._parent_node.find_type_stack(stack)
-        else:
-            if isinstance(self._parent_node, ExpressionNode):
-                return self._parent_node.find_type_stack(stack)
-        return []
-
-    def _stack_analysis(self, own_stack, attr_stack) -> bool:
-        """"
-        Recursively calling this until all own stack symbols are matched.
-        :return: True if successful without semantic errors
-        """
-
-        own_stack.reverse()  # More clearer operation on the stack
-        if len(own_stack) is 0:
-            return True
-
-        attr = Attributes(self.base_type, own_stack, self.filename, self.line, self.column, self.__class__._messages)
-
-        if own_stack[-1] is Specifiers.TypeModifier.ADDRESS:  # Need to check if applied on Lvalue
-            own_stack.pop(-1)
-
-            if not own_stack or own_stack[-1] is Specifiers.TypeModifier.PTR:
-                pass
-
-            else:
-                self.__class__._messages.error_lvalue_required_addr(attr)
-                return False
-
-        if not own_stack:
-            return True
-
-        if own_stack[-1] is Specifiers.TypeModifier.PTR:
-            if len(attr_stack) > 0 and attr_stack[-1] is Specifiers.TypeModifier.PTR:
-                pass
-            else:
-                self.__class__._messages.error_unary_not_ptr(attr)
-                return False
-
-        elif own_stack[-1] is Specifiers.TypeModifier.ARRAY:
-            if len(attr_stack) > 0 and attr_stack[-1] is Specifiers.TypeModifier.ARRAY:
-                pass
-            else:
-
-                self.__class__._messages.error_subscript_not_array(attr)
-                return False
-
-        elif own_stack[-1] is Specifiers.TypeModifier.FUNC:
-            if attr_stack and attr_stack[-1] is Specifiers.TypeModifier.FUNC:
-                pass
-            else:
-                self.__class__._messages.error_object_not_function(self._identifier_node.id, attr)
-
-        if len(own_stack) > 0:
-            own_stack.pop(-1)
-        if len(attr_stack) > 0:
-            attr_stack.pop(-1)
-
-        return self._stack_analysis(own_stack, attr_stack)

@@ -5,6 +5,7 @@ Academic Year: 2018-2019
 """
 
 import Specifiers
+import Attributes
 
 
 class ColorScheme:
@@ -28,26 +29,32 @@ class MessageGenerator:
         return self._error_counter
 
     @staticmethod
-    def file_info(attribute: "SymbolTable.Attributes"):
+    def file_info(attribute: "Attributes.Attributes"):
         """Starter prints all info of where something should be told about"""
 
         filename = attribute.filename
         line = attribute.line
         column = attribute.column
+        return MessageGenerator.file_info_f(filename, line, column)
 
+    @staticmethod
+    def file_info_f(filename, line, column):
         return "{0}:{1}:{2}: ".format(filename, line, column)
 
-    def error(self, attribute: "SymbolTable.Attributes"):
+    def error(self, attribute: "Attributes.Attributes"):
         """Defines of type error"""
+        return self.error_f(attribute.filename, attribute.line, attribute.column)
+
+    def error_f(self, filename, line, column):
         self._error_counter += 1
-        return "{0}error: ".format(MessageGenerator.file_info(attribute))
+        return "{0}error: ".format(MessageGenerator.file_info_f(filename, line, column))
 
     def error_redeclaration(self, lexeme, attribute):
         print(self.color_scheme.FAIL + "{0}redeclaration of \'{1}\' ".format(self.error(attribute), lexeme)
               + self.color_scheme.ENDC)
 
-    def error_undeclared_var(self, lexeme, attribute):
-        print(self.color_scheme.FAIL + "{0}'{1}' undeclared".format(self.error(attribute),
+    def error_undeclared_var(self, lexeme, filename, line, column):
+        print(self.color_scheme.FAIL + "{0}'{1}' undeclared".format(self.error_f(filename, line, column),
                                                                     lexeme) + self.color_scheme.ENDC)
 
     def error_redeclared_diff_symbol(self, lexeme, attribute):
@@ -104,7 +111,7 @@ class MessageGenerator:
                                                                                                  lexeme)
               + self.color_scheme.ENDC)
 
-    def error_no_conversion_int_ptr(self, attribute: "SymbolTable.Attributes",
+    def error_no_conversion_int_ptr(self, attribute: "Attributes.Attributes",
                                     expression_type: Specifiers.TypeSpecifier):
         print(
             self.color_scheme.FAIL + "{0}incompatible pointer conversion initializing {1} * with an expression of "
@@ -112,14 +119,14 @@ class MessageGenerator:
             .format(self.error(attribute), attribute.decl_type.value, expression_type.value)
             + self.color_scheme.ENDC)
 
-    def error_no_conversion_base_types(self, attribute: "SymbolTable.Attributes",
+    def error_no_conversion_base_types(self, attribute: "Attributes.Attributes",
                                        expression_type: Specifiers.TypeSpecifier):
         print(self.color_scheme.FAIL + "{0}Cannot convert base types, initializing {1}  with an expression of type {2}"
               .format(self.error(attribute), attribute.decl_type.value, expression_type.value)
               + self.color_scheme.ENDC)
 
     @staticmethod
-    def note(attribute: "SymbolTable.Attributes"):
+    def note(attribute: "Attributes.Attributes"):
         return "{0}note: ".format(MessageGenerator.file_info(attribute))
 
     def note_prev_decl(self, lexeme, attribute):
