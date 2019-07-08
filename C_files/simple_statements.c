@@ -1,4 +1,2 @@
-
-int a = 42;
-int b = a;
-int *c = &&b;
+int a = 12;
+int*c = &&a;

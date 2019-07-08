@@ -33,7 +33,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         if self.is_in_table(self.id):
             attr = self.get_attribute(self.id)
             self.base_type = attr.decl_type  # this is the base type
-
             # Now we need to check if the operations done on the identifier are legal
             if not len(self._type_stack) is 0:
                 if not self._stack_analysis(attr.operator_stack):
@@ -62,12 +61,11 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         # This is the attributes we retrieved from the symbol table. Note that the operators stored
         # in the symbol correspond to other operation on the right side of an assignment.
         # * means dereference while on lhs this declares that the variable will contain an address.
-        # For comparison purposes we will make the meaning on rhs uniform so * lhs becoms & (address of) rhs.
+        # For comparison purposes we will make the meaning on rhs uniform so * lhs becomes & (address of) rhs.
 
         nw_stack = list(attr_stack)
-        for element in enumerate(reversed(self._type_stack)):
-
-            # if it's a * we dereference the value, meaning that we need to deref a ptr type.
+        for element in reversed(self._type_stack):
+            # if it's a * we dereference the value, meaning that we need to derefe a ptr type.
             if element == Specifiers.TypeModifier.PTR:
                 if nw_stack[-1] == Specifiers.TypeModifier.PTR:  # Impicit convertion to R value in an id node
                     nw_stack.pop()
@@ -75,7 +73,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
             if element == Specifiers.TypeModifier.ADDRESS:
                 if not self._l_value:  # We need an L value to take an address from
-                    print("Stub for expected an Lvalue got an Rvalue instead")
+                    self.__class__._messages.error_lvalue_required_addr_operand(self.filename, self.line, self.column)
                     return False
 
                 else:

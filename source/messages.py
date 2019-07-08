@@ -125,6 +125,10 @@ class MessageGenerator:
               .format(self.error(attribute), attribute.decl_type.value, expression_type.value)
               + self.color_scheme.ENDC)
 
+    def error_lvalue_required_addr_operand(self, filename, line, column):
+        print(self.color_scheme.FAIL + "{0}lvalue required as unary '&' operand"
+              .format(self.error_f(filename, line, column)) + self.color_scheme.ENDC)
+
     @staticmethod
     def note(attribute: "Attributes.Attributes"):
         return "{0}note: ".format(MessageGenerator.file_info(attribute))

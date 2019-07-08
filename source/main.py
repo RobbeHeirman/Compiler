@@ -6,13 +6,13 @@
 """
 import os
 import subprocess
-import importlib
+from importlib import util
 
 from antlr4 import *
 import build
 import AST
 # Auto runs build to get dependant gen files
-if importlib.util.find_spec("gen") is None:
+if util.find_spec("gen") is None:
     build.main()
 
 from gen.CLexer import CLexer

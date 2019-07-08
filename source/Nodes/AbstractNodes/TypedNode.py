@@ -24,5 +24,3 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
         """
         if self._type_modifier_node:
             self._type_stack = self._type_modifier_node.generate_type_operator_stack()
-
-        print(self._type_stack)
