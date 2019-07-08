@@ -5,13 +5,13 @@ Academic Year: 2018-2019
 """
 from typing import List
 
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
+import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
 
-class ArrayInitNode(AbstractNode):
+class ArrayInitNode(AbstractNode.AbstractNode):
     label = "Array Init"
-    _children: List[ExpressionNode]
+    _children: List[ExpressionNode.ExpressionNode]
 
     def __init__(self, parent_node):
         super().__init__(parent_node)

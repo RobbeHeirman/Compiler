@@ -5,10 +5,10 @@ Academic Year: 2018-2019
 """
 from abc import ABC
 from antlr4 import ParserRuleContext
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
 
 
-class LeafNode(AbstractNode, ABC):
+class LeafNode(AbstractNode.AbstractNode, ABC):
     """
     Represents all leaf nodes
     """

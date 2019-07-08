@@ -1,24 +1,4 @@
 
-#include <stdio.h>
-int main(int a, char **argv){
-    //char ar[] = {'h','e','l','l','o',' ','w','o','r','l','d','!'};
-
-    /*int integer;
-    char character;
-    float floater;
-    int *pointer;
-
-    int integer2 = 12;
-    char character2 = 'a';
-    float floater2 = 17.2; */
-
-    char k;
-    int l = k;
-    //printf(b_ptr);
-
-    //int* pointer2 = &integer;
-    //int integer2 = *pointer2;
-
-
-}
-
+int a = 42;
+int b = a;
+int *c = &&b;

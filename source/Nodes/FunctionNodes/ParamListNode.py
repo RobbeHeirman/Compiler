@@ -3,11 +3,11 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Specifiers
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
 
 
-class ParamListNode(AbstractNode):
+class ParamListNode(AbstractNode.AbstractNode):
     label = "Param list"
 
     def __init__(self, parent_node):
@@ -30,6 +30,7 @@ class ParamListNode(AbstractNode):
         for child in self._children:
             if not child.semantic_analysis:
                 ret = False
+                self._error_counter += 1
         return ret
 
     def generate_llvm(self):

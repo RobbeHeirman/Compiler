@@ -4,88 +4,64 @@
  Course: Compilers
  Academic Year: 2018-2019
 """
+import os
 import subprocess
-import sys
-import traceback
+import importlib
 
 from antlr4 import *
+import build
+import AST
+# Auto runs build to get dependant gen files
+if importlib.util.find_spec("gen") is None:
+    build.main()
 
 from gen.CLexer import CLexer
 from gen.CParser import CParser
 import CListenerExtend as CListenerExtend
 
 
-class TracePrints(object):
-    def __init__(self):
-        self.stdout = sys.stdout
+def create_ast(input_file: str) -> AST.AST:
+    """
+    Function will create the AST from the listener and returns the ast
+    :param: input_file is the name of the input C file
+    :return: the corresponding AST
+    """
 
-    def write(self, s):
-        self.stdout.write("Writing %r\n" % s)
-        traceback.print_stack(file=self.stdout)
-
-
-# sys.stdout = TracePrints()
-def main(argv):
-    # Lexical analysis
-    # input_file = argv[0]
-    input_file = argv[1]
     input_stream = FileStream(input_file)
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = CParser(stream)
     tree = parser.statements()
-    if parser.getNumberOfSyntaxErrors() is not 0:
-        return 1
 
     listener = CListenerExtend.CListenerExtend(input_file)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
 
-    # Initial AST (Used for debugging)
-    ast = listener.ast
-    dot_file = "AST.dot"
-    if len(argv) == 3:
-        dot_file = argv[2]
-    ast.to_dot(dot_file)
-    dot_name = dot_file[0: -4]
-    dot_name += ".png"
-    subprocess.call(["dot", "-Tpng", dot_file, "-o", dot_name])
-
-    # Ast cleanup
-    ast.first_pass()
-    dot_file = "AST2.dot"
-    ast.to_dot(dot_file)
-    dot_name = dot_file[0: -4]
-    dot_name += ".png"
-    subprocess.call(["dot", "-Tpng", dot_file, "-o", dot_name])
-
-    if not ast.semantic_analysis():
-        print("I failed =(")
-    else:
-        file_name = argv[2]
-        file = open(file_name, 'w+')
-
-        target_triple = subprocess.check_output(["clang", "-print-target-triple"])
-        target_triple = str(target_triple[0:-1])
-        target_triple = 'target triple = "{0}"\n'.format(target_triple[2:])
-        file.write(target_triple)
-        file.write(ast.generate_llvm())
-        file.close()
-
-        print("Normal clang compile...")
-        subprocess.call(["clang", input_file, "-S", "-emit-llvm"])  # Test compiler errors
-        print("Done with clang compiling.")
-        print("Assembling own IR llvm...")
-        subprocess.call(["clang", "-Wno-override-module", "C_files/llvm.ll"])  # Test llvm generated language
-        print("Done with llvm assembling")
-        print("Running executable..")
-        child = subprocess.Popen(["a.exe"])
-        stream = child.communicate()[0]
-        print(child.returncode)
-        print("Done running executable")
-
-    return 0
+    return listener.ast
 
 
-if __name__ == '__main__':
-    sys.exit(main(sys.argv))
+def generate_ast_visuals(ast: AST, output_path_slug):
+    """
+    Generates a visual png file from the AST to the specified output_filename
+    :param ast: The ast we want to visualize
+    :param output_path_slug: The path + slug. Will be extended by png
+    :return: No return, files get generated on output_filename
+    """
+
+    ast.to_dot("temp.dot")
+    png_name = output_path_slug + ".png"
+    subprocess.call(["dot", "-Tpng", "temp.dot", "-o", png_name])
+    os.remove("temp.dot")
+
+
+def generate_llvm(ast: AST, output_path_slug):
+    """
+    Generates corresponding llvm_code
+    :param ast: the ast where we generate code from
+    :param output_path_slug: the slug of the output path.
+    :return: Nothing will be written to output_file
+    """
+    file_name = output_path_slug + ".ll"
+    file = open(file_name, 'w+')
+    file.write(ast.generate_llvm())
+    file.close()

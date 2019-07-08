@@ -5,18 +5,18 @@ Academic Year: 2018-2019
 """
 from typing import List, Union
 
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.DeclarationNodes.DeclarationNode import DeclarationNode
+import Nodes.AbstractNodes.AbstractNode as AbsractNode
+import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
 from Specifiers import TypeSpecifier
 
 
-class DeclListNode(AbstractNode):
+class DeclListNode(AbsractNode.AbstractNode):
     """
     Start of a , separated list of declarations.
     this such nodes has ONE base type and a list of declarations
     """
     base_type: TypeSpecifier
-    _declaration_nodes: List[DeclarationNode]
+    _declaration_nodes: List[DeclarationNode.DeclarationNode]
     _BASE_LABEL = "decl_list"
 
     def __init__(self, parent_node):
@@ -29,15 +29,15 @@ class DeclListNode(AbstractNode):
     def label(self):
         return '{0}'.format(self._BASE_LABEL)
 
-    def _add_declaration_node(self, child: DeclarationNode):
+    def _add_declaration_node(self, child: DeclarationNode.DeclarationNode):
         self._declaration_nodes.append(child)
 
     # This is how we mimic function overloading. Basically the node needs to know what to do with his child.
     _ADD_OVERLOAD_MAP = {
-        DeclarationNode: _add_declaration_node,
+        DeclarationNode.DeclarationNode: _add_declaration_node,
     }
 
-    def add_child(self, child: Union[DeclarationNode], index=None):
+    def add_child(self, child: Union[DeclarationNode.DeclarationNode], index=None):
         self._ADD_OVERLOAD_MAP[type(child)](self, child)
         super().add_child(child, index)
 

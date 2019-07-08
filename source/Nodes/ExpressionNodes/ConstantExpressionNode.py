@@ -6,11 +6,11 @@ Academic Year: 2018-2019
 import struct
 
 import LlvmCode
-from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
+import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 from Specifiers import TypeSpecifier
 
 
-class ConstantExpressionNode(ExpressionNode):
+class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
     def __init__(self, parent_node, constant):
         super().__init__(parent_node)
@@ -20,8 +20,8 @@ class ConstantExpressionNode(ExpressionNode):
     @property
     def label(self) -> str:
         ret = super().label
-        ret += "Constant\n"
-        ret += "{0}".format(self.constant)
+        ret += "Constant: "
+        ret += "{0}\n".format(self.constant)
         return ret
 
     @property

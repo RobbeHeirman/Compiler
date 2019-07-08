@@ -1,8 +1,8 @@
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode, ExpressionNodeType
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
+import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
 
-class LHSNode(ExpressionNode):
+class LHSNode(ExpressionNode.ExpressionNode):
 
     _BASE_LABEL = "LHS"
 
@@ -10,14 +10,14 @@ class LHSNode(ExpressionNode):
         super().__init__(parent_node)
         self._lhs_node = None
 
-    def add_child(self, child: AbstractNode):
+    def add_child(self, child: AbstractNode.AbstractNode):
 
         if isinstance(child, LHSNode):
             self._lhs_node = child
         super().add_child(child)
 
     def find_id(self):
-        if self.type is ExpressionNodeType.IDENTIFIER:
+        if self.type is ExpressionNode.ExpressionNodeType.IDENTIFIER:
             self._parent_node.remove_child(self)
             return self.identifier
 

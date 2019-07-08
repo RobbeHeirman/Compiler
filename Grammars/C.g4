@@ -2,6 +2,15 @@ grammar C;
 
 // Rules
 // =====================================================================================================================
+    root
+    : global_statement* EOF
+    ;
+
+    global_statement
+    : decl_list SEMICOLON
+    | func_def
+    ;
+
     statements
     : statement*
     ;
@@ -82,16 +91,16 @@ lhs // L value nodes
     ;
 
 expression // Possible R values
-    : constant
-    | expression expression_postfix
-    | expression_prefix expression
-    | id_expression
-    | SUB expression
-    | LPARANT expression RPARANT
-    | <assoc=right> expression POWER expression
-    | expression (INCEREMENT | DECREMENT)
-    | expression (ASTERIX | DIVIDE) expression
-    | expression (ADD | SUB) expression
+    : constant # ignore_expression
+    | expression expression_postfix # postfix_expression
+    | expression_prefix expression  # prefix_expression
+    | id_expression # ignore_expression
+    | SUB expression # ignore_expression
+    | LPARANT expression RPARANT # ignore_expression
+    | <assoc=right> expression POWER expression # ignore_expression
+    | expression (INCEREMENT | DECREMENT) # ignore_expression
+    | expression (ASTERIX | DIVIDE) expression # ignore_expression
+    | expression (ADD | SUB) expression # ignore_expression
     ;
 
 id_expression

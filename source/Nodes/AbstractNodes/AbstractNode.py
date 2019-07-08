@@ -3,20 +3,22 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from abc import ABC, abstractmethod
-from typing import List
+import abc
+import typing
+
+import Attributes
+import messages
 
 
-from SymbolTable import Attributes
-
-
-class AbstractNode(ABC):
+class AbstractNode(abc.ABC):
     """
     Abstract class of a node of the AST.
     Should be overridden by specific nodes of the AST.
     """
-    _children: List["AbstractNode"]
+    _children: typing.List["AbstractNode"]
     _parent_node: "AbstractNode"
+
+    _messages = messages.MessageGenerator()
     _index_counter = 0
     _indent_level = 0
 
@@ -35,8 +37,12 @@ class AbstractNode(ABC):
     def index(self):
         return self._index
 
+    @classmethod
+    def error_count(cls):
+        return cls._messages.error_counter
+
     @property
-    @abstractmethod
+    @abc.abstractmethod
     def label(self):  # Enforcing every node defines a label
         pass
 
@@ -77,22 +83,28 @@ class AbstractNode(ABC):
         """
         if index is None:
             self._children.append(child)
-
         else:
-
             self._children.insert(index, child)
 
     def remove_child(self, child):
         """
         Removes a child by value (reference of child node)
         """
-
         self._children.remove(child)
+
+    def pop_child(self, index: int = -1) -> "AbstractNode":
+        """
+        Follows list pop syntax. Removes child at index and returns it
+        :param index: index where we want to remove
+        :return: THe removed Node
+        """
+        return self._children.pop(index)
+
 
     def is_in_table(self, lexeme: str) -> bool:
         return self._parent_node.is_in_table(lexeme)
 
-    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes) -> bool:
+    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes.Attributes) -> bool:
         """
         Hook to add a lexeme to symbol table. Child classes may need to implement this.
         We will just call the parents add symbol to scope. Scoped nodes contain SymbolTables and will look
@@ -110,7 +122,7 @@ class AbstractNode(ABC):
     def increment_register_index(self):
         self._parent_node.increment_register_index()
 
-    def get_attribute(self, lexeme) -> Attributes:
+    def get_attribute(self, lexeme) -> Attributes.Attributes:
         return self._parent_node.get_attribute(lexeme)
 
     def cleanup(self):
@@ -125,9 +137,6 @@ class AbstractNode(ABC):
         AST cleanup.
         :return:
         """
-        # Some children remove themselves from parent list. This causes the iterator to skip elements. So we reverse
-        # it.
-
         for child in self._children:
             child.first_pass()
 
@@ -135,15 +144,14 @@ class AbstractNode(ABC):
         """
         Not all nodes check for semantic correctness. Those who do not just forward the check to their children.
         this function NEEDS to be overwritten by nodes who do check on semantics.
-        :return: true if the program if all children evaluate that the the (sub) program is semantically correct.
+        :return: Returns the amount of errors generated.
         """
-
-        ret_val = True
+        ret = True
         for child in self._children:
-            if not child.semantic_analysis():
-                ret_val = False
+            if child.semantic_analysis():
+                ret = False
 
-        return ret_val
+        return ret
 
     def generate_llvm(self) -> str:
         """

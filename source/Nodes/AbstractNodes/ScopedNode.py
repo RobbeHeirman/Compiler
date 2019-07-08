@@ -5,11 +5,12 @@ Academic Year: 2018-2019
 """
 from abc import ABC
 
-from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from SymbolTable import SymbolTable, Attributes
+import Attributes
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
+import SymbolTable
 
 
-class ScopedNode(AbstractNode, ABC):
+class ScopedNode(AbstractNode.AbstractNode, ABC):
     """
     This node is an abstract node that presents all nodes with their own scope.
     This means this node has it's own SymbolTable
@@ -21,10 +22,10 @@ class ScopedNode(AbstractNode, ABC):
         Initializer
         """
         super().__init__(parent_node)
-        self._symbol_table = SymbolTable()
+        self._symbol_table = SymbolTable.SymbolTable(self.__class__._messages)
         self._register_index = -1
 
-    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes) -> bool:
+    def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes.Attributes) -> bool:
         """
         This is a ScopedNode with own symbolTable. We will attempt to add to the symbol table here.
         :param lexeme: The lexeme (id name) of the variable we add
