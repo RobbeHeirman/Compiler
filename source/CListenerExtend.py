@@ -226,7 +226,10 @@ class CListenerExtend(CListener):
 
         """
         prefix_node = TypeModifierNode.TypeModifierNode(self._parent_node)
-        self._parent_node.add_child(prefix_node)
+        # The expression Node gets linked on exit (and found aswell)
+        if isinstance(self._parent_node, TypeModifierNode.TypeModifierNode):
+            self._parent_node.add_child(prefix_node)
+
         prefix_node.parent_node = self._parent_node
         self._parent_node = prefix_node
 
@@ -234,11 +237,12 @@ class CListenerExtend(CListener):
         """
         We want to place the prefixes as children of other expressions.
         """
+
+        # We can do this bcz exit is bottom up, and the recursive calls stops at a non type modifier expression.
         expressive_node = self._parent_node.pop_child()
         expressive_node.add_child(self._parent_node)  # parent node is the type modifier
 
         self._parent_node.parent_node.add_child(expressive_node)
-        self._parent_node.parent_node.remove_child(self._parent_node)
         expressive_node.parent_node = self._parent_node.parent_node
 
         self._parent_node = self._parent_node.parent_node

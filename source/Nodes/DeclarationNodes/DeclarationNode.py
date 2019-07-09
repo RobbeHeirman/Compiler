@@ -98,7 +98,6 @@ class DeclarationNode(TypedNode.TypedNode):
         """
         ret = True
         self._generate_type_modifier_stack()
-
         # We have all the info for the corresponding attribute object
         attr = Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
 

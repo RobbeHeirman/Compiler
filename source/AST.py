@@ -17,6 +17,7 @@ class AST:
         """
         self._root = None
         self._messenger = messages.MessageGenerator()
+
     def error_count(self) -> int:
         return self._messenger.error_counter
 
