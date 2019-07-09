@@ -12,9 +12,12 @@ import Specifiers
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     id: str
 
-    def __init__(self, parent_node, identifier: str):
+    def __init__(self, parent_node, ctx, filename):
         super().__init__(parent_node)
-        self.id = identifier
+        self.id = ctx.getText()
+        self.line = ctx.start.line
+        self.column = ctx.start.column
+        self.filename = filename
         self.base_type = Specifiers.TypeSpecifier.DEFAULT
 
         self._l_value = True  # As it's base form an identifier is an Lvalue
@@ -80,7 +83,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                     nw_stack.append(Specifiers.TypeModifier.PTR)  # Denoting this is address of R value
                     self._l_value = False
 
-        self.type_stack = nw_stack
+        self._type_stack = nw_stack
         return True
 
     def generate_llvm(self):

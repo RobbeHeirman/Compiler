@@ -8,9 +8,6 @@ import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
-
-import Nodes.FunctionNodes.ParamListNode as ParamListNode
-import Specifiers
 import Attributes as Attributes
 import typing
 
@@ -97,7 +94,6 @@ class DeclarationNode(TypedNode.TypedNode):
         on this scope lvl. But it can overshadow higher scoped (global...) declared variables with the same identifier.
         :return: Amount of errors encountered in node and children.
         """
-
         ret = True
         self._generate_type_modifier_stack()
 
@@ -109,48 +105,37 @@ class DeclarationNode(TypedNode.TypedNode):
         if self._expression_node:
             if not self._expression_node.semantic_analysis():
                 ret = False
+            self.analyze_initializer()
 
-            if self.base_type is not self._expression_node.base_type:
-                DeclarationNode._messages.error_no_conversion_base_types(attr, self._expression_node.base_type)
-                ret = False
-
-            if len(self._type_stack) > 0:
-                # Now we need to check if there are no violations on the operators.
-                # 1) Ptr type requires address of same type on the right side, NO IMPLICIT CONVERSIONS.
-                if self._type_stack[-1].PTR:
-                    if not self._expression_node.is_address():
-                        ret = False
-                        DeclarationNode._messages.error_no_conversion_int_ptr(attr, self._expression_node.base_type)
-
-                # 2) Explicit list init if array has no init size if type is array .
-                if self._type_stack[-1] is Specifiers.TypeModifier.ARRAY:
-                    # Last element is top of the stack.
-                    # If array size is not specified MUST have array init rhs.
-                    if not self._type_modifier_node.array_has_length():
-                        if self._expression_node is None:
-                            if not isinstance(self._parent_node, ParamListNode.ParamListNode):
-                                DeclarationNode._messages.error_array_size_missing(self.id, attr)
-                                ret = False
-
-                    if not isinstance(self._expression_node, ArrayInitNode.ArrayInitNode):
-                        tpl = self._expression_node.get_error_info()
-                        t_file = attr.filename
-                        attr.filename = tpl[0]
-                        t_line = attr.line
-                        attr.line = tpl[1]
-                        t_column = attr.column
-                        attr.column = tpl[2]
-                        DeclarationNode._messages.error_invalid_initializer(self.id, attr)
-                        attr.filename = t_file
-                        attr.line = t_line
-                        attr.column = t_column
-                        ret = False
-
-                # Functions are allowed to be declared but definitions are not handled by this node
-                elif self._type_stack[-1] is Specifiers.TypeModifier.FUNC:
-                    DeclarationNode._messages.error_func_initialized_like_var(self.id, attr)
-                    attr.function_signature = self._type_modifier_node.get_function_signature()
-                    ret = False
+            # # 2) Explicit list init if array has no init size if type is array .
+            # if self._type_stack[-1] is Specifiers.TypeModifier.ARRAY:
+            #     # Last element is top of the stack.
+            #     # If array size is not specified MUST have array init rhs.
+            #     if not self._type_modifier_node.array_has_length():
+            #         if self._expression_node is None:
+            #             if not isinstance(self._parent_node, ParamListNode.ParamListNode):
+            #                 DeclarationNode._messages.error_array_size_missing(self.id, attr)
+            #                 ret = False
+            #
+            #     if not isinstance(self._expression_node, ArrayInitNode.ArrayInitNode):
+            #         tpl = self._expression_node.get_error_info()
+            #         t_file = attr.filename
+            #         attr.filename = tpl[0]
+            #         t_line = attr.line
+            #         attr.line = tpl[1]
+            #         t_column = attr.column
+            #         attr.column = tpl[2]
+            #         DeclarationNode._messages.error_invalid_initializer(self.id, attr)
+            #         attr.filename = t_file
+            #         attr.line = t_line
+            #         attr.column = t_column
+            #         ret = False
+            #
+            # # Functions are allowed to be declared but definitions are not handled by this node
+            # elif self._type_stack[-1] is Specifiers.TypeModifier.FUNC:
+            #     DeclarationNode._messages.error_func_initialized_like_var(self.id, attr)
+            #     attr.function_signature = self._type_modifier_node.get_function_signature()
+            #     ret = False
 
         # Add to the scopes symbol_table.
         if not self.add_to_scope_symbol_table(self.id, attr):
@@ -158,10 +143,44 @@ class DeclarationNode(TypedNode.TypedNode):
 
         return ret
 
-    # def implicit_param_ptr_conversion(self):
-    #     """ int main(int *rgv []) == int main(int **argv)"""
-    #     if self._type_modifier_node:
-    #         self._type_modifier_node.implicit_param_ptr_conversion()
+    def analyze_initializer(self):
+        """
+        Here we will check if the type of the initializer is conform with te type of the declaration
+        :return:
+        """
+        # print(self.__class__.warning_count())
+        expression_stack = self._expression_node.type_stack
+        for element in reversed(self._type_stack):
+            if expression_stack and element == expression_stack[-1]:
+                expression_stack.pop()
+
+            # For now this means we have an implicit conversion from (int, char, float) to ptr
+            else:
+
+                print(self.__class__._messages.warning_init_makes_a_from_b(self._expression_node.base_type.value,
+                                                                           self._type_stack[-1].value,
+                                                                           self._filename,
+                                                                           self._line,
+                                                                           self._column))
+                break
+
+        if expression_stack:
+            if expression_stack[-1]:
+                print(self.__class__._messages.warning_init_makes_a_from_b(self.base_type.value,
+                                                                           expression_stack[-1].value,
+                                                                           self._filename,
+                                                                           self._line,
+                                                                           self._column))
+
+        elif self.base_type != self._expression_node.base_type:
+            print(self.__class__._messages.warning_init_makes_a_from_b(self.base_type.value,
+                                                                       self._expression_node.base_type.value,
+                                                                       self._filename,
+                                                                       self._line,
+                                                                       self._column))
+
+        return True
+        # TODO mechanism to inform expression node of conversion
 
     # def generate_llvm(self) -> str:
     #     """"

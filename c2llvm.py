@@ -26,7 +26,10 @@ if __name__ == "__main__":
     args = cmd_parser.parse_args()
 
     if args.test:
-        subprocess.call(["python3", "-m", "unittest", "discover", "-p", "*_test.py"])
+        try:
+            subprocess.call(["python3", "-m", "unittest", "discover", "-p", "*_test.py"])
+        except FileNotFoundError:
+            subprocess.call(["python", "-m", "unittest", "discover", "-p", "*_test.py"])
         sys.exit(0)
 
     if args.input_file is -1:

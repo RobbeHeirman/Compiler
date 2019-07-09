@@ -16,6 +16,11 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
         self.base_type = None
         self._type_stack = []
 
+    @property
+    def type_stack(self):
+        """ No outer modification on the list"""
+        return list(self._type_stack)
+
     def _generate_type_modifier_stack(self):
         """
         Generates the type modifier stack. This is a stack of type modifier types that will determine the modifiers

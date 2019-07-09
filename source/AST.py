@@ -19,6 +19,9 @@ class AST:
     def error_count(self) -> int:
         return self._root.error_count()
 
+    def warning_count(self) -> int:
+        return self._root.warning_count()
+
     @property
     def root(self):
         return self._root

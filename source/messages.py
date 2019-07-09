@@ -23,10 +23,17 @@ class MessageGenerator:
     def __init__(self):
         self.color_scheme = ColorScheme
         self._error_counter = 0
+        self._warning_counter = 0
+
+
 
     @property
     def error_counter(self):
         return self._error_counter
+
+    @property
+    def warning_counter(self):
+        return self._warning_counter
 
     @staticmethod
     def file_info(attribute: "Attributes.Attributes"):
@@ -129,11 +136,20 @@ class MessageGenerator:
         print(self.color_scheme.FAIL + "{0}lvalue required as unary '&' operand"
               .format(self.error_f(filename, line, column)) + self.color_scheme.ENDC)
 
+    # Warnings
+    # =======================================================================================================================
+    def warning_f(self, filename, line, column):
+        self._warning_counter += 1
+        return self.color_scheme.WARNING + "{0}warning: ".format(MessageGenerator.file_info_f(filename, line, column))
+
+    def warning_init_makes_a_from_b(self, a_type, b_type, filename, line, column):
+        return "{0}initialization makes {1} from {2} without a cast".format(
+            self.warning_f(filename, line, column), b_type, a_type) + self.color_scheme.ENDC
+
     @staticmethod
     def note(attribute: "Attributes.Attributes"):
         return "{0}note: ".format(MessageGenerator.file_info(attribute))
 
     def note_prev_decl(self, lexeme, attribute):
-        print(
-            self.color_scheme.FAIL + "{0}previous declaration of \'{1}\' was here".format(
-                MessageGenerator.note(attribute), lexeme) + self.color_scheme.ENDC)
+        return self.color_scheme.FAIL + "{0}previous declaration of \'{1}\' was here".format(
+            MessageGenerator.note(attribute), lexeme) + self.color_scheme.ENDC

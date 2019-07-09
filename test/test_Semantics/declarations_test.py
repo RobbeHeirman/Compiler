@@ -21,12 +21,12 @@ class STestDeclaration(unittest.TestCase):
         if os.path.exists(self.result_path):
             shutil.rmtree(self.result_path)
 
-    def run_analysis(self, filename, errors=0):
+    def run_analysis(self, filename, errors=0, warnings=0):
         orig_stdout = sys.stdout
         if not os.path.exists(self.result_path):
             os.makedirs(self.result_path)
         f = open(self.result_path + filename[:-2] + "_error.log", "w+")
-        sys.stdout = f
+
         file_name = self.path + filename
         ast = main.create_ast(file_name)
         ast.semantic_analysis()
@@ -34,6 +34,7 @@ class STestDeclaration(unittest.TestCase):
         sys.stdout = orig_stdout
         try:
             self.assertEqual(ast.error_count(), errors)
+            self.assertEqual(ast.warning_count(), warnings)
         except Exception:
             main.generate_ast_visuals(ast, self.result_path + filename[:-2])
             raise
@@ -55,4 +56,4 @@ class STestDeclaration(unittest.TestCase):
         self.run_analysis("happy_day_ptr.c")
 
     def test_wrong_type_init_int(self):
-        self.run_analysis("wrong_type_init_int.c", 3)
+        self.run_analysis("wrong_type_init_int.c", 0, 3)

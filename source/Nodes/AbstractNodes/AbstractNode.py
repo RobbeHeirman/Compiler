@@ -41,6 +41,10 @@ class AbstractNode(abc.ABC):
     def error_count(cls):
         return cls._messages.error_counter
 
+    @classmethod
+    def warning_count(cls):
+        return cls._messages.warning_counter
+
     @property
     @abc.abstractmethod
     def label(self):  # Enforcing every node defines a label
@@ -99,7 +103,6 @@ class AbstractNode(abc.ABC):
         :return: THe removed Node
         """
         return self._children.pop(index)
-
 
     def is_in_table(self, lexeme: str) -> bool:
         return self._parent_node.is_in_table(lexeme)
