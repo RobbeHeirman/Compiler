@@ -14,7 +14,10 @@ class STestDeclaration(unittest.TestCase):
     3) Re declaration of a simple type.
     """
 
-    def setUp(self):
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
         self.result_path = "test/test_results/semantic/declarations/"
         self.path = "C_files/semantic/Declaration/"
 
@@ -26,7 +29,7 @@ class STestDeclaration(unittest.TestCase):
         if not os.path.exists(self.result_path):
             os.makedirs(self.result_path)
         f = open(self.result_path + filename[:-2] + "_error.log", "w+")
-
+        sys.stdout = f
         file_name = self.path + filename
         ast = main.create_ast(file_name)
         ast.semantic_analysis()
