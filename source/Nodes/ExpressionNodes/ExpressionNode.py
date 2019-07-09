@@ -123,7 +123,7 @@ class ExpressionNode(TypedNode.TypedNode):
     #     for child in self._children:
     #         child.first_pass()
 
-    def semantic_analysis(self) -> bool:
+    def semantic_analysis(self, messenger) -> bool:
         """
         Semantic analysis in expressive nodes is looking up if the signature of the identifier matches the
         one in the symbol table.
@@ -132,7 +132,7 @@ class ExpressionNode(TypedNode.TypedNode):
         """
         ret = True
         for child in self._children:
-            if not child.semantic_analysis():
+            if not child.semantic_analysis(messenger):
                 ret = False
 
         return ret

@@ -18,7 +18,6 @@ class AbstractNode(abc.ABC):
     _children: typing.List["AbstractNode"]
     _parent_node: "AbstractNode"
 
-    _messages = messages.MessageGenerator()
     _index_counter = 0
     _indent_level = 0
 
@@ -36,14 +35,6 @@ class AbstractNode(abc.ABC):
     @property
     def index(self):
         return self._index
-
-    @classmethod
-    def error_count(cls):
-        return cls._messages.error_counter
-
-    @classmethod
-    def warning_count(cls):
-        return cls._messages.warning_counter
 
     @property
     @abc.abstractmethod
@@ -143,7 +134,7 @@ class AbstractNode(abc.ABC):
         for child in self._children:
             child.first_pass()
 
-    def semantic_analysis(self) -> bool:
+    def semantic_analysis(self, messenger) -> bool:
         """
         Not all nodes check for semantic correctness. Those who do not just forward the check to their children.
         this function NEEDS to be overwritten by nodes who do check on semantics.
@@ -151,7 +142,7 @@ class AbstractNode(abc.ABC):
         """
         ret = True
         for child in self._children:
-            if child.semantic_analysis():
+            if child.semantic_analysis(messenger):
                 ret = False
 
         return ret

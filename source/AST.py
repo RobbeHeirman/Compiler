@@ -4,6 +4,7 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 import Nodes.GlobalNodes.RootNode as RootNode
+import messages
 
 
 class AST:
@@ -15,12 +16,12 @@ class AST:
         Initializer
         """
         self._root = None
-
+        self._messenger = messages.MessageGenerator()
     def error_count(self) -> int:
-        return self._root.error_count()
+        return self._messenger.error_counter
 
     def warning_count(self) -> int:
-        return self._root.warning_count()
+        return self._messenger.warning_counter
 
     @property
     def root(self):
@@ -65,7 +66,7 @@ class AST:
         """
         Does the semantic analysis of our program.
         Will fill in & check the symbol table(s) (Scoped)
+        The messageGenerator is used to generate messages
         :return: True if the program is semantically correct.
         """
-
-        return self._root.semantic_analysis()  # let's do this!
+        return self._root.semantic_analysis(self._messenger)

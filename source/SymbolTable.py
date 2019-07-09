@@ -19,8 +19,7 @@ class SymbolTable:
 
     _container: typing.Dict[str, Attributes.Attributes]
 
-    def __init__(self, messenger: messages.MessageGenerator):
-        self._messenger = messenger
+    def __init__(self):
         self._container = dict()
 
     def add_id(self, lexeme: str, attribute: Attributes) -> bool:
@@ -40,9 +39,10 @@ class SymbolTable:
                         if attr.same_signature(attribute):
                             return True
 
-            self._messenger.error_redeclaration(lexeme, attribute)
+            # self._messenger.error_redeclaration(lexeme, attribute)
+            print("TODO the messages need to be refactored out of the symboltable responsibl")
             attribute_prev = self._container[lexeme]
-            self._messenger.note_prev_decl(lexeme, attribute_prev)
+            # self._messenger.note_prev_decl(lexeme, attribute_prev)
             return False
 
         self._container[lexeme] = attribute

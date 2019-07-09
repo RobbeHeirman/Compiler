@@ -19,7 +19,7 @@ class Attributes:
     _filename: str
 
     def __init__(self, base_type: TypeSpecifier, type_stack: typing.List[Specifiers.TypeModifier],
-                 filename: str, line: int, column: int, messenger: messages.MessageGenerator):
+                 filename: str, line: int, column: int):
         """
         Initializer
         :param base_type: The type_specifier attribute for this token.
@@ -35,8 +35,6 @@ class Attributes:
         self._line = line
         self._column = column
         self.function_signature = []
-
-        self._messenger = messenger
 
     def __eq__(self, val: "Attributes") -> bool:
 

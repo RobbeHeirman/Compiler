@@ -22,7 +22,7 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         Initializer
         """
         super().__init__(parent_node)
-        self._symbol_table = SymbolTable.SymbolTable(self.__class__._messages)
+        self._symbol_table = SymbolTable.SymbolTable()
         self._register_index = -1
 
     def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes.Attributes) -> bool:

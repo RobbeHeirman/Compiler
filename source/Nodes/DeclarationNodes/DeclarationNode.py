@@ -11,6 +11,8 @@ import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 import Attributes as Attributes
 import typing
 
+from messages import MessageGenerator
+
 
 class DeclarationNode(TypedNode.TypedNode):
     """
@@ -57,7 +59,7 @@ class DeclarationNode(TypedNode.TypedNode):
         if self._type_modifier_node:
             op_stack = self._type_modifier_node.generate_type_operator_stack()
         return Attributes.Attributes(self.base_type, op_stack,
-                                     self._filename, self._line, self._column, DeclarationNode._messages)
+                                     self._filename, self._line, self._column)
 
     def add_id(self, identifier):
 
@@ -88,7 +90,7 @@ class DeclarationNode(TypedNode.TypedNode):
 
         super().remove_child(child)
 
-    def semantic_analysis(self) -> bool:
+    def semantic_analysis(self, messenger: MessageGenerator) -> bool:
         """
         On a declaration, a new identifier is introduced into the scope. This has to be an unique identifier
         on this scope lvl. But it can overshadow higher scoped (global...) declared variables with the same identifier.
@@ -98,14 +100,13 @@ class DeclarationNode(TypedNode.TypedNode):
         self._generate_type_modifier_stack()
 
         # We have all the info for the corresponding attribute object
-        attr = Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column,
-                                     DeclarationNode._messages)
+        attr = Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
 
         # We first check of the expression is semantically correct
         if self._expression_node:
-            if not self._expression_node.semantic_analysis():
+            if not self._expression_node.semantic_analysis(messenger):
                 ret = False
-            self.analyze_initializer()
+            self.analyze_initializer(messenger)
 
             # # 2) Explicit list init if array has no init size if type is array .
             # if self._type_stack[-1] is Specifiers.TypeModifier.ARRAY:
@@ -143,7 +144,7 @@ class DeclarationNode(TypedNode.TypedNode):
 
         return ret
 
-    def analyze_initializer(self):
+    def analyze_initializer(self, messenger: MessageGenerator):
         """
         Here we will check if the type of the initializer is conform with te type of the declaration
         :return:
@@ -157,27 +158,28 @@ class DeclarationNode(TypedNode.TypedNode):
             # For now this means we have an implicit conversion from (int, char, float) to ptr
             else:
 
-                print(self.__class__._messages.warning_init_makes_a_from_b(self._expression_node.base_type.value,
-                                                                           self._type_stack[-1].value,
-                                                                           self._filename,
-                                                                           self._line,
-                                                                           self._column))
+                print(messenger.warning_init_makes_a_from_b(self._expression_node.base_type.value,
+                                                            self._type_stack[-1].value,
+                                                            self._filename,
+                                                            self._line,
+                                                            self._column))
                 break
 
         if expression_stack:
             if expression_stack[-1]:
-                print(self.__class__._messages.warning_init_makes_a_from_b(self.base_type.value,
-                                                                           expression_stack[-1].value,
-                                                                           self._filename,
-                                                                           self._line,
-                                                                           self._column))
+                print(messenger.warning_init_makes_a_from_b(self.base_type.value,
+                                                            expression_stack[-1].value,
+                                                            self._filename,
+                                                            self._line,
+                                                            self._column))
 
         elif self.base_type != self._expression_node.base_type:
-            print(self.__class__._messages.warning_init_makes_a_from_b(self.base_type.value,
-                                                                       self._expression_node.base_type.value,
-                                                                       self._filename,
-                                                                       self._line,
-                                                                       self._column))
+            print(type(messenger))
+            print(messenger.warning_init_makes_a_from_b(a_type=self.base_type.value,
+                                                        b_type=self._expression_node.base_type.value,
+                                                        filename=self._filename,
+                                                        line=self._line,
+                                                        column=self._column))
 
         return True
         # TODO mechanism to inform expression node of conversion

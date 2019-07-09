@@ -29,7 +29,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         return ret
 
-    def semantic_analysis(self):
+    def semantic_analysis(self, messenger):
 
         self._generate_type_modifier_stack()  # the modifiers applied in the expression
         ret = True
@@ -38,7 +38,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
             self.base_type = attr.decl_type  # this is the base type
             # Now we need to check if the operations done on the identifier are legal
             if not len(self._type_stack) is 0:
-                if not self._stack_analysis(attr.operator_stack):
+                if not self._stack_analysis(attr.operator_stack, messenger):
                     ret = False
 
                 # if self.type_stack and self.type_stack[-1] is DeclaratorSpecifier.FUNC:  # Now check the signature
@@ -49,11 +49,11 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 #    ret = False
 
         else:
-            self.__class__._messages.error_undeclared_var(self.id, self.filename, self.line, self.column)
+            messenger.error_undeclared_var(self.id, self.filename, self.line, self.column)
 
         return ret
 
-    def _stack_analysis(self, attr_stack) -> bool:
+    def _stack_analysis(self, attr_stack, messenger) -> bool:
         """"
         Checks the type modifier corresponding to the expression vs the modifier's corresponding to the attributes.
         Modifies the expression's modifier stack to correspond the correct type.
@@ -76,7 +76,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
             if element == Specifiers.TypeModifier.ADDRESS:
                 if not self._l_value:  # We need an L value to take an address from
-                    self.__class__._messages.error_lvalue_required_addr_operand(self.filename, self.line, self.column)
+                    messenger.error_lvalue_required_addr_operand(self.filename, self.line, self.column)
                     return False
 
                 else:

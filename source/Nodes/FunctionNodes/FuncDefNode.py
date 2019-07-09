@@ -44,7 +44,7 @@ class FuncDefNode(ScopedNode.ScopedNode):
 
         super().add_child(child, index)
 
-    def semantic_analysis(self) -> bool:
+    def semantic_analysis(self, messenger) -> bool:
         """
         Semantic analysis of a function definition.
         1)The function and his signature needs to be added to the symbol
@@ -55,8 +55,7 @@ class FuncDefNode(ScopedNode.ScopedNode):
         ret = True
         # 1) Add to the symbol table of the upper scope
         self._type_stack = [Specifiers.TypeModifier.PTR for _ in range(self._ptr_count)]
-        attr = Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column,
-                                     self.__class__._messages)
+        attr = Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
         signature = self._children[0].get_function_signature()
         attr.function_signature = signature
         if not self._parent_node.add_to_scope_symbol_table(self._id, attr):
