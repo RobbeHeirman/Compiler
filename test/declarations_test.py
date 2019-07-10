@@ -91,7 +91,11 @@ class LLVMTestDeclaration(unittest.TestCase):
 
             # We cannot define function's at this stage of the project.
             # 1561 is the error thrown that we lack an entry point, wich is okay
-            self.assertEqual(ret, 1561)
+            try:
+                self.assertEqual(ret, 1561)
+
+            except Exception:
+                subprocess.call(["clang", "-S", "-emit-llvm", file_name])
 
     def test_ll_happy_day_int(self):
         self._run_llvm("happy_day_int.c")
@@ -100,7 +104,7 @@ class LLVMTestDeclaration(unittest.TestCase):
         self._run_llvm("happy_day_char.c")
 
     def test_float_happy_day(self):
-        self._run_llvm("happy_day_float.c", False)
+        self._run_llvm("happy_day_float.c")
 
     def test_ptr_happy_day(self):
         self._run_llvm("happy_day_ptr.c")

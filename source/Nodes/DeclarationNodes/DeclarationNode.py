@@ -31,7 +31,8 @@ class DeclarationNode(TypedNode.TypedNode):
     _DEFAULT_VALUE_MAP = {
         Specifiers.TypeSpecifier.INT: 0,
         Specifiers.TypeSpecifier.FLOAT: 0.0,
-        Specifiers.TypeSpecifier.CHAR: 0
+        Specifiers.TypeSpecifier.CHAR: 0,
+        Specifiers.TypeModifier.PTR: "null"
     }
 
     def __init__(self, parent_node, filename, ctx):
@@ -220,8 +221,12 @@ class DeclarationNode(TypedNode.TypedNode):
         if self._is_global():
 
             # Globals must be assigned, so 0 by default
-            val = self._expression_node.llvm_constant if self._expression_node else \
-                self.__class__._DEFAULT_VALUE_MAP[self.base_type]
+            if not self._type_modifier_node:
+                val = self._expression_node.llvm_constant if self._expression_node else \
+                    self.__class__._DEFAULT_VALUE_MAP[self.base_type]
+
+            else:
+                val = self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1]]
 
             ret += LlvmCode.llvm_allocate_instruction_global(self.id, self.base_type, self._type_stack, str(val),
                                                              self.indent_string())
