@@ -5,7 +5,6 @@ import Specifiers
 
 
 class ExpressionNodeType(Enum):
-
     BINARY_OPERATOR = auto()
     CONSTANT = "Constant: "
     IDENTIFIER = "Identifier: "
@@ -30,8 +29,12 @@ class ExpressionNode(TypedNode.TypedNode):
     _OPERATOR_TYPES = [ExpressionNodeType.ARRAY,
                        ExpressionNodeType.PTR, ExpressionNodeType.ADDR, ExpressionNodeType.FUNCTION]
 
-    def __init__(self, parent_node):
+    def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node)
+
+        self.column = ctx.start.column
+        self.line = ctx.start.line
+        self.filename = filename
 
         self._identifier_node = None
         self._type_modifier_node = None
@@ -39,11 +42,6 @@ class ExpressionNode(TypedNode.TypedNode):
         self.type = None
 
         self._l_value = True
-
-        # Book keeping info
-        self.filename = None
-        self.line = None
-        self.column = None
 
     @property
     def type_string_llvm(self):
@@ -130,7 +128,12 @@ class ExpressionNode(TypedNode.TypedNode):
         Note: We do not support implicit conversions.
         :return:
         """
+        self._generate_type_modifier_stack()  # the modifiers applied in the expression
         ret = True
+
+        if not self._stack_analysis(messenger, []):
+            return False
+
         for child in self._children:
             if not child.semantic_analysis(messenger):
                 ret = False
@@ -139,3 +142,37 @@ class ExpressionNode(TypedNode.TypedNode):
 
     def is_constant(self):
         return False
+
+    def _stack_analysis(self, messenger, attr_stack=None) -> bool:
+        """"
+        Checks the type modifier corresponding to the expression vs the modifier's corresponding to the attributes.
+        Modifies the expression's modifier stack to correspond the correct type.
+        :param attr_stack. The stack found in the symbol table corresponding to the identifier
+        :return: True if successful without semantic errors
+        """
+
+        # This is the attributes we retrieved from the symbol table. Note that the operators stored
+        # in the symbol correspond to other operation on the right side of an assignment.
+        # * means dereference while on lhs this declares that the variable will contain an address.
+        # For comparison purposes we will make the meaning on rhs uniform so * lhs becomes & (address of) rhs.
+        if attr_stack is None:
+            attr_stack = []
+        nw_stack = list(attr_stack)
+        for element in reversed(self._type_stack):
+            # if it's a * we dereference the value, meaning that we need to dereference a ptr type.
+            if element == Specifiers.TypeModifier.PTR:
+                if nw_stack[-1] == Specifiers.TypeModifier.PTR:  # Implicit conversion to R value in an id node
+                    nw_stack.pop()
+                    self._l_value = True
+
+            if element == Specifiers.TypeModifier.ADDRESS:
+                if not self._l_value:  # We need an L value to take an address from
+                    messenger.error_lvalue_required_addr_operand(self.filename, self.line, self.column)
+                    return False
+
+                else:
+                    nw_stack.append(Specifiers.TypeModifier.PTR)  # Denoting this is address of R value
+                    self._l_value = False
+
+        self._type_stack = nw_stack
+        return True

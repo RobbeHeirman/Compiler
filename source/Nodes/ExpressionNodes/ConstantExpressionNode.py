@@ -12,10 +12,11 @@ from Specifiers import TypeSpecifier
 
 class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
-    def __init__(self, parent_node, constant):
-        super().__init__(parent_node)
+    def __init__(self, parent_node, filename, ctx):
+        super().__init__(parent_node, filename, ctx)
 
-        self.constant = constant
+        self.constant = ctx.getText()
+        self._l_value = False  # Constant's are always r value's
 
     @property
     def label(self) -> str:
