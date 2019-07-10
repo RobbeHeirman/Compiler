@@ -3,6 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import LlvmCode
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
@@ -104,7 +105,7 @@ class DeclarationNode(TypedNode.TypedNode):
         # We first check of the expression is semantically correct
         if self._expression_node:
             if not self._expression_node.semantic_analysis(messenger):
-                ret = False
+                return False
             self.analyze_initializer(messenger)
 
             # # 2) Explicit list init if array has no init size if type is array .
@@ -151,12 +152,12 @@ class DeclarationNode(TypedNode.TypedNode):
         # print(self.__class__.warning_count())
         expression_stack = self._expression_node.type_stack
         for element in reversed(self._type_stack):
+
             if expression_stack and element == expression_stack[-1]:
                 expression_stack.pop()
 
             # For now this means we have an implicit conversion from (int, char, float) to ptr
             else:
-
                 print(messenger.warning_init_makes_a_from_b(self._expression_node.base_type.value,
                                                             self._type_stack[-1].value,
                                                             self._filename,
@@ -164,18 +165,17 @@ class DeclarationNode(TypedNode.TypedNode):
                                                             self._column))
                 break
 
+
         if expression_stack:
-            if expression_stack[-1]:
-                print(messenger.warning_init_makes_a_from_b(self.base_type.value,
-                                                            expression_stack[-1].value,
-                                                            self._filename,
-                                                            self._line,
-                                                            self._column))
+            print(messenger.warning_init_makes_a_from_b(self.base_type.value,
+                                                        expression_stack[-1].value,
+                                                        self._filename,
+                                                        self._line,
+                                                        self._column))
 
         elif self.base_type != self._expression_node.base_type:
-            print(type(messenger))
-            print(messenger.warning_init_makes_a_from_b(a_type=self.base_type.value,
-                                                        b_type=self._expression_node.base_type.value,
+            print(messenger.warning_init_makes_a_from_b(a_type=self._expression_node.base_type.value,
+                                                        b_type=self.base_type.value,
                                                         filename=self._filename,
                                                         line=self._line,
                                                         column=self._column))
@@ -183,40 +183,44 @@ class DeclarationNode(TypedNode.TypedNode):
         return True
         # TODO mechanism to inform expression node of conversion
 
-    # def generate_llvm(self) -> str:
-    #     """"
-    #     This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
-    #     """
-    #     ptr = ""
-    #     ptr += "*" * len(self._type_stack[:-1])  # TODO: This is not correct need ot handle this better
-    #     ret = self.indent_string() + "; Declaration: {0}{1} {2}\n".format(self.base_type.value, ptr, self.id)
-    #     # Special types need other llvm code first
-    #     if self._type_stack and self._type_stack[-1] is TypeModifierNode.TypeModifier.ARRAY:
-    #         # Find the type
-    #         size = 0
-    #         if self._expression_node:
-    #             size = self._expression_node.size()  # Size of array if declared trough list
-    #         r_type = self.base_type.llvm_type + ptr
-    #         secondary_type = "[ " + str(size) + " x " + r_type + " ]"  # This is how we init an array
-    #         ret += self.indent_string() + "%{0} = alloca {1}\n".format(
-    #             self.id, secondary_type, self.base_type.llvm_alignment)
-    #
-    #     else:
-    #         ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self._type_stack, self.indent_string())
-    #
-    #     if self._expression_node is not None:
-    #         ret += self.indent_string() + "; = ...\n"
-    #         ret += self._expression_node.generate_llvm()
-    #         if not (isinstance(self._expression_node, ArrayInitNode)):
-    #             ret += LlvmCode.llvm_store_instruction(
-    #                 self.base_type,
-    #                 str(self.register_index),
-    #                 self._type_stack,
-    #
-    #                 self.base_type,
-    #                 self.id,
-    #                 self._type_stack,
-    #                 self.indent_string()
-    #             )
-    #     ret += self.indent_string() + "; end declaration\n"
-    #     return ret
+    def generate_llvm(self) -> str:
+        """"
+        This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
+        """
+        type_modifier_str = ""
+        for type in self.type_stack:
+            type_modifier_str += type.value
+
+        ret = self.indent_string() + "; Declaration: {0}{1} {2}\n".format(self.base_type.value, type_modifier_str,
+                                                                          self.id)
+
+        # # Special types need other llvm code first
+        # if self._type_stack and self._type_stack[-1] is TypeModifierNode.TypeModifier.ARRAY:
+        #     # Find the type
+        #     size = 0
+        #     if self._expression_node:
+        #         size = self._expression_node.size()  # Size of array if declared trough list
+        #     r_type = self.base_type.llvm_type + ptr
+        #     secondary_type = "[ " + str(size) + " x " + r_type + " ]"  # This is how we init an array
+        #     ret += self.indent_string() + "%{0} = alloca {1}\n".format(
+        #         self.id, secondary_type, self.base_type.llvm_alignment)
+
+        # else:
+        ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self._type_stack, self.indent_string())
+
+        if self._expression_node is not None:
+            ret += self.indent_string() + "; = ...\n"
+            ret += self._expression_node.generate_llvm()
+            if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
+                ret += LlvmCode.llvm_store_instruction(
+                    self.base_type,
+                    str(self.register_index),
+                    self._type_stack,
+
+                    self.base_type,
+                    self.id,
+                    self._type_stack,
+                    self.indent_string()
+                )
+        ret += self.indent_string() + "; end declaration\n"
+        return ret

@@ -54,7 +54,7 @@ if __name__ == "__main__":
         main.generate_ast_visuals(ast, path + slug + "2")
 
     # If the semantic analysis fails
-    if ast.semantic_analysis() is False:
+    if not ast.semantic_analysis():
         sys.exit(1)
 
     # generate the ll code

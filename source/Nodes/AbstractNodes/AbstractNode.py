@@ -5,9 +5,7 @@ Academic Year: 2018-2019
 """
 import abc
 import typing
-
 import Attributes
-import messages
 
 
 class AbstractNode(abc.ABC):
@@ -142,7 +140,7 @@ class AbstractNode(abc.ABC):
         """
         ret = True
         for child in self._children:
-            if child.semantic_analysis(messenger):
+            if not child.semantic_analysis(messenger):
                 ret = False
 
         return ret
