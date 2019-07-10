@@ -58,7 +58,7 @@ class STestDeclaration(unittest.TestCase):
         self.run_analysis("happy_day_ptr.c")
 
     def test_wrong_type_init_int(self):
-        self.run_analysis("wrong_type_init_int.c", 1, 3)
+        self.run_analysis("wrong_type_init_int.c", 1, 2)
 
 
 class LLVMTestDeclaration(unittest.TestCase):

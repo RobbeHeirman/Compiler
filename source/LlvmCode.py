@@ -131,7 +131,7 @@ def llvm_load_instruction(source_type: Specifiers.TypeModifier, source_register:
 # Global
 # ======================================================================================================================
 
-def llvm_allocate_instruction_global(target_register: str, spec_type: Specifiers.TypeModifier, operator_stack,
+def llvm_allocate_instruction_global(target_register: str, spec_type: Specifiers.TypeModifier, operator_stack, val,
                                      indent_string: str) -> str:
     """
     :param target_register:
@@ -143,5 +143,5 @@ def llvm_allocate_instruction_global(target_register: str, spec_type: Specifiers
 
     operator_string = convert_operator_stack_to_str(operator_stack)
 
-    return indent_string + "@{0} = global {1}{2}\n".format(
-        target_register, spec_type.llvm_type, operator_string)
+    return indent_string + "@{0} = global {1}{2} {3}\n".format(
+        target_register, spec_type.llvm_type, operator_string, val)

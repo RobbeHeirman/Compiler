@@ -169,8 +169,6 @@ class DeclarationNode(TypedNode.TypedNode):
                                                             self._line,
                                                             self._column))
                 break
-
-
         if expression_stack:
             print(messenger.warning_init_makes_a_from_b(self.base_type.value,
                                                         expression_stack[-1].value,
@@ -213,24 +211,26 @@ class DeclarationNode(TypedNode.TypedNode):
         # else:
 
         if self._is_global():
-            ret += LlvmCode.llvm_allocate_instruction_global(self.id, self.base_type, self._type_stack,
+
+            val = self._expression_node.llvm_constant if self._expression_node else 0
+            ret += LlvmCode.llvm_allocate_instruction_global(self.id, self.base_type, self._type_stack, str(val),
                                                              self.indent_string())
         else:
             ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self._type_stack, self.indent_string())
 
-        if self._expression_node is not None:
-            ret += self.indent_string() + "; = ...\n"
-            ret += self._expression_node.generate_llvm()
-            if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
-                ret += LlvmCode.llvm_store_instruction(
-                    self.base_type,
-                    str(self.register_index),
-                    self._type_stack,
+            if self._expression_node is not None:
+                ret += self.indent_string() + "; = ...\n"
+                ret += self._expression_node.generate_llvm()
+                if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
+                    ret += LlvmCode.llvm_store_instruction(
+                        self.base_type,
+                        str(self.register_index),
+                        self._type_stack,
 
-                    self.base_type,
-                    self.id,
-                    self._type_stack,
-                    self.indent_string()
-                )
+                        self.base_type,
+                        self.id,
+                        self._type_stack,
+                        self.indent_string()
+                    )
         ret += self.indent_string() + "; end declaration\n"
         return ret
