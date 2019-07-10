@@ -137,3 +137,5 @@ class ExpressionNode(TypedNode.TypedNode):
 
         return ret
 
+    def is_constant(self):
+        return False

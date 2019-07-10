@@ -13,7 +13,10 @@ def convert_operator_stack_to_str(operator_stack: typing.List[Specifiers.TypeMod
     :param operator_stack: The stack of declaratorSpecifiers
     :return: Operator stack in string notation
     """
-    return "*" * len(operator_stack)
+    ret_str = ""
+    for operator in operator_stack:
+        ret_str += operator.value
+    return ret_str
 
 
 def llvm_allocate_instruction(target_register: str, spec_type: Specifiers.TypeModifier, operator_stack,
@@ -123,3 +126,22 @@ def llvm_load_instruction(source_type: Specifiers.TypeModifier, source_register:
     )
 
     return ret
+
+
+# Global
+# ======================================================================================================================
+
+def llvm_allocate_instruction_global(target_register: str, spec_type: Specifiers.TypeModifier, operator_stack,
+                                     indent_string: str) -> str:
+    """
+    :param target_register:
+    :param spec_type:
+    :param operator_stack:
+    :param indent_string:
+    :return: Code string
+    """
+
+    operator_string = convert_operator_stack_to_str(operator_stack)
+
+    return indent_string + "@{0} = global {1}{2}\n".format(
+        target_register, spec_type.llvm_type, operator_string)

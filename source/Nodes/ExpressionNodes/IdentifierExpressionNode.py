@@ -67,9 +67,9 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         # For comparison purposes we will make the meaning on rhs uniform so * lhs becomes & (address of) rhs.
         nw_stack = list(attr_stack)
         for element in reversed(self._type_stack):
-            # if it's a * we dereference the value, meaning that we need to deref a ptr type.
+            # if it's a * we dereference the value, meaning that we need to dereference a ptr type.
             if element == Specifiers.TypeModifier.PTR:
-                if nw_stack[-1] == Specifiers.TypeModifier.PTR:  # Impicit convertion to R value in an id node
+                if nw_stack[-1] == Specifiers.TypeModifier.PTR:  # Implicit conversion to R value in an id node
                     nw_stack.pop()
                     self._l_value = True
 
@@ -92,4 +92,3 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                                               str(self.register_index), self.type_stack, self.indent_string())
 
         return ret
-        pass

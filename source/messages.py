@@ -25,8 +25,6 @@ class MessageGenerator:
         self._error_counter = 0
         self._warning_counter = 0
 
-
-
     @property
     def error_counter(self):
         return self._error_counter
@@ -135,6 +133,10 @@ class MessageGenerator:
     def error_lvalue_required_addr_operand(self, filename, line, column):
         print(self.color_scheme.FAIL + "{0}lvalue required as unary '&' operand"
               .format(self.error_f(filename, line, column)) + self.color_scheme.ENDC)
+
+    def error_init_is_not_constant(self, filename, line, column):
+        print(self.color_scheme.FAIL + self.error_f(filename, line, column) + "initializer element is not constant"
+              + self.color_scheme.ENDC)
 
     # Warnings
     # =======================================================================================================================

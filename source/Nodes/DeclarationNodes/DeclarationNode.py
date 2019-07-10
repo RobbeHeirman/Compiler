@@ -102,7 +102,12 @@ class DeclarationNode(TypedNode.TypedNode):
         # We have all the info for the corresponding attribute object
         attr = Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
 
-        # We first check of the expression is semantically correct
+        # Globals need a compile time constant.
+        if self._is_global() and self._expression_node and not self._expression_node.is_constant():
+            messenger.error_init_is_not_constant(self._filename, self._line, self._column)
+            return False
+
+        # Check of the expression is semantically correct
         if self._expression_node:
             if not self._expression_node.semantic_analysis(messenger):
                 return False
@@ -206,7 +211,12 @@ class DeclarationNode(TypedNode.TypedNode):
         #         self.id, secondary_type, self.base_type.llvm_alignment)
 
         # else:
-        ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self._type_stack, self.indent_string())
+
+        if self._is_global():
+            ret += LlvmCode.llvm_allocate_instruction_global(self.id, self.base_type, self._type_stack,
+                                                             self.indent_string())
+        else:
+            ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self._type_stack, self.indent_string())
 
         if self._expression_node is not None:
             ret += self.indent_string() + "; = ...\n"

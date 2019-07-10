@@ -60,3 +60,6 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
 
         else:
             return self._parent_node.get_attribute(lexeme)  # Looking in higher scoped symbol tables.
+
+    def _is_global(self):
+        return False

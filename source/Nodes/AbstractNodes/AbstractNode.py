@@ -155,3 +155,6 @@ class AbstractNode(abc.ABC):
             ret += child.generate_llvm()
 
         return ret
+
+    def _is_global(self) -> bool:
+        return self._parent_node._is_global()
