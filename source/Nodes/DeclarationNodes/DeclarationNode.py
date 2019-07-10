@@ -12,6 +12,7 @@ import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 import Attributes as Attributes
 import typing
 
+import Specifiers
 from messages import MessageGenerator
 
 
@@ -26,6 +27,12 @@ class DeclarationNode(TypedNode.TypedNode):
     _lexeme: str
 
     _BASE_LABEL = "Declaration"
+
+    _DEFAULT_VALUE_MAP = {
+        Specifiers.TypeSpecifier.INT: 0,
+        Specifiers.TypeSpecifier.FLOAT: 0.0,
+        Specifiers.TypeSpecifier.CHAR: 0
+    }
 
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node)
@@ -191,8 +198,8 @@ class DeclarationNode(TypedNode.TypedNode):
         This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
         """
         type_modifier_str = ""
-        for type in self.type_stack:
-            type_modifier_str += type.value
+        for _type in self.type_stack:
+            type_modifier_str += _type.value
 
         ret = self.indent_string() + "; Declaration: {0}{1} {2}\n".format(self.base_type.value, type_modifier_str,
                                                                           self.id)
@@ -212,7 +219,10 @@ class DeclarationNode(TypedNode.TypedNode):
 
         if self._is_global():
 
-            val = self._expression_node.llvm_constant if self._expression_node else 0
+            # Globals must be assigned, so 0 by default
+            val = self._expression_node.llvm_constant if self._expression_node else \
+                self.__class__._DEFAULT_VALUE_MAP[self.base_type]
+
             ret += LlvmCode.llvm_allocate_instruction_global(self.id, self.base_type, self._type_stack, str(val),
                                                              self.indent_string())
         else:

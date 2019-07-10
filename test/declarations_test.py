@@ -71,7 +71,7 @@ class LLVMTestDeclaration(unittest.TestCase):
         if not os.path.exists(self.result_path):
             os.makedirs(self.result_path)
 
-    def _run_llvm(self, filename):
+    def _run_llvm(self, filename, silence_output=True):
         file_name = self.path + filename
         ast = main.create_ast(file_name)
         if ast.semantic_analysis():
@@ -80,12 +80,27 @@ class LLVMTestDeclaration(unittest.TestCase):
             with open(result_file, "w+") as file:
                 file.write(code)
 
-            ret = subprocess.call(["clang", result_file])
+            if silence_output:
+                ret = subprocess.call(["clang", result_file], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+            else:
+                ret = subprocess.call(["clang", result_file])
 
             if ret == 1:
                 main.generate_ast_visuals(ast, self.result_path + filename[:-2])
 
-            self.assertEqual(ret, 0)
+            # We cannot define function's at this stage of the project.
+            # 1561 is the error thrown that we lack an entry point, wich is okay
+            self.assertEqual(ret, 1561)
 
     def test_ll_happy_day_int(self):
         self._run_llvm("happy_day_int.c")
+
+    def test_char_happy_day(self):
+        self._run_llvm("happy_day_char.c")
+
+    def test_float_happy_day(self):
+        self._run_llvm("happy_day_float.c", False)
+
+    def test_ptr_happy_day(self):
+        self._run_llvm("happy_day_ptr.c")
