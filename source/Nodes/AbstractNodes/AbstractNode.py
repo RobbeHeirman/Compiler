@@ -19,7 +19,7 @@ class AbstractNode(abc.ABC):
     _index_counter = 0
     _indent_level = 0
 
-    def __init__(self, parent: "AbstractNode" = None):
+    def __init__(self, parent: "AbstractNode" = None, filename=None, ctx=None):
         """
         Initializer
         """
@@ -29,6 +29,14 @@ class AbstractNode(abc.ABC):
         AbstractNode._index_counter += 1
         self._parent_node = parent
         self._children = list()
+
+        self._filename = filename
+        self._line = None
+        self._column = None
+        if ctx:
+            start = ctx.start
+            self._line = start.line
+            self._column = start.column
 
     @property
     def index(self):

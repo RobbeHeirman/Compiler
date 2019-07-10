@@ -87,9 +87,7 @@ class DeclarationNode(TypedNode.TypedNode):
         elif isinstance(child, ExpressionNode.ExpressionNode) or isinstance(child, ArrayInitNode.ArrayInitNode):
             self._expression_node = child
 
-        else:
-            print(type(child))
-            print("something went wrong")
+
         super().add_child(child)
 
     def remove_child(self, child):
@@ -105,6 +103,7 @@ class DeclarationNode(TypedNode.TypedNode):
         on this scope lvl. But it can overshadow higher scoped (global...) declared variables with the same identifier.
         :return: Amount of errors encountered in node and children.
         """
+
         ret = True
         self._generate_type_modifier_stack()
         # We have all the info for the corresponding attribute object
@@ -152,7 +151,10 @@ class DeclarationNode(TypedNode.TypedNode):
             #     ret = False
 
         # Add to the scopes symbol_table.
+        print(attr.operator_stack)
         if not self.add_to_scope_symbol_table(self.id, attr):
+            print("?")
+            messenger.error_redeclaration(self.id, attr)
             ret = False
 
         return ret
@@ -220,7 +222,7 @@ class DeclarationNode(TypedNode.TypedNode):
 
         if self._is_global():
 
-            # Globals must be assigned, so 0 by default
+            # Globals must be assigned, so 0 by default (maybe we could make a global decl node to split logic)
             if not self._type_modifier_node:
                 val = self._expression_node.llvm_constant if self._expression_node else \
                     self.__class__._DEFAULT_VALUE_MAP[self.base_type]

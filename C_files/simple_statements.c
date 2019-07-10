@@ -1,2 +1,7 @@
+int main(int argc ,int* argv ){
 
-int *e = &44;
+    return 0;
+}
+
+int main(){
+}

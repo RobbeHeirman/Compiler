@@ -33,13 +33,13 @@ class SymbolTable:
         """
         if lexeme in self._container.keys():
             attr = self._container[lexeme]
+            print(attribute.operator_stack)
             if attr.operator_stack and attribute.operator_stack:
                 if attribute.operator_stack[-1] is Specifiers.TypeModifier.FUNC:
                     if attr.operator_stack[-1] is Specifiers.TypeModifier.FUNC:
                         if attr.same_signature(attribute):
                             return True
 
-            # self._messenger.error_redeclaration(lexeme, attribute)
             print("TODO the messages need to be refactored out of the symboltable responsibl")
             attribute_prev = self._container[lexeme]
             # self._messenger.note_prev_decl(lexeme, attribute_prev)

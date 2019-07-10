@@ -11,31 +11,27 @@ import Nodes.AbstractNodes.ScopedNode as ScopedNode
 import Nodes.FunctionNodes.ReturnNode as ReturnNode
 import Specifiers
 import Attributes
+import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
 
 
-class FuncDefNode(ScopedNode.ScopedNode):
+class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
     _id: str
 
-    def __init__(self, parent_node: AbstractNode.AbstractNode, id_l: str, ptr_count: int, filename: str,
-                 ctx: ParserRuleContext):
-        super().__init__(parent_node)
+    def __init__(self, parent_node: AbstractNode.AbstractNode, filename, ctx):
 
-        self._id = id_l
-        self._ptr_count = ptr_count
+        super().__init__(parent_node, filename, ctx)
+
+        self._id = ctx.getText()
         self.base_type = None
         self._return_node = None
 
         self._type_stack = None
 
-        self._filename = filename
-        start = ctx.start
-        self._line = start.line
-        self._column = start.column
+
 
     @property
     def label(self):
-        ptr_label = "*" * self._ptr_count
-        return 'Func def\nIdentifier: {0}\nReturn type {1}{2}'.format(self._id, self.base_type.value, ptr_label)
+        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self._id, self.base_type.value)
 
     def add_child(self, child, index=None):
 
@@ -54,16 +50,17 @@ class FuncDefNode(ScopedNode.ScopedNode):
         """
         ret = True
         # 1) Add to the symbol table of the upper scope
-        self._type_stack = [Specifiers.TypeModifier.PTR for _ in range(self._ptr_count)]
+        self._generate_type_modifier_stack()
         attr = Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
         signature = self._children[0].get_function_signature()
         attr.function_signature = signature
+
         if not self._parent_node.add_to_scope_symbol_table(self._id, attr):
             ret = False
 
         # 2)
         for child in self._children:
-            if not child.semantic_analysis():
+            if not child.semantic_analysis(messenger):
                 ret = False
 
         if self._return_node and not self._return_node.has_return():
