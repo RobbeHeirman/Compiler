@@ -3,14 +3,14 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import sys
+
 from antlr4 import ParserRuleContext
 
 import messages
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.AbstractNodes.ScopedNode as ScopedNode
 import Nodes.FunctionNodes.ReturnNode as ReturnNode
-import Specifiers
-import Attributes
 import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
 
 
@@ -27,8 +27,6 @@ class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
 
         self._type_stack = None
 
-
-
     @property
     def label(self):
         return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self._id, self.base_type.value)
@@ -40,6 +38,13 @@ class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
 
         super().add_child(child, index)
 
+    def _make_attribute(self):
+
+        attr = super()._make_attribute()
+        signature = self._children[0].get_function_signature()
+        attr.function_signature = signature
+        return attr
+
     def semantic_analysis(self, messenger) -> bool:
         """
         Semantic analysis of a function definition.
@@ -48,23 +53,11 @@ class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
         2) The parameters are declared variables belonging to the scope of this function.
         :return: If the semantic analysis is correct.
         """
-        ret = True
-        # 1) Add to the symbol table of the upper scope
-        self._generate_type_modifier_stack()
-        attr = Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
-        signature = self._children[0].get_function_signature()
-        attr.function_signature = signature
+        ret = super().semantic_analysis(messenger)
 
-        if not self._parent_node.add_to_scope_symbol_table(self._id, attr):
-            ret = False
-
-        # 2)
-        for child in self._children:
-            if not child.semantic_analysis(messenger):
-                ret = False
 
         if self._return_node and not self._return_node.has_return():
-            messages.error_non_void_return(self._id, attr)
+            messenger.error_non_void_return(self._id, self._filename, self._line, self._column)
             ret = False
 
         return ret

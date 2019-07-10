@@ -87,7 +87,6 @@ class DeclarationNode(TypedNode.TypedNode):
         elif isinstance(child, ExpressionNode.ExpressionNode) or isinstance(child, ArrayInitNode.ArrayInitNode):
             self._expression_node = child
 
-
         super().add_child(child)
 
     def remove_child(self, child):
@@ -103,7 +102,6 @@ class DeclarationNode(TypedNode.TypedNode):
         on this scope lvl. But it can overshadow higher scoped (global...) declared variables with the same identifier.
         :return: Amount of errors encountered in node and children.
         """
-
         ret = True
         self._generate_type_modifier_stack()
         # We have all the info for the corresponding attribute object
@@ -195,6 +193,9 @@ class DeclarationNode(TypedNode.TypedNode):
 
         return True
         # TODO mechanism to inform expression node of conversion
+
+    def _make_attribute(self):
+        return Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
 
     def generate_llvm(self) -> str:
         """"

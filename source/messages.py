@@ -111,10 +111,9 @@ class MessageGenerator:
         print(self.color_scheme.FAIL + "{0}lvalue required as unary'&' operand".format(self.error(attribute))
               + self.color_scheme.ENDC)
 
-    def error_non_void_return(self, lexeme, attribute):
-        print(self.color_scheme.FAIL + "{0}non-void function '{1}' should return a value".format(self.error(attribute),
-                                                                                                 lexeme)
-              + self.color_scheme.ENDC)
+    def error_non_void_return(self, lexeme, filename, line, column):
+        print(self.color_scheme.FAIL + "{0}non-void function '{1}' should return a value".format(
+            self.error_f(filename, line, column), lexeme) + self.color_scheme.ENDC)
 
     def error_no_conversion_int_ptr(self, attribute: "Attributes.Attributes",
                                     expression_type: Specifiers.TypeSpecifier):
