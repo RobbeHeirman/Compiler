@@ -148,7 +148,7 @@ floating_constant
     ;
 
 func_def
-    : base_type ASTERIX* ID LPARANT parameter_list RPARANT LBRACES statements RBRACES
+    : base_type declarator LPARANT parameter_list RPARANT LBRACES statements RBRACES
     ;
 
 ret_statement
