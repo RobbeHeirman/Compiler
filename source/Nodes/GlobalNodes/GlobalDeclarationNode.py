@@ -10,7 +10,6 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
     _BASE_LABEL = "GlobalDeclaration"
 
     def __init__(self, parent_node, filename, ctx):
-        print("CALL MEEE")
         super().__init__(parent_node, filename, ctx)
 
     # Semantic analysis different,

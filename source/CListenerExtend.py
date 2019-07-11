@@ -55,9 +55,6 @@ class CListenerExtend(CListener):
     def ast(self):
         return self._ast
 
-    def enterRoot(self, ctx: CParser.RootContext):
-        print("hh")
-
     def enterStatements(self, ctx: CParser.StatementContext):
         """
         This is the root of our C program. It will make a root node
@@ -129,7 +126,6 @@ class CListenerExtend(CListener):
         can identify their parent
         :param ctx: context of the node
         """
-        print(self._scope_counter)
         declaration_node = GlobalDeclarationNode.GlobalDeclarationNode(self._parent_node, self._filename, ctx) \
             if self._scope_counter == 0 \
             else DeclarationNode.DeclarationNode(self._parent_node, self._filename, ctx)
