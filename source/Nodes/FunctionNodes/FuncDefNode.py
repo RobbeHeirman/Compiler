@@ -21,15 +21,13 @@ class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
 
         super().__init__(parent_node, filename, ctx)
 
-        self._id = ctx.getText()
         self.base_type = None
         self._return_node = None
-
         self._type_stack = None
 
     @property
     def label(self):
-        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self._id, self.base_type.value)
+        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, self.base_type.value)
 
     def add_child(self, child, index=None):
 
@@ -64,7 +62,7 @@ class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
 
     def generate_llvm(self):
         self.increment_register_index()
-        ret = self.indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self._id)
+        ret = self.indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self.id)
         ret += "{0}){{\n".format(self._children[0].generate_llvm())
         AbstractNode.AbstractNode._indent_level += 1
         for child in self._children[1:]:
