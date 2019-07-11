@@ -28,13 +28,6 @@ class DeclarationNode(TypedNode.TypedNode):
 
     _BASE_LABEL = "Declaration"
 
-    _DEFAULT_VALUE_MAP = {
-        Specifiers.TypeSpecifier.INT: 0,
-        Specifiers.TypeSpecifier.FLOAT: 0.0,
-        Specifiers.TypeSpecifier.CHAR: 0,
-        Specifiers.TypeModifier.PTR: "null"
-    }
-
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node)
 
@@ -219,34 +212,21 @@ class DeclarationNode(TypedNode.TypedNode):
 
         # else:
 
-        if self._is_global():
+        ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self._type_stack, self.indent_string())
 
-            # Globals must be assigned, so 0 by default (maybe we could make a global decl node to split logic)
-            if not self._type_modifier_node:
-                val = self._expression_node.llvm_constant if self._expression_node else \
-                    self.__class__._DEFAULT_VALUE_MAP[self.base_type]
+        if self._expression_node is not None:
+            ret += self.indent_string() + "; = ...\n"
+            ret += self._expression_node.generate_llvm()
+            if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
+                ret += LlvmCode.llvm_store_instruction(
+                    self.base_type,
+                    str(self.register_index),
+                    self._type_stack,
 
-            else:
-                val = self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1]]
-
-            ret += LlvmCode.llvm_allocate_instruction_global(self.id, self.base_type, self._type_stack, str(val),
-                                                             self.indent_string())
-        else:
-            ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self._type_stack, self.indent_string())
-
-            if self._expression_node is not None:
-                ret += self.indent_string() + "; = ...\n"
-                ret += self._expression_node.generate_llvm()
-                if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
-                    ret += LlvmCode.llvm_store_instruction(
-                        self.base_type,
-                        str(self.register_index),
-                        self._type_stack,
-
-                        self.base_type,
-                        self.id,
-                        self._type_stack,
-                        self.indent_string()
-                    )
+                    self.base_type,
+                    self.id,
+                    self._type_stack,
+                    self.indent_string()
+                )
         ret += self.indent_string() + "; end declaration\n"
         return ret

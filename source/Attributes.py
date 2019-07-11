@@ -2,7 +2,6 @@ import typing
 
 import Specifiers
 import Specifiers as TypeSpecifier
-import messages as messages
 
 
 class Attributes:
@@ -34,7 +33,6 @@ class Attributes:
         self._filename = filename
         self._line = line
         self._column = column
-        self.function_signature = []
 
     def __eq__(self, val: "Attributes") -> bool:
 
@@ -71,31 +69,44 @@ class Attributes:
     def decl_type(self):
         return self._base_type
 
-    def same_signature(self, attr: "Attributes") -> bool:
-        """
-        Compares the function signatures of two attributes.
-        :param attr: the attribute this attributes signature has to be compared against
-        :return:
-        """
+    # def same_signature(self, attr: "Attributes") -> bool:
+    #     """
+    #     Compares the function signatures of two attributes.
+    #     :param attr: the attribute this attributes signature has to be compared against
+    #     :return:
+    #     """
+    #
+    #     if self.function_signature == attr.function_signature:
+    #         return True
+    #     return False
 
-        if self.function_signature == attr.function_signature:
-            return True
-        return False
+    # def rhs_same_signature(self, type_specs, error_attr, l_id):
+    #
+    #     own_list = [attr.decl_type for attr in self.function_signature]
+    #
+    #     if own_list == type_specs:
+    #         return True
+    #
+    #     elif len(type_specs) < len(own_list):
+    #         # self._messenger.error_func_to_few_arguments(l_id, error_attr)
+    #         print("TODO Respecec msg attributes")
+    #     elif len(type_specs) > len(own_list):
+    #         # self._messenger.error_func_to_many_arguments(l_id, error_attr)
+    #         print("TODO Respecec msg attributes")
+    #     else:
+    #         # self._messenger.error_signature_does_not_match(l_id, error_attr)
+    #         print("TODO Respecec msg attributes")
+    #     return False
 
-    def rhs_same_signature(self, type_specs, error_attr, l_id):
 
-        own_list = [attr.decl_type for attr in self.function_signature]
+class AttributesGlobal(Attributes):
+    """
+    An extension on attributes for the global table
+    """
 
-        if own_list == type_specs:
-            return True
+    def __init__(self, base_type: TypeSpecifier, type_stack: typing.List[Specifiers.TypeModifier], filename: str,
+                 line: int, column: int, defined: bool):
+        super().__init__(base_type, type_stack, filename, line, column)
 
-        elif len(type_specs) < len(own_list):
-            self._messenger.error_func_to_few_arguments(l_id, error_attr)
-
-        elif len(type_specs) > len(own_list):
-            self._messenger.error_func_to_many_arguments(l_id, error_attr)
-
-        else:
-            self._messenger.error_signature_does_not_match(l_id, error_attr)
-
-        return False
+        self.function_signature = []
+        self.defined = defined
