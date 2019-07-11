@@ -65,8 +65,8 @@ if __name__ == "__main__":
 
     # If the semantic analysis fails
     if not ast.semantic_analysis():
-        sys.exit(1)
-
+        # sys.exit(1)
+        pass
     # generate the ll code
     if not args.no_code:
         main.generate_llvm(ast, path + slug)

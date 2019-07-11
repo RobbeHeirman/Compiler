@@ -31,7 +31,7 @@ def create_ast(input_file: str) -> AST.AST:
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = CParser(stream)
-    tree = parser.statements()
+    tree = parser.root()
 
     listener = CListenerExtend.CListenerExtend(input_file)
     walker = ParseTreeWalker()

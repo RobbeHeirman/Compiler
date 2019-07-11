@@ -7,7 +7,7 @@ grammar C;
     ;
 
     global_statement
-    : decl_list SEMICOLON
+    : decl_list
     | func_def
     ;
 
@@ -17,7 +17,7 @@ grammar C;
 
 statement
     : assignment
-    | decl_list SEMICOLON
+    | decl_list
     | func_def
     | ret_statement SEMICOLON
     | selection_statements
@@ -27,7 +27,7 @@ statement
     ;
 
 decl_list
-    : base_type simple_declaration (COMMA simple_declaration)*
+    : base_type simple_declaration (COMMA simple_declaration)* SEMICOLON
     ;
 
 simple_declaration // int a, char foo....

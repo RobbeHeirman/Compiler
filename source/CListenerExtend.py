@@ -24,6 +24,7 @@ import Nodes.FunctionNodes.FuncDefNode as FuncDefNode
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 import Nodes.FunctionNodes.ReturnNode as ReturnNode
 import Nodes.GlobalNodes.RootNode as RootNode
+from Nodes.GlobalNodes import GlobalDeclarationNode
 from Specifiers import ConditionType, TypeModifier, TypeSpecifier
 from gen.CListener import CListener
 from gen.CParser import CParser
@@ -47,15 +48,27 @@ class CListenerExtend(CListener):
         self._ast.root = root_node
         self._parent_node = root_node
 
+        # Will help us determine if we are in the global scope.
+        self._scope_counter = 0
+
     @property
     def ast(self):
         return self._ast
+
+    def enterRoot(self, ctx: CParser.RootContext):
+        print("hh")
 
     def enterStatements(self, ctx: CParser.StatementContext):
         """
         This is the root of our C program. It will make a root node
         :param ctx: Context of the node
         """
+
+        self._scope_counter += 1
+
+    def exitStatements(self, ctx: CParser.StatementsContext):
+
+        self._scope_counter -= 1
 
     def enterFunc_def(self, ctx: CParser.Func_defContext):
         counter = 0
@@ -116,7 +129,11 @@ class CListenerExtend(CListener):
         can identify their parent
         :param ctx: context of the node
         """
-        declaration_node = DeclarationNode.DeclarationNode(self._parent_node, self._filename, ctx)
+        print(self._scope_counter)
+        declaration_node = GlobalDeclarationNode.GlobalDeclarationNode(self._parent_node, self._filename, ctx) \
+            if self._scope_counter == 0 \
+            else DeclarationNode.DeclarationNode(self._parent_node, self._filename, ctx)
+
         self._parent_node.add_child(declaration_node)
         self._parent_node = declaration_node
 

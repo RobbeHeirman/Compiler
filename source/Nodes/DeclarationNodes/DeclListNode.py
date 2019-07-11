@@ -29,16 +29,8 @@ class DeclListNode(AbsractNode.AbstractNode):
     def label(self):
         return '{0}'.format(self._BASE_LABEL)
 
-    def _add_declaration_node(self, child: DeclarationNode.DeclarationNode):
-        self._declaration_nodes.append(child)
-
-    # This is how we mimic function overloading. Basically the node needs to know what to do with his child.
-    _ADD_OVERLOAD_MAP = {
-        DeclarationNode.DeclarationNode: _add_declaration_node,
-    }
-
     def add_child(self, child: Union[DeclarationNode.DeclarationNode], index=None):
-        self._ADD_OVERLOAD_MAP[type(child)](self, child)
+        self._declaration_nodes.append(child)
         super().add_child(child, index)
 
     def cleanup(self):
@@ -61,4 +53,3 @@ class DeclListNode(AbsractNode.AbstractNode):
             decl_node.first_pass()
 
         self._parent_node.remove_child(self)
-
