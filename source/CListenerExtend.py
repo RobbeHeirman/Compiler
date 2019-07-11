@@ -265,7 +265,7 @@ class CListenerExtend(CListener):
         self._parent_node.base_type = TypeSpecifier.INT
 
     def enterId_expression(self, ctx: CParser.Id_expressionContext):
-        id_node = IdentifierExpressionNode.IdentifierExpressionNode(self._parent_node, ctx, self._filename)
+        id_node = IdentifierExpressionNode.IdentifierExpressionNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(id_node)
         self._parent_node = id_node
 

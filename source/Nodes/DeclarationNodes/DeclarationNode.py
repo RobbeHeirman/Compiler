@@ -149,9 +149,7 @@ class DeclarationNode(TypedNode.TypedNode):
             #     ret = False
 
         # Add to the scopes symbol_table.
-        print(attr.operator_stack)
         if not self.add_to_scope_symbol_table(self.id, attr):
-            print("?")
             messenger.error_redeclaration(self.id, attr)
             ret = False
 

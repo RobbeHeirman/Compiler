@@ -15,3 +15,6 @@ class FunctionTest(SAbstractTest):
 
     def test_main_happy_day(self):
         self._run_analysis("main_happy_day.c")
+
+    def test_happy_day_regres(self):
+        return self._run_analysis("happy_day_regres.c")

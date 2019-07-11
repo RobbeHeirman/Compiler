@@ -16,7 +16,7 @@ class STestDeclaration(SAbstractTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.result_path += "semantic/"
+        self.result_path += "declaration/"
         self.path += "Declaration/"
 
         if os.path.exists(self.result_path):
@@ -40,6 +40,8 @@ class STestDeclaration(SAbstractTest):
     def test_wrong_type_init_int(self):
         self._run_analysis("wrong_type_init_int.c", 1, 2)
 
+    def test_redeclaration(self):
+        self._run_analysis("redeclaration.c", 5, 0)
 
 class LLVMTestDeclaration(LLVMAbstractTest):
 

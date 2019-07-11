@@ -12,8 +12,8 @@ import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     id: str
 
-    def __init__(self, parent_node, ctx, filename):
-        super().__init__(parent_node, ctx, filename)
+    def __init__(self, parent_node, filename, ctx):
+        super().__init__(parent_node, filename, ctx)
         self.id = ctx.getText()
         self.base_type = None
 
