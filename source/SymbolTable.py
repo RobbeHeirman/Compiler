@@ -7,8 +7,6 @@
 
 import typing
 from enum import Enum, auto
-
-import Specifiers
 import Attributes
 
 
@@ -53,7 +51,6 @@ class GlobalActions(Enum):
     """In a the global case, there are 3 actions. Do nothing, redefining error, define prev declared."""
 
     DO_NOTHING = auto()
-
     REDEFINE_ERROR = auto()
     # This is a special case. We need to restructure the AST so the definition happens on the first declare.
     DEFINE_PREV_DECLARED = ()
@@ -63,8 +60,9 @@ class GlobalSymbolTable(SymbolTable):
     """
     Extension for global variable support
     """
+    _container: typing.Dict[str, Attributes.AttributesGlobal]
 
-    def add_id(self, lexeme: str, attribute: Attributes.AttributesGlobal) -> bool:
+    def add_id(self, lexeme: str, attribute: Attributes.AttributesGlobal) -> GlobalActions:
         """
         Adds an id to the symbolic table. Returns True if adding was a success. Returns false if there is a parse error.
         For example redeclaration of a identifier is not allowed.
@@ -79,11 +77,20 @@ class GlobalSymbolTable(SymbolTable):
 
             # We can safely ignore a non defining redeclaration
             if not attribute.defined:
-                return True
-            attr = self._container[lexeme]
+                return GlobalActions.DO_NOTHING
 
-            # self._messenger.note_prev_decl(lexeme, attribute_prev)
-            return False
+            else:
+                # The following actions depend on the value in the already existing identifier
+                attr = self._container[lexeme]
 
+                # The value is already defined, so this is an error.
+                if attr.defined:
+                    return GlobalActions.REDEFINE_ERROR
+
+                # The node of the AST needs to undertake special action's because we just want to define it once.
+                else:
+                    return GlobalActions.DEFINE_PREV_DECLARED
+
+        # Not in table yet so we can safely add it.
         self._container[lexeme] = attribute
-        return True
+        return GlobalActions.DO_NOTHING

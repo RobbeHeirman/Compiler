@@ -5,7 +5,10 @@ Academic Year: 2018-2019
 """
 import LlvmCode
 import Specifiers
+from Attributes import AttributesGlobal
 from Nodes.DeclarationNodes import DeclarationNode
+from SymbolTable import GlobalActions
+from messages import MessageGenerator
 
 
 class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
@@ -21,7 +24,31 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node, filename, ctx)
 
-    # Semantic analysis
+    def semantic_analysis(self, messenger: MessageGenerator):
+
+        # Globals need a compile time constant.
+        defined = False
+        if self._expression_node:
+
+            if not self._expression_node.is_constant():
+                messenger.error_init_is_not_constant(self._filename, self._line, self._column)
+                return False
+
+            defined = True
+
+        attribute = AttributesGlobal(self.base_type, self.type_stack, self._filename, self._line, self._column, defined)
+        next_action = self.add_to_scope_symbol_table(self.id, attribute)
+
+        if next_action == GlobalActions.DO_NOTHING:
+            return True
+
+        elif next_action == GlobalActions.REDEFINE_ERROR:
+
+            return False
+
+        else:
+            print("Need to set the expression_node to the first declaration node.")
+            pass
 
     def generate_llvm(self):
 
