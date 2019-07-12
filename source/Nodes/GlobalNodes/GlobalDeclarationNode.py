@@ -43,19 +43,29 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
             defined = True
 
-        attribute = AttributesGlobal(self.base_type, self.type_stack, self._filename, self._line, self._column, defined)
+        attribute = AttributesGlobal(self.base_type, self.type_stack, self._filename, self._line, self._column, defined,
+                                     self)
         next_action = self.add_to_scope_symbol_table(self.id, attribute)
 
         if next_action == GlobalActions.DO_NOTHING:
             return True
 
+        elif next_action == GlobalActions.REMOVE_NODE:
+            # OPT: some redeclaration's just don't do anything, we can remove those nodes from the AST
+            self._parent_node.remove_child(self)
+
         elif next_action == GlobalActions.REDEFINE_ERROR:
             messenger.error_redefinition(self._filename, self._line, self._column, self.id)
             return False
 
-        else:
-            print("Need to set the expression_node to the first declaration node.")
-            pass
+        else:  # next action == DEFINE_PREV_DECLARED
+
+            # We need to add the definition to the original declaration of this symbol.
+            prev_declare_node = self.get_attribute(self.id).original_declaration_node
+            prev_declare_node.add_child(self._expression_node)
+
+            # This node is obsolete afterwards
+            self._parent_node.remove_child(self)
 
     def generate_llvm(self):
 

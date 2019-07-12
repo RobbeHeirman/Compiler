@@ -122,7 +122,7 @@ class AbstractNode(abc.ABC):
     def increment_register_index(self):
         self._parent_node.increment_register_index()
 
-    def get_attribute(self, lexeme) -> Attributes.Attributes:
+    def get_attribute(self, lexeme) -> typing.Union[Attributes.Attributes, Attributes.AttributesGlobal]:
         return self._parent_node.get_attribute(lexeme)
 
     def cleanup(self):

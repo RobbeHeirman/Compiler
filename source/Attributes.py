@@ -109,8 +109,10 @@ class AttributesGlobal(Attributes):
     """
 
     def __init__(self, base_type: TypeSpecifier, type_stack: typing.List[Specifiers.TypeModifier], filename: str,
-                 line: int, column: int, defined: bool):
+                 line: int, column: int, defined: bool, original_declaration_node):
         super().__init__(base_type, type_stack, filename, line, column)
 
         self.function_signature = []
         self.defined = defined
+
+        self.original_declaration_node = original_declaration_node

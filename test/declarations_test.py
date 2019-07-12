@@ -46,6 +46,9 @@ class STestDeclaration(SAbstractTest):
     def test_redefinition(self):
         self._run_analysis("redefinition.c", 4, 2)
 
+    def test_forward_declaration(self):
+        self._run_analysis("forward_declaration.c")
+
 
 class LLVMTestDeclaration(LLVMAbstractTest):
 
@@ -68,3 +71,6 @@ class LLVMTestDeclaration(LLVMAbstractTest):
 
     def test_ptr_happy_day(self):
         self._run_llvm("happy_day_ptr.c")
+
+    def test_forward_declaration(self):
+        self._run_llvm("forward_declaration.c")

@@ -51,6 +51,7 @@ class GlobalActions(Enum):
     """In a the global case, there are 3 actions. Do nothing, redefining error, define prev declared."""
 
     DO_NOTHING = auto()
+    REMOVE_NODE = auto()  # OPT: some redeclaration's just don't do anything, we can remove those nodes from the AST
     WRONG_TYPE = auto()
     REDEFINE_ERROR = auto()
     # This is a special case. We need to restructure the AST so the definition happens on the first declare.
@@ -84,7 +85,8 @@ class GlobalSymbolTable(SymbolTable):
 
             # We can safely ignore a non defining redeclaration
             if not attribute.defined:
-                return GlobalActions.DO_NOTHING
+                # OPT: some redeclaration's just don't do anything, we can remove those nodes from the AST
+                return GlobalActions.REMOVE_NODE
 
             else:
                 # The following actions depend on the value in the already existing identifier
