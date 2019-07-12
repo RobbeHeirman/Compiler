@@ -1,13 +1,7 @@
-import enum
 import typing
 
 import Specifiers
 import Specifiers as TypeSpecifier
-
-
-class SymbolTypes(enum.Enum):
-    FUNCTION = enum.auto()
-    DEFAULT = enum.auto()
 
 
 class Attributes:
@@ -40,16 +34,16 @@ class Attributes:
         self._line = line
         self._column = column
 
-        # Some symbol types are different. This seems to be a memory thing, prob used by linking
-        # Using this to mimic compiler for now.
-        self._symbol = SymbolTypes.FUNCTION if type_stack[-1] == Specifiers.TypeModifier.FUNC else SymbolTypes.DEFAULT
-
     def __eq__(self, val: "Attributes") -> bool:
 
         if self._base_type == val._base_type:
             if self.operator_stack == val.operator_stack:
                 return True
         return False
+
+    @property
+    def base_type(self):
+        return self._base_type
 
     @property
     def filename(self) -> str:
@@ -77,7 +71,7 @@ class Attributes:
 
     @property
     def decl_type(self):
-        return self._base_type
+        return self.base_type
 
     # def same_signature(self, attr: "Attributes") -> bool:
     #     """

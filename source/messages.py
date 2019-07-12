@@ -137,6 +137,10 @@ class MessageGenerator:
         print(self.color_scheme.FAIL + self.error_f(filename, line, column) + "initializer element is not constant"
               + self.color_scheme.ENDC)
 
+    def error_redefinition(self, filename, line, column, id):
+        print(self.color_scheme.FAIL + self.error_f(filename, line, column) + "redefinition of '" + str(id) + "'"
+              + self.color_scheme.ENDC)
+
     # Warnings
     # =======================================================================================================================
     def warning_f(self, filename, line, column):

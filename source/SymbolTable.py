@@ -51,6 +51,7 @@ class GlobalActions(Enum):
     """In a the global case, there are 3 actions. Do nothing, redefining error, define prev declared."""
 
     DO_NOTHING = auto()
+    WRONG_TYPE = auto()
     REDEFINE_ERROR = auto()
     # This is a special case. We need to restructure the AST so the definition happens on the first declare.
     DEFINE_PREV_DECLARED = ()
@@ -74,6 +75,12 @@ class GlobalSymbolTable(SymbolTable):
 
         # In the global case we can declare as much as we want, but only define once.
         if lexeme in self._container.keys():
+            attr = self._container[lexeme]
+
+            # We check if the redeclaration has the same type.
+
+            if attribute.operator_stack != attr.operator_stack or attribute.base_type != attr.base_type:
+                return GlobalActions.WRONG_TYPE
 
             # We can safely ignore a non defining redeclaration
             if not attribute.defined:
@@ -81,7 +88,6 @@ class GlobalSymbolTable(SymbolTable):
 
             else:
                 # The following actions depend on the value in the already existing identifier
-                attr = self._container[lexeme]
 
                 # The value is already defined, so this is an error.
                 if attr.defined:
@@ -92,5 +98,6 @@ class GlobalSymbolTable(SymbolTable):
                     return GlobalActions.DEFINE_PREV_DECLARED
 
         # Not in table yet so we can safely add it.
+
         self._container[lexeme] = attribute
         return GlobalActions.DO_NOTHING

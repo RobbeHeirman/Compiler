@@ -5,6 +5,7 @@ Academic Year: 2018-2019
 """
 
 import Nodes.AbstractNodes.ScopedNode as ScopedNode
+import SymbolTable
 
 
 class RootNode(ScopedNode.ScopedNode):
@@ -15,6 +16,8 @@ class RootNode(ScopedNode.ScopedNode):
 
     def __init__(self):
         super().__init__()
+
+        self._symbol_table = SymbolTable.GlobalSymbolTable()
 
     def is_in_table(self, lexeme: str) -> bool:
         """

@@ -17,7 +17,7 @@ class STestDeclaration(SAbstractTest):
         super().__init__(*args, **kwargs)
 
         self.result_path += "declaration/"
-        self.path += "Declaration/"
+        self.path += "GlobalDeclaration/"
 
         if os.path.exists(self.result_path):
             shutil.rmtree(self.result_path)
@@ -41,14 +41,14 @@ class STestDeclaration(SAbstractTest):
         self._run_analysis("wrong_type_init_int.c", 1, 2)
 
     def test_redeclaration(self):
-        self._run_analysis("redeclaration.c", 5, 0)
+        self._run_analysis("redeclaration_init.c", 5, 0)
 
 class LLVMTestDeclaration(LLVMAbstractTest):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.result_path += "declarations/"
-        self.path += "Declaration/"
+        self.path += "GlobalDeclaration/"
 
         if not os.path.exists(self.result_path):
             os.makedirs(self.result_path)

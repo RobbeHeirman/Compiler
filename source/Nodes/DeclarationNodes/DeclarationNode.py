@@ -12,13 +12,12 @@ import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 import Attributes as Attributes
 import typing
 
-import Specifiers
 from messages import MessageGenerator
 
 
 class DeclarationNode(TypedNode.TypedNode):
     """
-    Represents a Declaration in our abstract syntax tree.
+    Represents a GlobalDeclaration in our abstract syntax tree.
     Will deduct the base type of the declaration in the first pass.
     Has 1 or 2 children a declarator (will become a stack of pre and postfix type specifiers after first pass)
     An optional initializer as 2d child.
@@ -26,7 +25,7 @@ class DeclarationNode(TypedNode.TypedNode):
     _type_modifier_node: "TypeModifierNode"
     _lexeme: str
 
-    _BASE_LABEL = "Declaration"
+    _BASE_LABEL = "GlobalDeclaration"
 
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node)
@@ -191,8 +190,8 @@ class DeclarationNode(TypedNode.TypedNode):
         for _type in self.type_stack:
             type_modifier_str += _type.value
 
-        ret = self.indent_string() + "; Declaration: {0}{1} {2}\n".format(self.base_type.value, type_modifier_str,
-                                                                          self.id)
+        ret = self.indent_string() + "; GlobalDeclaration: {0}{1} {2}\n".format(self.base_type.value, type_modifier_str,
+                                                                                self.id)
 
         # # Special types need other llvm code first
         # if self._type_stack and self._type_stack[-1] is TypeModifierNode.TypeModifier.ARRAY:

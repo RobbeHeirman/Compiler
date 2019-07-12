@@ -27,12 +27,19 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
     def semantic_analysis(self, messenger: MessageGenerator):
 
         # Globals need a compile time constant.
+        self._generate_type_modifier_stack()
         defined = False
         if self._expression_node:
+            # Expression semantics still need to be right
+            if not self._expression_node.semantic_analysis(messenger):
+                return False
 
+            # Need a constant
             if not self._expression_node.is_constant():
                 messenger.error_init_is_not_constant(self._filename, self._line, self._column)
                 return False
+
+            self.analyze_initializer(messenger)
 
             defined = True
 
@@ -43,7 +50,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             return True
 
         elif next_action == GlobalActions.REDEFINE_ERROR:
-
+            messenger.error_redefinition(self._filename, self._line, self._column, self.id)
             return False
 
         else:
