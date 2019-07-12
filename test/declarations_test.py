@@ -41,7 +41,11 @@ class STestDeclaration(SAbstractTest):
         self._run_analysis("wrong_type_init_int.c", 1, 2)
 
     def test_redeclaration(self):
-        self._run_analysis("redeclaration_init.c", 5, 0)
+        self._run_analysis("redeclaration_init.c", 0, 0)
+
+    def test_redefinition(self):
+        self._run_analysis("redefinition.c", 4, 2)
+
 
 class LLVMTestDeclaration(LLVMAbstractTest):
 
