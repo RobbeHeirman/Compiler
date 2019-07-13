@@ -79,14 +79,13 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             messenger.error_redefinition(self._filename, self._line, self._column, self.id)
             return False
 
+        elif next_action == GlobalActions.WRONG_TYPE:
+            messenger.error_conflicting_types(self._filename, self._line, self._column, self.id)
+            return False
+
         else:  # next action == DEFINE_PREV_DECLARED
             prev_declare = self.get_attribute(self.id)
-            if func_signature is not None and prev_declare.function_signature != func_signature:
-                messenger.error_conflicting_types(self._filename, self._line, self._column, self.id)
-                return False
-
             prev_declare.original_declaration_node.add_child(self._expression_node)
-
             # This node is obsolete afterwards
             self._parent_node.remove_child(self)
 

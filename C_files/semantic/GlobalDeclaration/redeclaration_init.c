@@ -13,5 +13,4 @@ int *d;
 char *d;
 
 
-float* e;
-int e;
+

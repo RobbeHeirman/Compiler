@@ -1,7 +1,2 @@
-int bla(int a);
-
-int bla (int a, int b){
-
-}
-
-
+int a;
+int *a;

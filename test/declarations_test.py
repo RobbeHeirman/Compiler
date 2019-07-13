@@ -49,6 +49,9 @@ class STestDeclaration(SAbstractTest):
     def test_forward_declaration(self):
         self._run_analysis("forward_declaration.c")
 
+    def test_conflict_types(self):
+        self._run_analysis("conflict_types.c", 7)
+
 
 class LLVMTestDeclaration(LLVMAbstractTest):
 

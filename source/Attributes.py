@@ -116,3 +116,9 @@ class AttributesGlobal(Attributes):
         self.defined = defined
 
         self.original_declaration_node = original_declaration_node
+
+    def __eq__(self, o):
+        if super().__eq__(o):
+            if self.function_signature == o.function_signature:
+                return True
+        return False

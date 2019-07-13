@@ -57,7 +57,6 @@ class GlobalActions(Enum):
     # This is a special case. We need to restructure the AST so the definition happens on the first declare.
     DEFINE_PREV_DECLARED = ()
 
-
 class GlobalSymbolTable(SymbolTable):
     """
     Extension for global variable support
@@ -78,8 +77,7 @@ class GlobalSymbolTable(SymbolTable):
             attr = self._container[lexeme]
 
             # We check if the redeclaration has the same type.
-
-            if attribute.operator_stack != attr.operator_stack or attribute.base_type != attr.base_type:
+            if attribute != attr:
                 return GlobalActions.WRONG_TYPE
 
             # We can safely ignore a non defining redeclaration
