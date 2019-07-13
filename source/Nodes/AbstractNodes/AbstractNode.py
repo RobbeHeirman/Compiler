@@ -38,6 +38,9 @@ class AbstractNode(abc.ABC):
             self._line = start.line
             self._column = start.column
 
+        # Flag that we can remove the noe from the AST
+        self._remove_me = False
+
     @property
     def index(self):
         return self._index
@@ -132,6 +135,19 @@ class AbstractNode(abc.ABC):
         """
         raise Exception("{0} type does not have cleanup implemented".format(type(self)))
 
+    def is_obsolete(self):
+        return self._remove_me
+
+    def _remove_obsoletes(self):
+        """
+        Some nodes become obesolete after analysis. This function safely removes all nodes that set their up for
+        removal flag
+        :return:
+        """
+        [child._remove_obsoletes() for child in reversed(self._children)]
+        if self.is_obsolete():
+            self._parent_node.remove_child(self)
+
     def first_pass(self):
         """
         AST cleanup.
@@ -146,11 +162,8 @@ class AbstractNode(abc.ABC):
         this function NEEDS to be overwritten by nodes who do check on semantics.
         :return: Returns the amount of errors generated.
         """
-        ret = True
-        for child in self._children:
-            if not child.semantic_analysis(messenger):
-                ret = False
-
+        ret = any([child.semantic_analysis(messenger) for child in self._children])
+        self._remove_obsoletes()
         return ret
 
     def generate_llvm(self) -> str:

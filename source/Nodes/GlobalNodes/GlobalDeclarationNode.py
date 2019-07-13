@@ -65,7 +65,6 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
         :param attribute:
         :return:
         """
-
         next_action = self._parent_node.add_to_scope_symbol_table(self.id, attribute)
         if next_action == GlobalActions.DO_NOTHING:
             return True
@@ -73,7 +72,9 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
         elif next_action == GlobalActions.REMOVE_NODE:
 
             # OPT: some redeclaration's just don't do anything, we can remove those nodes from the AST
-            self._parent_node.remove_child(self)
+            self._remove_me = True
+            print(self._remove_me)
+            return True
 
         elif next_action == GlobalActions.REDEFINE_ERROR:
             messenger.error_redefinition(self._filename, self._line, self._column, self.id)
@@ -87,7 +88,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             prev_declare = self.get_attribute(self.id)
             prev_declare.original_declaration_node.add_child(self._expression_node)
             # This node is obsolete afterwards
-            self._parent_node.remove_child(self)
+            self._remove_me = True
 
         return True
 
