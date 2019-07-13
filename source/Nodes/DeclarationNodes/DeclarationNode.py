@@ -79,6 +79,9 @@ class DeclarationNode(TypedNode.TypedNode):
         elif isinstance(child, ExpressionNode.ExpressionNode) or isinstance(child, ArrayInitNode.ArrayInitNode):
             self._expression_node = child
 
+        elif child is None:
+            print("happens")
+
         super().add_child(child)
 
     def remove_child(self, child):

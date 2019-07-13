@@ -1,6 +1,7 @@
-int main(){
+int bla(int a);
+
+int bla (int a, int b){
+
 }
 
-int a(){
 
-}

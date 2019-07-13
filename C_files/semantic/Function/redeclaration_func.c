@@ -1,8 +1,9 @@
-"""
-Author: Robbe Heirman
-Project: Simple C Compiler
-Academic Year: 2018-2019
-"""
+
 
 int a();
-int a();
+int a(); // This is allowed
+
+int a(int a, int b){
+
+    return 12;
+}

@@ -8,18 +8,19 @@ import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.AbstractNodes.ScopedNode as ScopedNode
 import Nodes.FunctionNodes.ReturnNode as ReturnNode
 import Nodes.GlobalNodes.GlobalDeclarationNode as GlobalDeclarationNode
+from Attributes import AttributesGlobal
+from Nodes.FunctionNodes.ParamListNode import ParamListNode
+from Nodes.GlobalNodes.StatementsNode import StatementsNode
 
 
 class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
     _id: str
 
     def __init__(self, parent_node: AbstractNode.AbstractNode, filename, ctx):
-
         super().__init__(parent_node, filename, ctx)
 
-        self.base_type = None
-        self._return_node = None
-        self._type_stack = None
+        self._param_list_node = None
+        self._function_signature = []
 
     @property
     def label(self):
@@ -27,8 +28,11 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
     def add_child(self, child, index=None):
 
-        if isinstance(child, ReturnNode.ReturnNode):
-            self._return_node = child
+        if isinstance(child, StatementsNode):
+            self._expression_node = child
+
+        elif isinstance(child, ParamListNode):
+            self._param_list_node = child
 
         super().add_child(child, index)
 
@@ -40,13 +44,22 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         2) The parameters are declared variables belonging to the scope of this function.
         :return: If the semantic analysis is correct.
         """
-        ret = super().semantic_analysis(messenger)
 
-        # if self._return_node and not self._return_node.has_return():
-        #     messenger.error_non_void_return(self._id, self._filename, self._line, self._column)
-        #     ret = False
+        # Check if the children are playing nice
+        for child in self._children:
+            if not child.semantic_analysis(messenger):
+                return False
 
-        return ret
+        self._generate_type_modifier_stack()
+
+        self._function_signature = self._param_list_node.get_function_signature()
+        attribute = AttributesGlobal(self.base_type, self._type_stack, self._filename, self._line, self._column,
+                                     True,
+                                     self)
+
+        attribute.function_signature = self._function_signature
+
+        return self._add_to_table(attribute, messenger, self._function_signature)
 
     def generate_llvm(self):
         self.increment_register_index()
@@ -56,8 +69,8 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         for child in self._children[1:]:
             ret += child.generate_llvm()
 
-        if self._return_node is None:
-            ret += self.indent_string() + "  ret {0} 0\n".format(self.base_type.llvm_type)
+        # if self._return_node is None:
+        #     ret += self.indent_string() + "  ret {0} 0\n".format(self.base_type.llvm_type)
 
         ret += "}\n"
         self.__class__._indent_level -= 1

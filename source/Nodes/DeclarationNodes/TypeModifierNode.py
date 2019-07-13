@@ -63,11 +63,6 @@ class TypeModifierNode(AbstractNode.AbstractNode):
 
         super().add_child(child)
 
-    # def remove_child(self, child):
-    #     if isinstance(child, TypeModifierNode):
-    #         self._declarator_node = None
-    #     super().remove_child(child)
-
     def add_id(self, identifier: str):
         """
         Will propagate an added id to the declaration node

@@ -48,9 +48,25 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
                                      defined,
                                      self)
 
-        # adding to the parent's symbol table prevents from global nodes with own symbol tables to add themselves.
-        next_action = self._parent_node.add_to_scope_symbol_table(self.id, attribute)
+        # Function types have something extra, their function signature need to be recorded
+        function_signature = None
+        if self._type_stack and self._type_stack[-1] == Specifiers.TypeModifier.FUNC:
+            function_signature = self._type_modifier_node.get_function_signature()
 
+            attribute.function_signature = function_signature
+
+        self._add_to_table(attribute, messenger, function_signature)
+
+        # adding to the parent's symbol table prevents from global nodes with own symbol tables to add themselves.
+
+    def _add_to_table(self, attribute, messenger, func_signature) -> bool:
+        """
+        The actions performed by response of the symbol table are the same for all global declarations
+        :param attribute:
+        :return:
+        """
+
+        next_action = self._parent_node.add_to_scope_symbol_table(self.id, attribute)
         if next_action == GlobalActions.DO_NOTHING:
             return True
 
@@ -64,13 +80,17 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             return False
 
         else:  # next action == DEFINE_PREV_DECLARED
-            # print("something here??")
-            # We need to add the definition to the original declaration of this symbol.
-            prev_declare_node = self.get_attribute(self.id).original_declaration_node
-            prev_declare_node.add_child(self._expression_node)
+            prev_declare = self.get_attribute(self.id)
+            if func_signature is not None and prev_declare.function_signature != func_signature:
+                messenger.error_conflicting_types(self._filename, self._line, self._column, self.id)
+                return False
+
+            prev_declare.original_declaration_node.add_child(self._expression_node)
 
             # This node is obsolete afterwards
             self._parent_node.remove_child(self)
+
+        return True
 
     def generate_llvm(self):
 
