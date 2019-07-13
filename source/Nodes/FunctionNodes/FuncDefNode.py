@@ -3,18 +3,14 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-import sys
 
-from antlr4 import ParserRuleContext
-
-import messages
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.AbstractNodes.ScopedNode as ScopedNode
 import Nodes.FunctionNodes.ReturnNode as ReturnNode
-import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
+import Nodes.GlobalNodes.GlobalDeclarationNode as GlobalDeclarationNode
 
 
-class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
+class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
     _id: str
 
     def __init__(self, parent_node: AbstractNode.AbstractNode, filename, ctx):
@@ -36,13 +32,6 @@ class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
 
         super().add_child(child, index)
 
-    def _make_attribute(self):
-
-        attr = super()._make_attribute()
-        signature = self._children[0].get_function_signature()
-        attr.function_signature = signature
-        return attr
-
     def semantic_analysis(self, messenger) -> bool:
         """
         Semantic analysis of a function definition.
@@ -53,10 +42,9 @@ class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
         """
         ret = super().semantic_analysis(messenger)
 
-
-        if self._return_node and not self._return_node.has_return():
-            messenger.error_non_void_return(self._id, self._filename, self._line, self._column)
-            ret = False
+        # if self._return_node and not self._return_node.has_return():
+        #     messenger.error_non_void_return(self._id, self._filename, self._line, self._column)
+        #     ret = False
 
         return ret
 
@@ -64,7 +52,7 @@ class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
         self.increment_register_index()
         ret = self.indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self.id)
         ret += "{0}){{\n".format(self._children[0].generate_llvm())
-        AbstractNode.AbstractNode._indent_level += 1
+        self.__class__._indent_level += 1
         for child in self._children[1:]:
             ret += child.generate_llvm()
 
@@ -72,8 +60,5 @@ class FuncDefNode(ScopedNode.ScopedNode, DeclarationNode.DeclarationNode):
             ret += self.indent_string() + "  ret {0} 0\n".format(self.base_type.llvm_type)
 
         ret += "}\n"
-
-        if ret is False:
-            self._error_counter += 1
-
+        self.__class__._indent_level -= 1
         return ret

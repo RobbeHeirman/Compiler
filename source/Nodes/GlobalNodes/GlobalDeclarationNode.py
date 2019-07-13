@@ -18,7 +18,8 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
         Specifiers.TypeSpecifier.INT: 0,
         Specifiers.TypeSpecifier.FLOAT: 0.0,
         Specifiers.TypeSpecifier.CHAR: 0,
-        Specifiers.TypeModifier.PTR: "null"
+        Specifiers.TypeModifier.PTR: "null",
+        Specifiers.TypeModifier.FUNC: "null"
     }
 
     def __init__(self, parent_node, filename, ctx):
@@ -43,14 +44,18 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
             defined = True
 
-        attribute = AttributesGlobal(self.base_type, self.type_stack, self._filename, self._line, self._column, defined,
+        attribute = AttributesGlobal(self.base_type, self._type_stack, self._filename, self._line, self._column,
+                                     defined,
                                      self)
-        next_action = self.add_to_scope_symbol_table(self.id, attribute)
+
+        # adding to the parent's symbol table prevents from global nodes with own symbol tables to add themselves.
+        next_action = self._parent_node.add_to_scope_symbol_table(self.id, attribute)
 
         if next_action == GlobalActions.DO_NOTHING:
             return True
 
         elif next_action == GlobalActions.REMOVE_NODE:
+
             # OPT: some redeclaration's just don't do anything, we can remove those nodes from the AST
             self._parent_node.remove_child(self)
 
@@ -59,7 +64,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             return False
 
         else:  # next action == DEFINE_PREV_DECLARED
-
+            # print("something here??")
             # We need to add the definition to the original declaration of this symbol.
             prev_declare_node = self.get_attribute(self.id).original_declaration_node
             prev_declare_node.add_child(self._expression_node)

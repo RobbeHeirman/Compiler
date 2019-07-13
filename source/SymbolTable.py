@@ -73,7 +73,6 @@ class GlobalSymbolTable(SymbolTable):
         :param lexeme: The lexeme, the name of the identifier
         :return: True if this action is allowed, False if not.
         """
-
         # In the global case we can declare as much as we want, but only define once.
         if lexeme in self._container.keys():
             attr = self._container[lexeme]

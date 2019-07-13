@@ -25,7 +25,7 @@ class DeclarationNode(TypedNode.TypedNode):
     _type_modifier_node: "TypeModifierNode"
     _lexeme: str
 
-    _BASE_LABEL = "GlobalDeclaration"
+    _BASE_LABEL = "Declaration"
 
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node)

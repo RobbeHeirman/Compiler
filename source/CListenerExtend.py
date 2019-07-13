@@ -126,6 +126,7 @@ class CListenerExtend(CListener):
         can identify their parent
         :param ctx: context of the node
         """
+
         declaration_node = GlobalDeclarationNode.GlobalDeclarationNode(self._parent_node, self._filename, ctx) \
             if self._scope_counter == 0 \
             else DeclarationNode.DeclarationNode(self._parent_node, self._filename, ctx)

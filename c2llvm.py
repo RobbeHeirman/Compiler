@@ -67,6 +67,7 @@ if __name__ == "__main__":
     if not ast.semantic_analysis():
         # sys.exit(1)
         pass
+    main.generate_ast_visuals(ast, path + slug + "2")
     # generate the ll code
     if not args.no_code:
         main.generate_llvm(ast, path + slug)
