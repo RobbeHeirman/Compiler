@@ -23,7 +23,15 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
     @property
     def label(self):
-        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, self.base_type.value)
+        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, self._type_stack[0])
+
+    @property
+    def base_type(self):
+        return self._type_stack[0]
+
+    @base_type.setter
+    def base_type(self, tp):
+        self._type_stack.append(tp)
 
     def add_child(self, child, index=None):
 
@@ -49,16 +57,16 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
             if not child.semantic_analysis(messenger):
                 return False
 
-        self._generate_type_modifier_stack()
+        self._generate_type_modifier_stack(messenger)
 
         self._function_signature = self._param_list_node.get_function_signature()
-        attribute = AttributesGlobal(self.base_type, self._type_stack, self._filename, self._line, self._column,
+        attribute = AttributesGlobal(self._type_stack, self._filename, self._line, self._column,
                                      True,
                                      self)
 
         attribute.function_signature = self._function_signature
 
-        return self._add_to_table(attribute, messenger, self._function_signature)
+        return self._add_to_table(attribute, messenger)
 
     def get_return_type(self):
 
