@@ -275,13 +275,15 @@ class CListenerExtend(CListener):
 
     def enterCharacter_constant(self, ctx: CParser.Character_constantContext):
         self._parent_node: ConstantExpressionNode.ConstantExpressionNode
-        self._parent_node.base_type = TypeSpecifier.CHAR
+        self._parent_node.add_base_type(TypeSpecifier.CHAR)
 
     def enterFloating_constant(self, ctx: CParser.Floating_constantContext):
-        self._parent_node.base_type = TypeSpecifier.FLOAT
+        self._parent_node: ConstantExpressionNode.ConstantExpressionNode
+        self._parent_node.add_base_type(TypeSpecifier.FLOAT)
 
     def enterInteger_constant(self, ctx: CParser.Integer_constantContext):
-        self._parent_node.base_type = TypeSpecifier.INT
+        self._parent_node: ConstantExpressionNode.ConstantExpressionNode
+        self._parent_node.add_base_type(TypeSpecifier.INT)
 
     def enterId_expression(self, ctx: CParser.Id_expressionContext):
         id_node = IdentifierExpressionNode.IdentifierExpressionNode(self._parent_node, self._filename, ctx)

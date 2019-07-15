@@ -28,12 +28,10 @@ class DeclarationNode(TypedNode.TypedNode):
     _BASE_LABEL = "Declaration"
 
     def __init__(self, parent_node, filename, ctx):
-        super().__init__(parent_node)
+        super().__init__(parent_node, filename, ctx)
 
         self.id = None
-
         self._expression_node = None
-
         # Error message info
         self._filename = filename
         start = ctx.start
@@ -43,24 +41,23 @@ class DeclarationNode(TypedNode.TypedNode):
     @property
     def label(self):
         ret_label = self._BASE_LABEL
-        if self.base_type is not None:
-            ret_label += "\\nBase type: {0}".format(self.base_type.value)
+        if self._type_stack:
+            ret_label += f"\\nBase type: {self._type_stack[0]}"
 
         if self.id is not None:
-            ret_label += "\\n Identifier: {0}".format(self.id)
+            ret_label += f"\\n Identifier: {self.id}"
 
         return ret_label
 
     @property
     def type_string_llvm(self):
-        return self.base_type.llvm_type + "*" * len(self._type_stack)
+        return self._type_stack[0].llvm_type + "*" * len(self._type_stack)
 
     def to_attribute(self):
         op_stack = []
         if self._type_modifier_node:
             op_stack = self._type_modifier_node.generate_type_operator_stack()
-        return Attributes.Attributes(self.base_type, op_stack,
-                                     self._filename, self._line, self._column)
+        return Attributes.Attributes(op_stack, self._filename, self._line, self._column)
 
     def add_id(self, identifier):
 
@@ -100,7 +97,7 @@ class DeclarationNode(TypedNode.TypedNode):
         ret = True
         self._generate_type_modifier_stack()
         # We have all the info for the corresponding attribute object
-        attr = Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
+        attr = self._make_attribute()
 
         # Check of the expression is semantically correct
         if self._expression_node:
@@ -154,10 +151,10 @@ class DeclarationNode(TypedNode.TypedNode):
         expression_stack = self._expression_node.type_stack
         for element in reversed(self._type_stack):
 
-            if expression_stack and element == expression_stack[-1]:
+            if element == expression_stack[-1]:
                 expression_stack.pop()
 
-            # For now this means we have an implicit conversion from (int, char, float) to ptr
+            #
             else:
                 print(messenger.warning_init_makes_a_from_b(self._expression_node.base_type.value,
                                                             self._type_stack[-1].value,
@@ -165,25 +162,12 @@ class DeclarationNode(TypedNode.TypedNode):
                                                             self._line,
                                                             self._column))
                 break
-        if expression_stack:
-            print(messenger.warning_init_makes_a_from_b(self.base_type.value,
-                                                        expression_stack[-1].value,
-                                                        self._filename,
-                                                        self._line,
-                                                        self._column))
-
-        elif self.base_type != self._expression_node.base_type:
-            print(messenger.warning_init_makes_a_from_b(a_type=self._expression_node.base_type.value,
-                                                        b_type=self.base_type.value,
-                                                        filename=self._filename,
-                                                        line=self._line,
-                                                        column=self._column))
 
         return True
         # TODO mechanism to inform expression node of conversion
 
     def _make_attribute(self):
-        return Attributes.Attributes(self.base_type, self._type_stack, self._filename, self._line, self._column)
+        return Attributes.Attributes(self._type_stack, self._filename, self._line, self._column)
 
     def generate_llvm(self) -> str:
         """"
@@ -193,8 +177,8 @@ class DeclarationNode(TypedNode.TypedNode):
         for _type in self.type_stack:
             type_modifier_str += _type.value
 
-        ret = self.indent_string() + "; GlobalDeclaration: {0}{1} {2}\n".format(self.base_type.value, type_modifier_str,
-                                                                                self.id)
+        ret = self.indent_string() + "; Declaration: {0}{1} {2}\n".format(self._type_stack[0].value, type_modifier_str,
+                                                                          self.id)
 
         # # Special types need other llvm code first
         # if self._type_stack and self._type_stack[-1] is TypeModifierNode.TypeModifier.ARRAY:
@@ -209,21 +193,13 @@ class DeclarationNode(TypedNode.TypedNode):
 
         # else:
 
-        ret += LlvmCode.llvm_allocate_instruction(self.id, self.base_type, self._type_stack, self.indent_string())
+        ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.indent_string())
 
         if self._expression_node is not None:
             ret += self.indent_string() + "; = ...\n"
             ret += self._expression_node.generate_llvm()
             if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
-                ret += LlvmCode.llvm_store_instruction(
-                    self.base_type,
-                    str(self.register_index),
-                    self._type_stack,
-
-                    self.base_type,
-                    self.id,
-                    self._type_stack,
-                    self.indent_string()
-                )
+                ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, self.id,
+                                                       self._type_stack, self.indent_string())
         ret += self.indent_string() + "; end declaration\n"
         return ret

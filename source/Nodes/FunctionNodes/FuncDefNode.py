@@ -62,7 +62,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
     def get_return_type(self):
 
-        return self.base_type, self._type_stack
+        return self._type_stack
 
     def generate_llvm(self):
         self.increment_register_index()

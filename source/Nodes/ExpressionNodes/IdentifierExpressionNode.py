@@ -15,9 +15,9 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node, filename, ctx)
         self.id = ctx.getText()
-        self.base_type = None
-
         self._l_value = True  # As it's base form an identifier is an Lvalue
+
+        self._type_stack = self.get_attribute(self.id).operator_stack
 
     @property
     def label(self) -> str:
@@ -32,7 +32,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         ret = True
         if self.is_in_table(self.id):
             attr = self.get_attribute(self.id)
-            self.base_type = attr.decl_type  # this is the base type
             # Now we need to check if the operations done on the identifier are legal
             if not self._stack_analysis(messenger, attr.operator_stack):
                 ret = False

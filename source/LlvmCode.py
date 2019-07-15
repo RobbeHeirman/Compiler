@@ -19,11 +19,10 @@ def convert_operator_stack_to_str(operator_stack: typing.List[Specifiers.TypeMod
     return ret_str
 
 
-def llvm_allocate_instruction(target_register: str, spec_type: Specifiers.TypeModifier, operator_stack,
+def llvm_allocate_instruction(target_register: str, operator_stack,
                               indent_string: str) -> str:
     """
     :param target_register:
-    :param spec_type:
     :param operator_stack:
     :param indent_string:
     :return: Code string
@@ -32,21 +31,19 @@ def llvm_allocate_instruction(target_register: str, spec_type: Specifiers.TypeMo
     operator_string = convert_operator_stack_to_str(operator_stack)
 
     return indent_string + "%{0} = alloca {1}{2}\n".format(
-        target_register, spec_type.llvm_type, operator_string)
+        target_register, operator_stack[0].llvm_type, operator_string)
 
 
-def llvm_store_instruction(source_type: Specifiers.TypeModifier, source_register: str,
+def llvm_store_instruction(source_register: str,
                            source_operator_stack: typing.List[Specifiers.TypeModifier],
-                           target_type: Specifiers.TypeModifier, target_register: str,
+                           target_register: str,
                            target_operator_stack: typing.List[Specifiers.TypeModifier],
                            indent_string: str) -> str:
     """
 
     :param indent_string: The indentation string of the code
-    :param source_type: The type specifier of the source value
     :param source_register: The register of the source
     :param source_operator_stack: The extra operator stack (*, [], () ...)
-    :param target_type: Type of the target where we store.
     :param target_register: Register of target.
     :param target_operator_stack: Target's operator stack.
     :return: a String of result llvm code
@@ -54,10 +51,10 @@ def llvm_store_instruction(source_type: Specifiers.TypeModifier, source_register
     s_operator_string = convert_operator_stack_to_str(source_operator_stack)
     t_operator_string = convert_operator_stack_to_str(target_operator_stack)
     ret = indent_string + "store {0}{1} %{2}, {3}{4}* %{5}\n".format(
-        source_type.llvm_type,
+        source_operator_stack[0].llvm_type,
         s_operator_string,
         source_register,
-        target_type.llvm_type,
+        target_operator_stack[0].llvm_type,
         t_operator_string,
         target_register,
         # source_type.llvm_alignment
@@ -65,29 +62,24 @@ def llvm_store_instruction(source_type: Specifiers.TypeModifier, source_register
     return ret
 
 
-def llvm_store_instruction_c(source_type: Specifiers.TypeModifier, source_constant: str,
-                             source_operator_stack: typing.List[Specifiers.TypeModifier],
-                             target_type: Specifiers.TypeModifier, target_register: str,
-                             target_operator_stack: typing.List[Specifiers.TypeModifier],
-                             indent_string: str) -> str:
+def llvm_store_instruction_c(source_type, source_constant: str, target_type, target_register: str, indent_string: str) \
+        -> str:
     """
 
     :param indent_string: The indentation string of the code
     :param source_type: The type specifier of the source value
     :param source_constant: The source constant
-    :param source_operator_stack: The extra operator stack (*, [], () ...)
     :param target_type: Type of the target where we store.
     :param target_register: Register of target.
-    :param target_operator_stack: Target's operator stack.
     :return: a String of result llvm code
     """
-    s_operator_string = convert_operator_stack_to_str(source_operator_stack)
-    t_operator_string = convert_operator_stack_to_str(target_operator_stack)
+    s_operator_string = convert_operator_stack_to_str(source_type)
+    t_operator_string = convert_operator_stack_to_str(target_type)
     ret = indent_string + "store {0}{1} {2}, {3}{4}* %{5}\n".format(
-        source_type.llvm_type,
+        source_type[0].llvm_type,
         s_operator_string,
         source_constant,
-        target_type.llvm_type,
+        target_type[0].llvm_type,
         t_operator_string,
         target_register
         # source_type.llvm_alignment
@@ -131,11 +123,11 @@ def llvm_load_instruction(source_type: Specifiers.TypeModifier, source_register:
 # Global
 # ======================================================================================================================
 
-def llvm_allocate_instruction_global(target_register: str, spec_type: Specifiers.TypeModifier, operator_stack, val,
+def llvm_allocate_instruction_global(target_register: str, operator_stack, val,
                                      indent_string: str) -> str:
     """
+    :param val:
     :param target_register:
-    :param spec_type:
     :param operator_stack:
     :param indent_string:
     :return: Code string
@@ -144,4 +136,4 @@ def llvm_allocate_instruction_global(target_register: str, spec_type: Specifiers
     operator_string = convert_operator_stack_to_str(operator_stack)
 
     return indent_string + "@{0} = global {1}{2} {3}\n".format(
-        target_register, spec_type.llvm_type, operator_string, val)
+        target_register, operator_stack[0].llvm_type, operator_string, val)

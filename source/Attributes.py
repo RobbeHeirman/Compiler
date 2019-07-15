@@ -17,28 +17,24 @@ class Attributes:
     _line: int
     _filename: str
 
-    def __init__(self, base_type: TypeSpecifier, type_stack: typing.List[Specifiers.TypeModifier],
+    def __init__(self, type_stack: typing.List[Specifiers.TypeModifier],
                  filename: str, line: int, column: int):
         """
         Initializer
-        :param base_type: The type_specifier attribute for this token.
         :param type_stack: The operators applied on the declaration (*, [], ())
         :param filename: name of the file lexeme is found
         :param line: the line where de lexeme is found.
         :param column: the column where the lexeme is found.
         """
 
-        self._base_type = base_type
         self.operator_stack = type_stack  # Stacks all the declared operators operators
         self._filename = filename
         self._line = line
         self._column = column
 
     def __eq__(self, val: "Attributes") -> bool:
-
-        if self._base_type == val._base_type:
-            if self.operator_stack == val.operator_stack:
-                return True
+        if self.operator_stack == val.operator_stack:
+            return True
         return False
 
     @property
@@ -93,13 +89,13 @@ class Attributes:
     #
     #     elif len(type_specs) < len(own_list):
     #         # self._messenger.error_func_to_few_arguments(l_id, error_attr)
-    #         print("TODO Respecec msg attributes")
+    #         print("TODO Respect msg attributes")
     #     elif len(type_specs) > len(own_list):
     #         # self._messenger.error_func_to_many_arguments(l_id, error_attr)
-    #         print("TODO Respecec msg attributes")
+    #         print("TODO Respect msg attributes")
     #     else:
     #         # self._messenger.error_signature_does_not_match(l_id, error_attr)
-    #         print("TODO Respecec msg attributes")
+    #         print("TODO Respect msg attributes")
     #     return False
 
 
@@ -108,9 +104,9 @@ class AttributesGlobal(Attributes):
     An extension on attributes for the global table
     """
 
-    def __init__(self, base_type: TypeSpecifier, type_stack: typing.List[Specifiers.TypeModifier], filename: str,
+    def __init__(self, type_stack: typing.List[Specifiers.TypeModifier], filename: str,
                  line: int, column: int, defined: bool, original_declaration_node):
-        super().__init__(base_type, type_stack, filename, line, column)
+        super().__init__(type_stack, filename, line, column)
 
         self.function_signature = []
         self.defined = defined

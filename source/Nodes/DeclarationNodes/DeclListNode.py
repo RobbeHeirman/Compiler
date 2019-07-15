@@ -5,12 +5,12 @@ Academic Year: 2018-2019
 """
 from typing import List, Union
 
-import Nodes.AbstractNodes.AbstractNode as AbsractNode
+import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
 from Specifiers import TypeSpecifier
 
 
-class DeclListNode(AbsractNode.AbstractNode):
+class DeclListNode(AbstractNode.AbstractNode):
     """
     Start of a , separated list of declarations.
     this such nodes has ONE base type and a list of declarations
@@ -46,7 +46,7 @@ class DeclListNode(AbsractNode.AbstractNode):
 
         index = self._parent_node.get_child_index(self)
         for decl_node in self._declaration_nodes:
-            decl_node.base_type = self.base_type
+            decl_node.set_base_type(self.base_type)
             decl_node.parent_node = self._parent_node
             self._parent_node.add_child(decl_node, index)
             index += 1

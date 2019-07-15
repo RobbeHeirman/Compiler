@@ -28,7 +28,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
     def semantic_analysis(self, messenger: MessageGenerator):
 
         # Globals need a compile time constant.
-        self._generate_type_modifier_stack()
+        self._generate_type_modifier_stack(messenger)
         defined = False
         if self._expression_node:
             # Expression semantics still need to be right
@@ -44,22 +44,21 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
             defined = True
 
-        attribute = AttributesGlobal(self.base_type, self._type_stack, self._filename, self._line, self._column,
+        attribute = AttributesGlobal(self._type_stack, self._filename, self._line, self._column,
                                      defined,
                                      self)
 
         # Function types have something extra, their function signature need to be recorded
-        function_signature = None
         if self._type_stack and self._type_stack[-1] == Specifiers.TypeModifier.FUNC:
             function_signature = self._type_modifier_node.get_function_signature()
 
             attribute.function_signature = function_signature
 
-        self._add_to_table(attribute, messenger, function_signature)
+        self._add_to_table(attribute, messenger)
 
         # adding to the parent's symbol table prevents from global nodes with own symbol tables to add themselves.
 
-    def _add_to_table(self, attribute, messenger, func_signature) -> bool:
+    def _add_to_table(self, attribute, messenger) -> bool:
         """
         The actions performed by response of the symbol table are the same for all global declarations
         :param attribute:
@@ -96,17 +95,12 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
         ret = ""
         # Globals must be assigned, so 0 by default (maybe we could make a global decl node to split logic)
-        val = ""
-        if not self._type_modifier_node:
-            val = self._expression_node.llvm_constant if self._expression_node else \
-                self.__class__._DEFAULT_VALUE_MAP[self.base_type]
+        val = self._expression_node.llvm_constant if self._expression_node else \
+            self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1]]
 
-        else:
-            val = self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1]]
-
-        ret += self.indent_string() + "; Global declaration " + str(self.base_type.value) + " " + self.id + " = " + str(
+        ret += self.indent_string() + "; Global declaration " + str(self.type_stack[0]) + " " + self.id + " = " + str(
             val) + "\n "
-        ret += LlvmCode.llvm_allocate_instruction_global(self.id, self.base_type, self._type_stack, str(val),
+        ret += LlvmCode.llvm_allocate_instruction_global(self.id, self._type_stack, str(val),
                                                          self.indent_string())
         ret += self.indent_string() + "; end declaration" + "\n"
 

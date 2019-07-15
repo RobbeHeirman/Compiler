@@ -25,12 +25,9 @@ class ReturnNode(AbstractNode.AbstractNode):
         child.semantic_analysis(messenger)
 
         self._parent_node: StatementsNode
-
-        ret_tuple = self._parent_node.get_return_type()
         child: ExpressionNode
-        if not child.base_type == ret_tuple[0] or not child.type_stack == ret_tuple[1]:
-            print(messenger.error_conflicting_return_type(self._filename, self._line, self._column))
-
+        if not child.type_stack == self._parent_node.get_return_type():
+            messenger.error_conflicting_return_type(self._filename, self._line, self._column)
 
     # def generate_llvm(self):
     #     ret = self._children[0].generate_llvm()

@@ -8,12 +8,10 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
     Superclass for all classes who have knowledge about their type. (Declarations right side id's expressions...)
     """
 
-    def __init__(self, parent_node):
-        super().__init__(parent_node)
+    def __init__(self, parent_node, filename, ctx):
+        super().__init__(parent_node, filename, ctx)
 
         self._type_modifier_node = None  # Start of the type modifier subtree this can be *, [], ()
-
-        self.base_type = None
         self._type_stack = []
 
     @property
@@ -21,11 +19,21 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
         """ No outer modification on the list"""
         return list(self._type_stack)
 
-    def _generate_type_modifier_stack(self):
+    def type_stack_ref(self):
+        """
+        So we can modify the type stack from outer nodes
+        :return:
+        """
+        return self._type_stack
+
+    def set_base_type(self, tp):
+        self._type_stack.append(tp)
+
+    def _generate_type_modifier_stack(self, messenger):
         """
         Generates the type modifier stack. This is a stack of type modifier types that will determine the modifiers
         applied on the node. See the TypeModifier enum for choices.
         :return: None
         """
         if self._type_modifier_node:
-            self._type_stack = self._type_modifier_node.generate_type_operator_stack()
+            self._type_modifier_node.generate_type_operator_stack(self, messenger)

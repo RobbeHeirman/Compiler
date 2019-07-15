@@ -27,9 +27,10 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
     @property
     def llvm_constant(self) -> str:
-        if self.base_type is TypeSpecifier.CHAR:
+        if self._type_stack[0] is TypeSpecifier.CHAR:
             return str(ord(str(self.constant)[1]))
-        elif self.base_type is TypeSpecifier.FLOAT:
+
+        elif self._type_stack[0] is TypeSpecifier.FLOAT:
             constant = float(self.constant)
             constant = struct.unpack('f', struct.pack('f', constant))[0]
             constant = hex(struct.unpack('Q', struct.pack('d', constant))[0])
@@ -37,18 +38,19 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
         return str(self.constant)
 
+    def add_base_type(self, base_type):
+        self._type_stack.append(base_type)
+
+
     def generate_llvm(self) -> str:
         self.increment_register_index()
         ret = self.indent_string() + ";... {0}\n".format(self.constant)
-        ret += LlvmCode.llvm_allocate_instruction(str(self.register_index), self.base_type, [],
-                                                  self.indent_string())
-
-        ret += LlvmCode.llvm_store_instruction_c(self.base_type, self.llvm_constant, [],
-                                                 self.base_type, str(self.register_index), [],
-                                                 self.indent_string())
+        ret += LlvmCode.llvm_allocate_instruction(str(self.register_index), self._type_stack, self.indent_string())
+        ret += LlvmCode.llvm_store_instruction_c(self._type_stack, self.llvm_constant,
+                                                 self._type_stack, str(self.register_index), self.indent_string())
         prev_index = self.register_index
         self.increment_register_index()
-        ret += LlvmCode.llvm_load_instruction(self.base_type, str(prev_index), [], self.base_type,
+        ret += LlvmCode.llvm_load_instruction(self._type_stack[0], str(prev_index), [], self._type_stack[0],
                                               str(self.register_index), [], self.indent_string())
 
         return ret

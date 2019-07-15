@@ -30,33 +30,27 @@ class ExpressionNode(TypedNode.TypedNode):
                        ExpressionNodeType.PTR, ExpressionNodeType.ADDR, ExpressionNodeType.FUNCTION]
 
     def __init__(self, parent_node, filename, ctx):
-        super().__init__(parent_node)
-
-        self.column = ctx.start.column
-        self.line = ctx.start.line
-        self.filename = filename
+        super().__init__(parent_node, filename, ctx)
 
         self._identifier_node = None
         self._type_modifier_node = None
 
         self.type = None
 
-        self._l_value = True
+        self.l_value = True
 
     @property
     def type_string_llvm(self):
-        return self.base_type.llvm_type + "*" * len(self._type_stack)
+        return self._type_stack[0].llvm_type + "*" * len(self._type_stack)
 
     @property
     def label(self):
         ret = self._BASE_LABEL + "\n"
-        if self.base_type:
-            ret += "Base type: " + self.base_type.value + "\n"
-
+        if self._type_stack:
+            ret += "Base type: " + self._type_stack[0].value + "\n"
         return ret
 
     def is_address(self):
-
         if self._type_stack and self._type_stack[-1] is Specifiers.TypeModifier.ADDRESS:
             return True
 
@@ -78,14 +72,14 @@ class ExpressionNode(TypedNode.TypedNode):
         """
         :return: A tuple filename, line, column
         """
-        if self.filename is None:
+        if self._filename is None:
             for _ in self._children:
                 # val = child.get_error_info()
                 val = ""
                 if val is not None:
                     return val
         else:
-            return self.filename, self.line, self.column
+            return self._filename, self._line, self._column
 
     def _handle_member_operator_node(self):
         if self._type_modifier_node is not None:
@@ -128,11 +122,8 @@ class ExpressionNode(TypedNode.TypedNode):
         Note: We do not support implicit conversions.
         :return:
         """
-        self._generate_type_modifier_stack()  # the modifiers applied in the expression
+        self._generate_type_modifier_stack(messenger)  # the modifiers applied in the expression
         ret = True
-
-        if not self._stack_analysis(messenger, []):
-            return False
 
         for child in self._children:
             if not child.semantic_analysis(messenger):
@@ -143,36 +134,3 @@ class ExpressionNode(TypedNode.TypedNode):
     def is_constant(self):
         return False
 
-    def _stack_analysis(self, messenger, attr_stack=None) -> bool:
-        """"
-        Checks the type modifier corresponding to the expression vs the modifier's corresponding to the attributes.
-        Modifies the expression's modifier stack to correspond the correct type.
-        :param attr_stack. The stack found in the symbol table corresponding to the identifier
-        :return: True if successful without semantic errors
-        """
-
-        # This is the attributes we retrieved from the symbol table. Note that the operators stored
-        # in the symbol correspond to other operation on the right side of an assignment.
-        # * means dereference while on lhs this declares that the variable will contain an address.
-        # For comparison purposes we will make the meaning on rhs uniform so * lhs becomes & (address of) rhs.
-        if attr_stack is None:
-            attr_stack = []
-        nw_stack = list(attr_stack)
-        for element in reversed(self._type_stack):
-            # if it's a * we dereference the value, meaning that we need to dereference a ptr type.
-            if element == Specifiers.TypeModifier.PTR:
-                if nw_stack[-1] == Specifiers.TypeModifier.PTR:  # Implicit conversion to R value in an id node
-                    nw_stack.pop()
-                    self._l_value = True
-
-            if element == Specifiers.TypeModifier.ADDRESS:
-                if not self._l_value:  # We need an L value to take an address from
-                    messenger.error_lvalue_required_addr_operand(self.filename, self.line, self.column)
-                    return False
-
-                else:
-                    nw_stack.append(Specifiers.TypeModifier.PTR)  # Denoting this is address of R value
-                    self._l_value = False
-
-        self._type_stack = nw_stack
-        return True
