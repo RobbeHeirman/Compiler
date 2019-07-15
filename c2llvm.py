@@ -4,7 +4,6 @@ import subprocess
 import sys
 import os
 import shutil
-import traceback
 
 import main
 

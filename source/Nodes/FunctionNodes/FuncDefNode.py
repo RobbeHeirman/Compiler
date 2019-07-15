@@ -6,11 +6,10 @@ Academic Year: 2018-2019
 
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.AbstractNodes.ScopedNode as ScopedNode
-import Nodes.FunctionNodes.ReturnNode as ReturnNode
 import Nodes.GlobalNodes.GlobalDeclarationNode as GlobalDeclarationNode
 from Attributes import AttributesGlobal
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
-from Nodes.GlobalNodes.StatementsNode import StatementsNode
+import Nodes.GlobalNodes.StatementsNode
 
 
 class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
@@ -28,7 +27,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
     def add_child(self, child, index=None):
 
-        if isinstance(child, StatementsNode):
+        if isinstance(child, Nodes.GlobalNodes.StatementsNode.StatementsNode):
             self._expression_node = child
 
         elif isinstance(child, ParamListNode):
@@ -60,6 +59,10 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         attribute.function_signature = self._function_signature
 
         return self._add_to_table(attribute, messenger, self._function_signature)
+
+    def get_return_type(self):
+
+        return self.base_type, self._type_stack
 
     def generate_llvm(self):
         self.increment_register_index()

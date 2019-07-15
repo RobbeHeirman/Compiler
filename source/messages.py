@@ -144,6 +144,11 @@ class MessageGenerator:
     def error_conflicting_types(self, filename, line, column, node_id):
         print(self.color_scheme.FAIL + self.error_f(filename, line, column) + "conflicting types for '" + str(node_id)
               + "'" + self.color_scheme.ENDC)
+
+    def error_conflicting_return_type(self, filename, line, column):
+        print("{0}{1}conflicting return types{2}".format(self.color_scheme.FAIL, self.error_f(filename, line, column),
+                                                         self.color_scheme.ENDC))
+
     # Warnings
     # =======================================================================================================================
     def warning_f(self, filename, line, column):

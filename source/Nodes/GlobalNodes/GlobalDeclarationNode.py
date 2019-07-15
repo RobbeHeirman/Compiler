@@ -72,8 +72,8 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
         elif next_action == GlobalActions.REMOVE_NODE:
 
             # OPT: some redeclaration's just don't do anything, we can remove those nodes from the AST
-            self._remove_me = True
-            print(self._remove_me)
+            self._parent_node.remove_child(self)
+
             return True
 
         elif next_action == GlobalActions.REDEFINE_ERROR:
@@ -88,7 +88,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             prev_declare = self.get_attribute(self.id)
             prev_declare.original_declaration_node.add_child(self._expression_node)
             # This node is obsolete afterwards
-            self._remove_me = True
+            self._parent_node.remove_child(self)
 
         return True
 
