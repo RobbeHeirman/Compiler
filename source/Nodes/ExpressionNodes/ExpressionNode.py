@@ -122,7 +122,8 @@ class ExpressionNode(TypedNode.TypedNode):
         Note: We do not support implicit conversions.
         :return:
         """
-        self._generate_type_modifier_stack(messenger)  # the modifiers applied in the expression
+        if not self._generate_type_modifier_stack(messenger):  # the modifiers applied in the expression
+            return False
         ret = True
 
         for child in self._children:

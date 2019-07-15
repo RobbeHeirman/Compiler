@@ -28,7 +28,9 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
     def semantic_analysis(self, messenger: MessageGenerator):
 
         # Globals need a compile time constant.
-        self._generate_type_modifier_stack(messenger)
+        if not self._generate_type_modifier_stack(messenger):
+            return False
+
         defined = False
         if self._expression_node:
             # Expression semantics still need to be right
@@ -94,7 +96,6 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
     def generate_llvm(self):
 
         ret = ""
-        # Globals must be assigned, so 0 by default (maybe we could make a global decl node to split logic)
         val = self._expression_node.llvm_constant if self._expression_node else \
             self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1]]
 

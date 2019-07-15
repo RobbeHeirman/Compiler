@@ -9,15 +9,16 @@ from Specifiers import TypeModifier
 
 class ExpressionTypeModifierNode(TypeModifierNode):
 
-    def __init__(self, parent_node, modifier):
+    def __init__(self, parent_node, modifier=None):
         super().__init__(parent_node, modifier)
 
     def generate_type_operator_stack(self, node, messenger):
-
         if self._type_modifier_node:
-            return self._type_modifier_node.generate_type_operator_stack(node, messenger)
+            if not self._type_modifier_node.generate_type_operator_stack(node, messenger):
+                return False
 
         # Meaning the Dereference operator
+
         if self.modifier_type == TypeModifier.PTR:
             if node.type_stack_ref().type_stack[-1] == TypeModifier.PTR:
                 # If we dereference the type loses it's 'ptr' type

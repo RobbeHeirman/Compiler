@@ -81,15 +81,15 @@ class TypeModifierNode(AbstractNode.AbstractNode):
     def generate_type_operator_stack(self, node, messenger):
         """
         This function generates the operators stack.
+        :param node:
         :param messenger:
-        :param l_value: if l_value or r _value
-        :param type_stack: A stack of DeclaratorSpecifiers that represents the member operator stack.
         :return: the type_stack
         """
         if self._type_modifier_node is not None:
             self._type_modifier_node.generate_type_operator_stack(node.type_stack_ref(), messenger)
 
         node.type_stack_ref().append(self.modifier_type)
+        return True
 
     def array_has_length(self) -> bool:
         if self._type_modifier_node is not None:

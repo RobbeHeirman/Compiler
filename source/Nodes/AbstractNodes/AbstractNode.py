@@ -39,6 +39,18 @@ class AbstractNode(abc.ABC):
             self._column = start.column
 
     @property
+    def filename(self):
+        return self._filename
+
+    @property
+    def line(self):
+        return self._line
+
+    @property
+    def column(self):
+        return self._column
+
+    @property
     def index(self):
         return self._index
 

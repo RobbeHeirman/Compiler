@@ -36,4 +36,6 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
         :return: None
         """
         if self._type_modifier_node:
-            self._type_modifier_node.generate_type_operator_stack(self, messenger)
+            return self._type_modifier_node.generate_type_operator_stack(self, messenger)
+
+        return True

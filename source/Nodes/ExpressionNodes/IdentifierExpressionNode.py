@@ -7,6 +7,7 @@ Academic Year: 2018-2019
 # import LlvmCode
 import LlvmCode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
+from Specifiers import TypeSpecifier
 
 
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
@@ -19,13 +20,14 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
     @property
     def label(self) -> str:
-        self._type_stack = self.get_attribute(self.id).operator_stack
+
         ret = super().label
         ret += "Identifier\n Id: {0}".format(self.id)
 
         return ret
 
     def semantic_analysis(self, messenger):
+        self._type_stack = self.get_attribute(self.id).operator_stack
         self._generate_type_modifier_stack(messenger)  # the modifiers applied in the expression
         if not self.is_in_table(self.id):
             messenger.error_undeclared_var(self.id, self._filename, self._line, self._column)

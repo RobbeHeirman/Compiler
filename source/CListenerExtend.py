@@ -24,6 +24,7 @@ import Nodes.FunctionNodes.FuncDefNode as FuncDefNode
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 import Nodes.FunctionNodes.ReturnNode as ReturnNode
 import Nodes.GlobalNodes.RootNode as RootNode
+from Nodes.ExpressionNodes import ExpressionTypeModifierNode
 from Nodes.GlobalNodes import GlobalDeclarationNode
 from Nodes.GlobalNodes.StatementsNode import StatementsNode
 from Specifiers import ConditionType, TypeModifier, TypeSpecifier
@@ -239,7 +240,7 @@ class CListenerExtend(CListener):
         This is filled in later by the prefix rule itself.
 
         """
-        prefix_node = TypeModifierNode.TypeModifierNode(self._parent_node)
+        prefix_node = ExpressionTypeModifierNode.ExpressionTypeModifierNode(self._parent_node)
         # The expression Node gets linked on exit (and found as well)
         if isinstance(self._parent_node, TypeModifierNode.TypeModifierNode):
             self._parent_node.add_child(prefix_node)

@@ -54,10 +54,8 @@ class DeclarationNode(TypedNode.TypedNode):
         return self._type_stack[0].llvm_type + "*" * len(self._type_stack)
 
     def to_attribute(self):
-        op_stack = []
-        if self._type_modifier_node:
-            op_stack = self._type_modifier_node.generate_type_operator_stack()
-        return Attributes.Attributes(op_stack, self._filename, self._line, self._column)
+
+        return Attributes.Attributes(self._type_stack, self._filename, self._line, self._column)
 
     def add_id(self, identifier):
 
@@ -149,7 +147,11 @@ class DeclarationNode(TypedNode.TypedNode):
         """
         # print(self.__class__.warning_count())
         expression_stack = self._expression_node.type_stack
-        prev_ele = expression_stack[-1]
+        try:
+            prev_ele = expression_stack[-1]
+        except IndexError:
+            print(self.id)
+            raise IndexError
         for element in reversed(self._type_stack):
             if expression_stack and element == expression_stack[-1]:
                 prev_ele = expression_stack.pop()

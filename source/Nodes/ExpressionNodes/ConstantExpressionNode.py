@@ -16,7 +16,8 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
         super().__init__(parent_node, filename, ctx)
 
         self.constant = ctx.getText()
-        self._l_value = False  # Constant's are always r value's
+        self.l_value = False  # Constant's are always r value's
+
 
     @property
     def label(self) -> str:
@@ -41,7 +42,6 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
     def add_base_type(self, base_type):
         self._type_stack.append(base_type)
 
-
     def generate_llvm(self) -> str:
         self.increment_register_index()
         ret = self.indent_string() + ";... {0}\n".format(self.constant)
@@ -50,8 +50,8 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
                                                  self._type_stack, str(self.register_index), self.indent_string())
         prev_index = self.register_index
         self.increment_register_index()
-        ret += LlvmCode.llvm_load_instruction(self._type_stack[0], str(prev_index), [], self._type_stack[0],
-                                              str(self.register_index), [], self.indent_string())
+        ret += LlvmCode.llvm_load_instruction(str(prev_index), self._type_stack, str(self.register_index),
+                                              self._type_stack, self.indent_string())
 
         return ret
 
