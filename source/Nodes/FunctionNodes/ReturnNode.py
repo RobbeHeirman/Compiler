@@ -22,12 +22,15 @@ class ReturnNode(AbstractNode.AbstractNode):
     def semantic_analysis(self, messenger):
 
         child = self._children[0]
-        child.semantic_analysis(messenger)
+        if not child.semantic_analysis(messenger):
+            return False
 
         self._parent_node: StatementsNode
         child: ExpressionNode
         if not child.type_stack == self._parent_node.get_return_type():
             messenger.error_conflicting_return_type(self._filename, self._line, self._column)
+            return False
+        return True
 
     # def generate_llvm(self):
     #     ret = self._children[0].generate_llvm()

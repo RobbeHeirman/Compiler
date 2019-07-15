@@ -95,7 +95,7 @@ class DeclarationNode(TypedNode.TypedNode):
         :return: Amount of errors encountered in node and children.
         """
         ret = True
-        self._generate_type_modifier_stack()
+        self._generate_type_modifier_stack(messenger)
         # We have all the info for the corresponding attribute object
         attr = self._make_attribute()
 
@@ -149,18 +149,13 @@ class DeclarationNode(TypedNode.TypedNode):
         """
         # print(self.__class__.warning_count())
         expression_stack = self._expression_node.type_stack
+        prev_ele = expression_stack[-1]
         for element in reversed(self._type_stack):
-
-            if element == expression_stack[-1]:
-                expression_stack.pop()
-
-            #
+            if expression_stack and element == expression_stack[-1]:
+                prev_ele = expression_stack.pop()
             else:
-                print(messenger.warning_init_makes_a_from_b(self._expression_node.base_type.value,
-                                                            self._type_stack[-1].value,
-                                                            self._filename,
-                                                            self._line,
-                                                            self._column))
+                print(messenger.warning_init_makes_a_from_b(prev_ele.value, self._type_stack[-1].value, self._filename,
+                                                            self._line, self._column))
                 break
 
         return True

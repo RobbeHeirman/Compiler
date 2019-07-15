@@ -87,18 +87,15 @@ def llvm_store_instruction_c(source_type, source_constant: str, target_type, tar
     return ret
 
 
-def llvm_load_instruction(source_type: Specifiers.TypeModifier, source_register: str,
-                          source_operator_stack: typing.List[Specifiers.TypeModifier],
-                          target_type: Specifiers.TypeModifier, target_register: str,
+def llvm_load_instruction(source_register: str,
+                          source_operator_stack: typing.List[Specifiers.TypeModifier], target_register: str,
                           target_operator_stack: typing.List[Specifiers.TypeModifier],
                           indent_string: str) -> str:
     """
 
       :param indent_string: The indentation string of the code
-      :param source_type: The type specifier of the source value
       :param source_register: The register of the source
       :param source_operator_stack: The extra operator stack (*, [], () ...)
-      :param target_type: Type of the target where we store.
       :param target_register: Register of target.
       :param target_operator_stack: Target's operator stack.
       :return: a String of result llvm code
@@ -108,10 +105,10 @@ def llvm_load_instruction(source_type: Specifiers.TypeModifier, source_register:
 
     ret = indent_string + "%{0} = load {1}{2}, {3}{4}* %{5}\n".format(
         target_register,
-        target_type.llvm_type,
+        source_operator_stack[0].llvm_type,
         t_operator_string,
 
-        source_type.llvm_type,
+        source_operator_stack[0].llvm_type,
         s_operator_string,
         source_register,
         # source_type.llvm_alignment
