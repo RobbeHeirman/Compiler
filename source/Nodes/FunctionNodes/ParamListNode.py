@@ -5,6 +5,7 @@ Academic Year: 2018-2019
 """
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Specifiers
+import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
 
 
 class ParamListNode(AbstractNode.AbstractNode):
@@ -30,10 +31,10 @@ class ParamListNode(AbstractNode.AbstractNode):
     def generate_llvm(self):
         ret = ""
         for child in self._children:
-
-            ret += "{0}".format(child.base_type.llvm_type)
+            child: DeclarationNode.DeclarationNode
+            ret += "{0}".format(child._type_stack[0])
             for d_type in child.type_stack:
-                if d_type is Specifiers.DeclaratorSpecifier.PTR:
+                if d_type is Specifiers.TypeModifier.PTR:
                     ret += "*"
             ret += " %{0}".format(child.id)
 

@@ -23,7 +23,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
     @property
     def label(self):
-        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, self._type_stack[0])
+        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, [el.value for el in self._type_stack])
 
     @property
     def base_type(self):
@@ -55,7 +55,6 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # Check if the children are playing nice
         for child in self._children:
             if not child.semantic_analysis(messenger):
-                print(child)
                 return False
 
         self._generate_type_modifier_stack(messenger)

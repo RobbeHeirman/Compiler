@@ -153,7 +153,7 @@ class CListenerExtend(CListener):
         :return:
         """
         value = ctx.getText()
-        self._parent_node.base_type = TypeSpecifier(value)
+        self._parent_node.set_base_type(TypeSpecifier(value))
 
     def enterDeclarator(self, ctx: CParser.DeclaratorContext):
         """

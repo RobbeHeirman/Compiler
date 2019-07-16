@@ -10,8 +10,6 @@ import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
 import Attributes as Attributes
-import typing
-
 from messages import MessageGenerator
 
 
@@ -42,7 +40,7 @@ class DeclarationNode(TypedNode.TypedNode):
     def label(self):
         ret_label = self._BASE_LABEL
         if self._type_stack:
-            ret_label += f"\\nBase type: {self._type_stack[0]}"
+            ret_label += f"\\n Type: {[val.value for val in self._type_stack]}"
 
         if self.id is not None:
             ret_label += f"\\n Identifier: {self.id}"
@@ -61,7 +59,7 @@ class DeclarationNode(TypedNode.TypedNode):
 
         self.id = identifier
 
-    def add_child(self, child: typing.Union[TypeModifierNode.TypeModifierNode], index: int = None):
+    def add_child(self, child, index: int = None):
         """
         extends add_child of abstractNode. To quick filter useful information for DeclarationNode
         :param index: index where to add
