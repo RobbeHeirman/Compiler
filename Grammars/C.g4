@@ -48,7 +48,7 @@ declarator // optional prefix operator sequence + optional postfix operator
     : LPARANT declarator RPARANT
     | declarator postfix_operator
     | ptr_decl declarator
-    | LPARANT id_decl RPARANT
+    //| LPARANT id_decl RPARANT
     | id_decl
     ;
 
@@ -148,7 +148,14 @@ floating_constant
     ;
 
 func_def
-    : base_type declarator LPARANT parameter_list RPARANT LBRACES statements RBRACES
+    : base_type func_declarator LBRACES statements RBRACES
+    ;
+
+func_declarator
+    : LPARANT func_declarator RPARANT
+    | func_declarator postfix_operator
+    | ptr_decl func_declarator
+    | id_decl function_operator
     ;
 
 ret_statement

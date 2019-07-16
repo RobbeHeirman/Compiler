@@ -54,6 +54,10 @@ class CListenerExtend(CListener):
         # Will help us determine if we are in the global scope.
         self._scope_counter = 0
 
+        # Function def helper
+        self._func_def_node = None
+        self._prev_node = None
+
     @property
     def ast(self):
         return self._ast
@@ -75,13 +79,23 @@ class CListenerExtend(CListener):
         self._parent_node = self._parent_node.parent_node
 
     def enterFunc_def(self, ctx: CParser.Func_defContext):
-
         func_node = FuncDefNode.FuncDefNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(func_node)
         self._parent_node = func_node
+        self._func_def_node = func_node
 
     def exitFunc_def(self, ctx: CParser.Func_defContext):
         self._parent_node = self._parent_node.parent_node
+        self._func_def_node = None
+
+    def enterFunc_declarator(self, ctx: CParser.Func_declaratorContext):
+        # noinspection PyTypeChecker
+        self.enterDeclarator(ctx)
+
+    def exitFunc_declarator(self, ctx: CParser.Func_declaratorContext):
+
+        # noinspection PyTypeChecker
+        self.exitDeclarator(ctx)
 
     def enterParameter_list(self, ctx: CParser.Parameter_listContext):
         node = ParamListNode.ParamListNode(self._parent_node)
@@ -163,7 +177,6 @@ class CListenerExtend(CListener):
         :param ctx:
         :return:
         """
-
         # column = start.column
         if ctx.getChild(0).getText() is not "(":  # parenthesis are just used to order
             node = TypeModifierNode.TypeModifierNode(self._parent_node)
@@ -180,14 +193,23 @@ class CListenerExtend(CListener):
         self._parent_node.modifier_type = TypeModifier.PTR
 
     def enterFunction_operator(self, ctx: CParser.Function_operatorContext):
-        self._parent_node.modifier_type = TypeModifier.FUNC
+
+        if self._func_def_node:
+            self._prev_node = self._parent_node
+            self._parent_node = self._func_def_node
+        else:
+            self._parent_node.modifier_type = TypeModifier.FUNC
+
+    def exitFunction_operator(self, ctx: CParser.Function_operatorContext):
+
+        if self._func_def_node:
+            self._parent_node = self._prev_node
 
     def enterArray_operator(self, ctx: CParser.Array_operatorContext):
 
         self._parent_node.modifier_type = TypeModifier.ARRAY
 
     def enterId_decl(self, ctx: CParser.Id_declContext):
-
         self._parent_node: Union[DeclarationNode.DeclarationNode, TypeModifierNode.TypeModifierNode]
         self._parent_node.add_id(ctx.getText())
         # Is just a stub. We propagated the identifier. So the node is no necessary.
@@ -257,7 +279,6 @@ class CListenerExtend(CListener):
         # We can do this bcz exit is bottom up, and the recursive calls stops at a non type modifier expression.
         expressive_node = self._parent_node.pop_child(0)
 
-
         expressive_node.add_child(self._parent_node)  # parent node is the type modifier
 
         self._parent_node.parent_node.add_child(expressive_node)
@@ -303,7 +324,6 @@ class CListenerExtend(CListener):
     def enterExpression_postfix(self, ctx: CParser.Expression_postfixContext):
         val = ctx.getChild(0).getChild(0).getText() + ctx.getChild(0).getChild(2).getText()
         self._parent_node.modifier_type = TypeModifier(val)
-
 
     def enterExpression_param_list(self, ctx: CParser.Expression_param_listContext):
 
