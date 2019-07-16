@@ -18,7 +18,6 @@ class ExpressionTypeModifierNode(TypeModifierNode):
                 return False
 
         # Meaning the Dereference operator
-
         if self.modifier_type == TypeModifier.PTR:
             if node.type_stack_ref().type_stack[-1] == TypeModifier.PTR:
                 # If we dereference the type loses it's 'ptr' type
@@ -38,4 +37,8 @@ class ExpressionTypeModifierNode(TypeModifierNode):
             else:
                 messenger.error_lvalue_required_addr_operand(node.filename, node.line, node.column)
                 return False
+
+        # Function call,
+        elif self.modifier_type == TypeModifier.FUNC:
+            pass
         return True

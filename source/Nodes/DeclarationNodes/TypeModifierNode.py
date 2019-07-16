@@ -86,7 +86,7 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         :return: the type_stack
         """
         if self._type_modifier_node is not None:
-            self._type_modifier_node.generate_type_operator_stack(node.type_stack_ref(), messenger)
+            self._type_modifier_node.generate_type_operator_stack(node, messenger)
 
         node.type_stack_ref().append(self.modifier_type)
         return True
