@@ -58,6 +58,7 @@ class GlobalActions(Enum):
     # This is a special case. We need to restructure the AST so the definition happens on the first declare.
     DEFINE_PREV_DECLARED = ()
 
+
 class GlobalSymbolTable(SymbolTable):
     """
     Extension for global variable support

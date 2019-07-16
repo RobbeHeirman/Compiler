@@ -27,7 +27,6 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
     def semantic_analysis(self, messenger: MessageGenerator):
 
-        # Globals need a compile time constant.
         if not self._generate_type_modifier_stack(messenger):
             return False
 

@@ -55,17 +55,16 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # Check if the children are playing nice
         for child in self._children:
             if not child.semantic_analysis(messenger):
+                print(child)
                 return False
 
         self._generate_type_modifier_stack(messenger)
-
         self._function_signature = self._param_list_node.get_function_signature()
         attribute = AttributesGlobal(self._type_stack, self._filename, self._line, self._column,
                                      True,
                                      self)
 
         attribute.function_signature = self._function_signature
-
         return self._add_to_table(attribute, messenger)
 
     def get_return_type(self):

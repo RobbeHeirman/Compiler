@@ -158,7 +158,7 @@ class AbstractNode(abc.ABC):
         this function NEEDS to be overwritten by nodes who do check on semantics.
         :return: Returns the amount of errors generated.
         """
-        ret = any([child.semantic_analysis(messenger) for child in list(self._children)])
+        ret = all([child.semantic_analysis(messenger) for child in list(self._children)])
         return ret
 
     def generate_llvm(self) -> str:
