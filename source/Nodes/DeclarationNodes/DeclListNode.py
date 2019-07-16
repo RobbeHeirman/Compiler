@@ -29,6 +29,9 @@ class DeclListNode(AbstractNode.AbstractNode):
     def label(self):
         return '{0}'.format(self._BASE_LABEL)
 
+    def set_base_type(self, typ):
+        self.base_type = typ
+
     def add_child(self, child: Union[DeclarationNode.DeclarationNode], index=None):
         self._declaration_nodes.append(child)
         super().add_child(child, index)

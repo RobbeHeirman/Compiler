@@ -132,7 +132,8 @@ class DeclarationNode(TypedNode.TypedNode):
             #     ret = False
 
         # Add to the scopes symbol_table.
-        if not self.add_to_scope_symbol_table(self.id, attr):
+
+        if not self._parent_node.add_to_scope_symbol_table(self.id, attr):
             messenger.error_redeclaration(self.id, attr)
             ret = False
 

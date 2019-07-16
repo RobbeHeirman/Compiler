@@ -92,8 +92,8 @@ lhs // L value nodes
 
 expression // Possible R values
     : constant # ignore_expression
-    | expression expression_postfix # postfix_expression
-    | expression_prefix expression  # prefix_expression
+    | expression expression_postfix # fix_expression
+    | expression_prefix expression  # fix_expression
     | id_expression # ignore_expression
     | SUB expression # ignore_expression
     | LPARANT expression RPARANT # ignore_expression

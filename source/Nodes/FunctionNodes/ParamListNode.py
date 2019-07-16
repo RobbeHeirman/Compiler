@@ -20,13 +20,6 @@ class ParamListNode(AbstractNode.AbstractNode):
     def get_signature_list(self):
         return [child.base_type for child in self._children]
 
-    def semantic_analysis(self, messenger):
-
-        ret = True
-        for child in self._children:
-            if not child.semantic_analysis:
-                ret = False
-        return ret
 
     def generate_llvm(self):
         ret = ""

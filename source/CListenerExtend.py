@@ -24,6 +24,7 @@ import Nodes.FunctionNodes.FuncDefNode as FuncDefNode
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 import Nodes.FunctionNodes.ReturnNode as ReturnNode
 import Nodes.GlobalNodes.RootNode as RootNode
+from Nodes.AbstractNodes import TypedNode
 from Nodes.ExpressionNodes import ExpressionTypeModifierNode
 from Nodes.GlobalNodes import GlobalDeclarationNode
 from Nodes.GlobalNodes.StatementsNode import StatementsNode
@@ -153,6 +154,7 @@ class CListenerExtend(CListener):
         :return:
         """
         value = ctx.getText()
+        self._parent_node: TypedNode.TypedNode
         self._parent_node.set_base_type(TypeSpecifier(value))
 
     def enterDeclarator(self, ctx: CParser.DeclaratorContext):
@@ -208,7 +210,6 @@ class CListenerExtend(CListener):
         :param ctx: ParserContextNode
         :return:
         """
-        # id_name = ctx.getChild(0).getText()
         assignment_node = AssignmentNode.AssignmentNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(assignment_node)
         self._parent_node = assignment_node
@@ -234,7 +235,7 @@ class CListenerExtend(CListener):
     # Expressions
     # ======================================================================================================================
 
-    def enterPrefix_expression(self, ctx: CParser.Prefix_expressionContext):
+    def enterFix_expression(self, ctx: CParser.Fix_expressionContext):
         """
         If on the expression rule a prefix expression is chosen. We create a typeModifierNode.
         This is filled in later by the prefix rule itself.
@@ -248,13 +249,15 @@ class CListenerExtend(CListener):
         prefix_node.parent_node = self._parent_node
         self._parent_node = prefix_node
 
-    def exitPrefix_expression(self, ctx: CParser.Prefix_expressionContext):
+    def exitFix_expression(self, ctx: CParser.Fix_expressionContext):
         """
         We want to place the prefixes as children of other expressions.
         """
 
         # We can do this bcz exit is bottom up, and the recursive calls stops at a non type modifier expression.
-        expressive_node = self._parent_node.pop_child()
+        expressive_node = self._parent_node.pop_child(0)
+
+
         expressive_node.add_child(self._parent_node)  # parent node is the type modifier
 
         self._parent_node.parent_node.add_child(expressive_node)
@@ -299,7 +302,8 @@ class CListenerExtend(CListener):
 
     def enterExpression_postfix(self, ctx: CParser.Expression_postfixContext):
         val = ctx.getChild(0).getChild(0).getText() + ctx.getChild(0).getChild(2).getText()
-        self._parent_node.type_modifier = TypeModifier(val)
+        self._parent_node.modifier_type = TypeModifier(val)
+
 
     def enterExpression_param_list(self, ctx: CParser.Expression_param_listContext):
 
