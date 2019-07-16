@@ -21,3 +21,9 @@ class FunctionTest(SAbstractTest):
 
     def test_redeclaration_func(self):
         return self._run_analysis("redeclaration_func.c", errors=1)
+
+    def test_redefinition(self):
+        return self._run_analysis("redefinition.c", 1, 0)
+
+    def test_return_conflict(self):
+        return self._run_analysis("redefinition.c", 1)

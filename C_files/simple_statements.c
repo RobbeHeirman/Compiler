@@ -1,8 +1,3 @@
 
-int main(){
-}
-
-int a(){
-
-    main();
+int main(int a){
 }
