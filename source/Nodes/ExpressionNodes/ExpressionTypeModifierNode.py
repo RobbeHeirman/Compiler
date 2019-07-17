@@ -9,8 +9,8 @@ from Specifiers import TypeModifier
 
 class ExpressionTypeModifierNode(TypeModifierNode):
 
-    def __init__(self, parent_node, modifier=None):
-        super().__init__(parent_node, modifier)
+    def __init__(self, parent_node, filename, ctx, modifier=None):
+        super().__init__(parent_node, filename, ctx, modifier)
 
     def generate_type_operator_stack(self, node, messenger):
         if self._type_modifier_node:
@@ -19,7 +19,7 @@ class ExpressionTypeModifierNode(TypeModifierNode):
 
         # Meaning the Dereference operator
         if self.modifier_type == TypeModifier.PTR:
-            if node.type_stack_ref().type_stack[-1] == TypeModifier.PTR:
+            if node.type_stack_ref().type_stack[-1].type_modifier == TypeModifier.PTR:
                 # If we dereference the type loses it's 'ptr' type
                 node.type_stack_ref().type_stack.pop()
                 node.l_value = True
@@ -40,5 +40,17 @@ class ExpressionTypeModifierNode(TypeModifierNode):
 
         # Function call,
         elif self.modifier_type == TypeModifier.FUNC:
-            pass
+
+            if node.type_stack_ref()[-1].modifier_type == TypeModifier.FUNC:
+                if self.get_function_signature() == node.type_stack_ref()[-1].get_function_signature():
+                    node.type_stack_ref().pop()
+
+                else:
+                    print(self.get_function_signature())
+                    print(node.type_stack_ref()[-1].get_function_signature())
+                    print(f'{self._line}TODO something about wrong signatures')
+
+            else:
+                print("TODO some messages about no function callable")
+                pass
         return True

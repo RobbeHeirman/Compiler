@@ -8,8 +8,10 @@ import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.AbstractNodes.ScopedNode as ScopedNode
 import Nodes.GlobalNodes.GlobalDeclarationNode as GlobalDeclarationNode
 from Attributes import AttributesGlobal
+from Nodes.DeclarationNodes.TypeModifierNode import TypeModifierNode
 from Nodes.FunctionNodes.ParamListNode import ParamListNode
 import Nodes.GlobalNodes.StatementsNode
+from Specifiers import TypeModifier
 
 
 class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
@@ -21,9 +23,12 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         self._param_list_node = None
         self._function_signature = []
 
+        self._own_mod_node = TypeModifierNode(self, filename, ctx)
+
     @property
     def label(self):
-        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, [el.value for el in self._type_stack])
+        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, [el.modifier_type.value for el in
+                                                                             self._type_stack[:-1]])
 
     @property
     def base_type(self):
@@ -51,24 +56,34 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         2) The parameters are declared variables belonging to the scope of this function.
         :return: If the semantic analysis is correct.
         """
-
         # Check if the children are playing nice
-        for child in self._children:
-            if not child.semantic_analysis(messenger):
-                return False
+
+        if not self._param_list_node.semantic_analysis(messenger):
+            return False
 
         self._generate_type_modifier_stack(messenger)
+        self._own_mod_node.modifier_type = TypeModifier.FUNC
+        self._own_mod_node.add_child(self._param_list_node)
+        self._type_stack.append(self._own_mod_node)
+
         self._function_signature = self._param_list_node.get_function_signature()
         attribute = AttributesGlobal(self._type_stack, self._filename, self._line, self._column,
                                      True,
                                      self)
 
         attribute.function_signature = self._function_signature
-        return self._add_to_table(attribute, messenger)
+        if not self._add_to_table(attribute, messenger):
+            return False
+
+        for child in self._children:
+            if child is not self._param_list_node:
+                if not child.semantic_analysis(messenger):
+                    return False
+        return True
 
     def get_return_type(self):
 
-        return self._type_stack
+        return self._type_stack[:-1]
 
     def generate_llvm(self):
         self.increment_register_index()

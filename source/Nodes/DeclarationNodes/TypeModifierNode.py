@@ -22,12 +22,12 @@ class TypeModifierNode(AbstractNode.AbstractNode):
 
     _BASE_LABEL = "TypeModifier"
 
-    def __init__(self, parent_node, mod_type: Specifiers.TypeModifier = None):
+    def __init__(self, parent_node, filename, ctx, mod_type: Specifiers.TypeModifier = None):
         """
         Initializer
         :param parent_node: the parent node
         """
-        super().__init__(parent_node)
+        super().__init__(parent_node, filename, ctx)
 
         self._type_modifier_node = None  # Child type_modifier_node. Used for nested type modifiers
         self._rhs_node = None
@@ -35,6 +35,20 @@ class TypeModifierNode(AbstractNode.AbstractNode):
 
         self.modifier_type = mod_type
         self._is_implicit_conversion = False
+
+    def __eq__(self, o):
+
+        if self.modifier_type == o.modifier_type:
+            if self.get_function_signature() == o.get_function_signature():
+                return True
+
+        return False
+
+    def get_function_signature(self):
+        if self._param_list_node:
+            return self._param_list_node.get_function_signature()
+
+        return []
 
     @property
     def label(self):
@@ -88,7 +102,7 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         if self._type_modifier_node is not None:
             self._type_modifier_node.generate_type_operator_stack(node, messenger)
 
-        node.type_stack_ref().append(self.modifier_type)
+        node.type_stack_ref().append(self)
         return True
 
     def array_has_length(self) -> bool:
@@ -100,9 +114,6 @@ class TypeModifierNode(AbstractNode.AbstractNode):
             else:
                 return True
 
-    def get_function_signature(self):
-        if self._param_list_node:
-            return self._param_list_node.get_function_signature()
 
     # def implicit_param_ptr_conversion(self):
     #

@@ -155,7 +155,12 @@ func_declarator
     : LPARANT func_declarator RPARANT
     | func_declarator postfix_operator
     | ptr_decl func_declarator
-    | id_decl function_operator
+    | w_p_id function_operator
+    ;
+
+w_p_id:
+    LPARANT w_p_id RPARANT
+    | id_decl
     ;
 
 ret_statement

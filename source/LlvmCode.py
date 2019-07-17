@@ -15,7 +15,7 @@ def convert_operator_stack_to_str(operator_stack: typing.List[Specifiers.TypeMod
     """
     ret_str = ""
     for operator in operator_stack:
-        ret_str += operator.value
+        ret_str += operator.modifier_type.value
     return ret_str
 
 

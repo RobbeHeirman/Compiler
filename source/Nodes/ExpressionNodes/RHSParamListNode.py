@@ -3,10 +3,11 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-import Nodes.AbstractNodes.AbstractNode as AbstractNode
+
+import Nodes.FunctionNodes.ParamListNode as ParamListNode
 
 
-class RHSParamListNode(AbstractNode.AbstractNode):
+class RHSParamListNode(ParamListNode.ParamListNode):
 
     @property
     def label(self):

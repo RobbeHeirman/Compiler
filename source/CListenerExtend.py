@@ -179,7 +179,7 @@ class CListenerExtend(CListener):
         """
         # column = start.column
         if ctx.getChild(0).getText() is not "(":  # parenthesis are just used to order
-            node = TypeModifierNode.TypeModifierNode(self._parent_node)
+            node = TypeModifierNode.TypeModifierNode(self._parent_node, self._filename, ctx)
             self._parent_node.add_child(node)
             self._parent_node = node
 
@@ -263,7 +263,7 @@ class CListenerExtend(CListener):
         This is filled in later by the prefix rule itself.
 
         """
-        prefix_node = ExpressionTypeModifierNode.ExpressionTypeModifierNode(self._parent_node)
+        prefix_node = ExpressionTypeModifierNode.ExpressionTypeModifierNode(self._parent_node, self._filename, ctx)
         # The expression Node gets linked on exit (and found as well)
         if isinstance(self._parent_node, TypeModifierNode.TypeModifierNode):
             self._parent_node.add_child(prefix_node)

@@ -31,6 +31,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             return False
 
         defined = False
+
         if self._expression_node:
             # Expression semantics still need to be right
             if not self._expression_node.semantic_analysis(messenger):
@@ -50,7 +51,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
                                      self)
 
         # Function types have something extra, their function signature need to be recorded
-        if self._type_stack and self._type_stack[-1] == Specifiers.TypeModifier.FUNC:
+        if self._type_stack and self._type_stack[-1].modifier_type == Specifiers.TypeModifier.FUNC:
             function_signature = self._type_modifier_node.get_function_signature()
 
             attribute.function_signature = function_signature
@@ -96,7 +97,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
         ret = ""
         val = self._expression_node.llvm_constant if self._expression_node else \
-            self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1]]
+            self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1].modifier_type]
 
         ret += self.indent_string() + "; Global declaration " + str(self.type_stack[0]) + " " + self.id + " = " + str(
             val) + "\n "

@@ -40,7 +40,7 @@ class DeclarationNode(TypedNode.TypedNode):
     def label(self):
         ret_label = self._BASE_LABEL
         if self._type_stack:
-            ret_label += f"\\n Type: {[val.value for val in self._type_stack]}"
+            ret_label += f"\\n Type: {[val.modifier_type.value for val in self._type_stack]}"
 
         if self.id is not None:
             ret_label += f"\\n Identifier: {self.id}"
@@ -50,10 +50,6 @@ class DeclarationNode(TypedNode.TypedNode):
     @property
     def type_string_llvm(self):
         return self._type_stack[0].llvm_type + "*" * len(self._type_stack)
-
-    def to_attribute(self):
-
-        return Attributes.Attributes(self._type_stack, self._filename, self._line, self._column)
 
     def add_id(self, identifier):
 
@@ -152,6 +148,7 @@ class DeclarationNode(TypedNode.TypedNode):
             print(self.id)
             raise IndexError
         for element in reversed(self._type_stack):
+
             if expression_stack and element == expression_stack[-1]:
                 prev_ele = expression_stack.pop()
             else:
@@ -169,11 +166,8 @@ class DeclarationNode(TypedNode.TypedNode):
         """"
         This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
         """
-        type_modifier_str = ""
-        for _type in self.type_stack:
-            type_modifier_str += _type.value
 
-        ret = self.indent_string() + "; Declaration: {0}{1} {2}\n".format(self._type_stack[0].value, type_modifier_str,
+        ret = self.indent_string() + "; Declaration: {0}{1}\n".format(self._type_stack[0].value,
                                                                           self.id)
 
         # # Special types need other llvm code first

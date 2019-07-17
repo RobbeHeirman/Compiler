@@ -49,6 +49,12 @@ class TypeModifier(Enum):
     FUNC = "()"
     ADDRESS = "&"
 
+    @property
+    def modifier_type(self):
+        return self
+
+    def get_function_signature(self):
+        return []
 
 class TypeSpecifier(Enum):
     """
@@ -71,6 +77,10 @@ class TypeSpecifier(Enum):
         }
 
         return _LLVM_TYPE[self]
+
+    @property
+    def modifier_type(self):
+        return self
 
     @property
     def llvm_alignment(self) -> int:

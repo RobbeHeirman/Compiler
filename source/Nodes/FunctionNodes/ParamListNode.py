@@ -3,6 +3,8 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+from typing import List
+
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Specifiers
 import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
@@ -15,9 +17,11 @@ class ParamListNode(AbstractNode.AbstractNode):
         super().__init__(parent_node)
 
     def get_function_signature(self):
-        return [child.to_attribute() for child in self._children]
+        self._children: List[DeclarationNode]
+        return [child.type_stack for child in self._children]
 
     def get_signature_list(self):
+        self._children: List[DeclarationNode]
         return [child.base_type for child in self._children]
 
 
