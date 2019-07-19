@@ -25,13 +25,13 @@ class Attributes:
         :param column: the column where the lexeme is found.
         """
 
-        self.operator_stack = type_stack  # Stacks all the declared operators operators
+        self._operator_stack = type_stack  # Stacks all the declared operators operators
         self._filename = filename
         self._line = line
         self._column = column
 
     def __eq__(self, val: "Attributes") -> bool:
-        if self.operator_stack == val.operator_stack:
+        if self._operator_stack == val._operator_stack:
             return True
         return False
 
@@ -66,6 +66,10 @@ class Attributes:
     @property
     def decl_type(self):
         return self.base_type
+
+    @property
+    def operator_stack(self):
+        return list(self._operator_stack)
 
     # def same_signature(self, attr: "Attributes") -> bool:
     #     """

@@ -42,6 +42,13 @@ class TypeSpecifier:
                 return True
         return False
 
+    def __repr__(self):
+
+        if not self._type_spec == self.__class__.FUNCTION:
+            return f'type: {self._type_spec}'
+
+        return f'type: ({self._function_signature})'
+
     @property
     def value(self):
         return self._type_spec

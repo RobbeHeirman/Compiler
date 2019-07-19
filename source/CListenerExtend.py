@@ -19,7 +19,6 @@ import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
 import Nodes.ExpressionNodes.IdentifierExpressionNode as IdentifierExpressionNode
 import Nodes.ExpressionNodes.LHSNode as LhsNode
-import Nodes.ExpressionNodes.RHSParamListNode as RHSParamNode
 import Nodes.FunctionNodes.FuncDefNode as FuncDefNode
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 import Nodes.FunctionNodes.ReturnNode as ReturnNode
@@ -329,7 +328,7 @@ class CListenerExtend(CListener):
 
     def enterExpression_param_list(self, ctx: CParser.Expression_param_listContext):
 
-        node = RHSParamNode.RHSParamListNode(self._parent_node)
+        node = ParamListNode.ParamListNode(self._parent_node)
         self._parent_node.add_child(node)
         self._parent_node = node
 

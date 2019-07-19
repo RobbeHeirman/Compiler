@@ -60,7 +60,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
         self._generate_type_modifier_stack(messenger)
         self._type_stack.append(type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.FUNCTION,
-                                                             self._param_list_node.get_function_signature))
+                                                             self._param_list_node.get_function_signature()))
 
         self._function_signature = self._param_list_node.get_function_signature()
         attribute = Attributes.AttributesGlobal(self._type_stack, self._filename, self._line, self._column,

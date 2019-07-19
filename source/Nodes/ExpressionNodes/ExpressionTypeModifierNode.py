@@ -42,11 +42,12 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
         elif self._modifier_type == type_specifier.TypeSpecifier.FUNCTION:
 
             if node.type_stack_ref()[-1] == type_specifier.TypeSpecifier.FUNCTION:
+                self._param_list_node.semantic_analysis(messenger)
                 if self.get_function_signature() == node.type_stack_ref()[-1].function_signature:
                     node.type_stack_ref().pop()
 
                 else:
-                    print(self.get_function_signature())
+                    print(f' Right side: {self.get_function_signature()}')
                     print(node.type_stack_ref()[-1].function_signature)
                     print(f'{self._line}TODO something about wrong signatures')
 
