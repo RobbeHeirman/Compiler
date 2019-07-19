@@ -14,7 +14,7 @@ def convert_operator_stack_to_str(operator_stack: typing.List[type_specifier.Typ
     :return: Operator stack in string notation
     """
     ret_str = ""
-    for operator in operator_stack:
+    for operator in operator_stack[1:]:
         ret_str += operator.value
     return ret_str
 

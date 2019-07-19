@@ -31,7 +31,7 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
         if self._type_stack[0] is type_specifier.TypeSpecifier.CHAR:
             return str(ord(str(self.constant)[1]))
 
-        elif self._type_stack[0] is TypeSpecifier.FLOAT:
+        elif self._type_stack[0] is type_specifier.TypeSpecifier.FLOAT:
             constant = float(self.constant)
             constant = struct.unpack('f', struct.pack('f', constant))[0]
             constant = hex(struct.unpack('Q', struct.pack('d', constant))[0])

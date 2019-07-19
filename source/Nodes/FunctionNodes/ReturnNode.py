@@ -10,6 +10,7 @@ from Nodes.GlobalNodes.StatementsNode import StatementsNode
 
 class ReturnNode(AbstractNode.AbstractNode):
     label = "return"
+    _parent_node: StatementsNode
 
     def __init__(self, parent_node: AbstractNode.AbstractNode, ctx):
         super().__init__(parent_node, ctx)
@@ -27,11 +28,12 @@ class ReturnNode(AbstractNode.AbstractNode):
             return False
         return True
 
-    # def generate_llvm(self):
-    #     ret = self._children[0].generate_llvm()
-    #     ret_type = self._parent_node.base_type
-    #     ret += self.indent_string() + "ret {0} %{1}\n".format(ret_type.llvm_type, self.register_index)
-    #     return ret
+    def generate_llvm(self):
+
+        ret = self._children[0].generate_llvm()
+        ret_type = self._parent_node.get_return_type()
+        ret += self.indent_string() + "ret {0} %{1}\n".format(ret_type[0].llvm_type, self.register_index)
+        return ret
 
     def has_return(self):
         if self._children:
