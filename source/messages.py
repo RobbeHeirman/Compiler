@@ -4,8 +4,8 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 
-import Specifiers
 import Attributes
+import type_specifier
 
 
 class ColorScheme:
@@ -116,7 +116,7 @@ class MessageGenerator:
             self.error_f(filename, line, column), lexeme) + self.color_scheme.ENDC)
 
     def error_no_conversion_int_ptr(self, attribute: "Attributes.Attributes",
-                                    expression_type: Specifiers.TypeSpecifier):
+                                    expression_type: type_specifier.TypeSpecifier):
         print(
             self.color_scheme.FAIL + "{0}incompatible pointer conversion initializing {1} * with an expression of "
                                      "type {2} "
@@ -124,7 +124,7 @@ class MessageGenerator:
             + self.color_scheme.ENDC)
 
     def error_no_conversion_base_types(self, attribute: "Attributes.Attributes",
-                                       expression_type: Specifiers.TypeSpecifier):
+                                       expression_type: type_specifier.TypeSpecifier):
         print(self.color_scheme.FAIL + "{0}Cannot convert base types, initializing {1}  with an expression of type {2}"
               .format(self.error(attribute), attribute.decl_type.value, expression_type.value)
               + self.color_scheme.ENDC)

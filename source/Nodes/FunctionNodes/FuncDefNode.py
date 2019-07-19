@@ -7,11 +7,10 @@ Academic Year: 2018-2019
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.AbstractNodes.ScopedNode as ScopedNode
 import Nodes.GlobalNodes.GlobalDeclarationNode as GlobalDeclarationNode
-from Attributes import AttributesGlobal
-from Nodes.DeclarationNodes.TypeModifierNode import TypeModifierNode
-from Nodes.FunctionNodes.ParamListNode import ParamListNode
+import Attributes
+import type_specifier
+import Nodes.FunctionNodes.ParamListNode as ParamListNode
 import Nodes.GlobalNodes.StatementsNode
-from Specifiers import TypeModifier
 
 
 class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
@@ -23,11 +22,9 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         self._param_list_node = None
         self._function_signature = []
 
-        self._own_mod_node = TypeModifierNode(self, filename, ctx)
-
     @property
     def label(self):
-        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, [el.modifier_type.value for el in
+        return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, [el.value for el in
                                                                              self._type_stack[:-1]])
 
     @property
@@ -43,7 +40,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         if isinstance(child, Nodes.GlobalNodes.StatementsNode.StatementsNode):
             self._expression_node = child
 
-        elif isinstance(child, ParamListNode):
+        elif isinstance(child, ParamListNode.ParamListNode):
             self._param_list_node = child
 
         super().add_child(child, index)
@@ -62,14 +59,13 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
             return False
 
         self._generate_type_modifier_stack(messenger)
-        self._own_mod_node.modifier_type = TypeModifier.FUNC
-        self._own_mod_node.add_child(self._param_list_node)
-        self._type_stack.append(self._own_mod_node)
+        self._type_stack.append(type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.FUNCTION,
+                                                             self._param_list_node.get_function_signature))
 
         self._function_signature = self._param_list_node.get_function_signature()
-        attribute = AttributesGlobal(self._type_stack, self._filename, self._line, self._column,
-                                     True,
-                                     self)
+        attribute = Attributes.AttributesGlobal(self._type_stack, self._filename, self._line, self._column,
+                                                True,
+                                                self)
 
         attribute.function_signature = self._function_signature
         if not self._add_to_table(attribute, messenger):

@@ -7,7 +7,7 @@ import typing
 
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
-import Specifiers
+import type_specifier
 
 
 class TypeModifierNode(AbstractNode.AbstractNode):
@@ -22,7 +22,7 @@ class TypeModifierNode(AbstractNode.AbstractNode):
 
     _BASE_LABEL = "TypeModifier"
 
-    def __init__(self, parent_node, filename, ctx, mod_type: Specifiers.TypeModifier = None):
+    def __init__(self, parent_node, filename, ctx, mod_type: type_specifier.TypeSpecifier = None):
         """
         Initializer
         :param parent_node: the parent node
@@ -33,16 +33,28 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         self._rhs_node = None
         self._param_list_node = None
 
-        self.modifier_type = mod_type
+        self._modifier_type = mod_type
         self._is_implicit_conversion = False
 
     def __eq__(self, o):
 
-        if self.modifier_type == o.modifier_type:
+        if self._modifier_type == o.modifier_type:
             if self.get_function_signature() == o.get_function_signature():
                 return True
 
         return False
+
+    @property
+    def modifier_type(self):
+        return self._modifier_type
+
+    @modifier_type.setter
+    def modifier_type(self, val):
+
+        if isinstance(val, str):
+            val = type_specifier.TypeSpecifier(val)
+
+        self._modifier_type = val
 
     def get_function_signature(self):
         if self._param_list_node:
@@ -54,8 +66,8 @@ class TypeModifierNode(AbstractNode.AbstractNode):
     def label(self):
 
         ret = self._BASE_LABEL
-        if self.modifier_type is not None:
-            ret += "\nType: {0}\n".format(self.modifier_type.value)
+        if self._modifier_type is not None:
+            ret += "\nType: {0}\n".format(self._modifier_type.value)
         else:
             ret += "??"
 
@@ -102,7 +114,7 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         if self._type_modifier_node is not None:
             self._type_modifier_node.generate_type_operator_stack(node, messenger)
 
-        node.type_stack_ref().append(self)
+        node.type_stack_ref().append(self._modifier_type)
         return True
 
     def array_has_length(self) -> bool:
@@ -113,7 +125,6 @@ class TypeModifierNode(AbstractNode.AbstractNode):
                 return False
             else:
                 return True
-
 
     # def implicit_param_ptr_conversion(self):
     #

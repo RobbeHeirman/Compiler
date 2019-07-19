@@ -24,11 +24,13 @@ import Nodes.FunctionNodes.FuncDefNode as FuncDefNode
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 import Nodes.FunctionNodes.ReturnNode as ReturnNode
 import Nodes.GlobalNodes.RootNode as RootNode
-from Nodes.AbstractNodes import TypedNode
-from Nodes.ExpressionNodes import ExpressionTypeModifierNode
-from Nodes.GlobalNodes import GlobalDeclarationNode
-from Nodes.GlobalNodes.StatementsNode import StatementsNode
-from Specifiers import ConditionType, TypeModifier, TypeSpecifier
+import Nodes.GlobalNodes.GlobalDeclarationNode as GlobalDeclarationNode
+import Nodes.GlobalNodes.StatementsNode as StatementNode
+import Specifiers
+import type_specifier
+import Nodes.AbstractNodes.TypedNode as TypedNode
+import Nodes.ExpressionNodes.ExpressionTypeModifierNode as ExpressionTypeModifierNode
+
 from gen.CListener import CListener
 from gen.CParser import CParser
 
@@ -69,7 +71,7 @@ class CListenerExtend(CListener):
         """
 
         self._scope_counter += 1
-        node = StatementsNode(self._parent_node, self._filename, ctx)
+        node = StatementNode.StatementsNode(self._parent_node, self._filename, ctx)
         self._parent_node.add_child(node)
         self._parent_node = node
 
@@ -169,7 +171,7 @@ class CListenerExtend(CListener):
         """
         value = ctx.getText()
         self._parent_node: TypedNode.TypedNode
-        self._parent_node.set_base_type(TypeSpecifier(value))
+        self._parent_node.set_base_type(type_specifier.TypeSpecifier(value))
 
     def enterDeclarator(self, ctx: CParser.DeclaratorContext):
         """
@@ -190,7 +192,7 @@ class CListenerExtend(CListener):
 
     def enterPtr_decl(self, ctx: CParser.Ptr_declContext):
 
-        self._parent_node.modifier_type = TypeModifier.PTR
+        self._parent_node.modifier_type = type_specifier.TypeSpecifier.POINTER
 
     def enterFunction_operator(self, ctx: CParser.Function_operatorContext):
 
@@ -198,7 +200,7 @@ class CListenerExtend(CListener):
             self._prev_node = self._parent_node
             self._parent_node = self._func_def_node
         else:
-            self._parent_node.modifier_type = TypeModifier.FUNC
+            self._parent_node.modifier_type = type_specifier.TypeSpecifier.FUNCTION
 
     def exitFunction_operator(self, ctx: CParser.Function_operatorContext):
 
@@ -207,7 +209,7 @@ class CListenerExtend(CListener):
 
     def enterArray_operator(self, ctx: CParser.Array_operatorContext):
 
-        self._parent_node.modifier_type = TypeModifier.ARRAY
+        self._parent_node.modifier_type = type_specifier.TypeSpecifier.ARRAY
 
     def enterId_decl(self, ctx: CParser.Id_declContext):
         self._parent_node: Union[DeclarationNode.DeclarationNode, TypeModifierNode.TypeModifierNode]
@@ -297,15 +299,15 @@ class CListenerExtend(CListener):
 
     def enterCharacter_constant(self, ctx: CParser.Character_constantContext):
         self._parent_node: ConstantExpressionNode.ConstantExpressionNode
-        self._parent_node.add_base_type(TypeSpecifier.CHAR)
+        self._parent_node.set_base_type(type_specifier.TypeSpecifier.CHAR)
 
     def enterFloating_constant(self, ctx: CParser.Floating_constantContext):
         self._parent_node: ConstantExpressionNode.ConstantExpressionNode
-        self._parent_node.add_base_type(TypeSpecifier.FLOAT)
+        self._parent_node.set_base_type(type_specifier.TypeSpecifier.FLOAT)
 
     def enterInteger_constant(self, ctx: CParser.Integer_constantContext):
         self._parent_node: ConstantExpressionNode.ConstantExpressionNode
-        self._parent_node.add_base_type(TypeSpecifier.INT)
+        self._parent_node.set_base_type(type_specifier.TypeSpecifier.INT)
 
     def enterId_expression(self, ctx: CParser.Id_expressionContext):
         id_node = IdentifierExpressionNode.IdentifierExpressionNode(self._parent_node, self._filename, ctx)
@@ -319,11 +321,11 @@ class CListenerExtend(CListener):
 
     def enterExpression_prefix(self, ctx: CParser.Expression_prefixContext):
         val = ctx.getChild(0).getText()
-        self._parent_node.modifier_type = TypeModifier(val)
+        self._parent_node.modifier_type = type_specifier.TypeSpecifier(val)
 
     def enterExpression_postfix(self, ctx: CParser.Expression_postfixContext):
         val = ctx.getChild(0).getChild(0).getText() + ctx.getChild(0).getChild(2).getText()
-        self._parent_node.modifier_type = TypeModifier(val)
+        self._parent_node.modifier_type = type_specifier.TypeSpecifier(val)
 
     def enterExpression_param_list(self, ctx: CParser.Expression_param_listContext):
 
@@ -345,7 +347,7 @@ class CListenerExtend(CListener):
 
     def enterIf_statement(self, ctx: CParser.If_statementContext):
 
-        c_type = ConditionType.IF
+        c_type = Specifiers.ConditionType.IF
         node = IfElseNode.IfElseNode(self._parent_node, c_type)
 
         self._parent_node.add_child(node)
@@ -355,7 +357,7 @@ class CListenerExtend(CListener):
         self._parent_node = self._parent_node.parent_node
 
     def enterElse_if_statement(self, ctx: CParser.Else_if_statementContext):
-        c_type = ConditionType.ELSE_IF
+        c_type = Specifiers.ConditionType.ELSE_IF
         node = IfElseNode.IfElseNode(self._parent_node, c_type)
 
         self._parent_node.add_child(node)
@@ -365,7 +367,7 @@ class CListenerExtend(CListener):
         self._parent_node = self._parent_node.parent_node
 
     def enterElse_statement(self, ctx: CParser.Else_statementContext):
-        c_type = ConditionType.ELSE
+        c_type = Specifiers.ConditionType.ELSE
         node = IfElseNode.IfElseNode(self._parent_node, c_type)
 
         self._parent_node.add_child(node)
@@ -376,7 +378,7 @@ class CListenerExtend(CListener):
 
     def enterWhile_statement(self, ctx: CParser.While_statementContext):
 
-        c_type = ConditionType.WHILE
+        c_type = Specifiers.ConditionType.WHILE
         node = IfElseNode.IfElseNode(self._parent_node, c_type)
         self._parent_node.add_child(node)
         self._parent_node = node

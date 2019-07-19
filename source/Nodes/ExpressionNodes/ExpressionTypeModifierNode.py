@@ -3,11 +3,11 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from Nodes.DeclarationNodes.TypeModifierNode import TypeModifierNode
-from Specifiers import TypeModifier
+import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
+import type_specifier
 
 
-class ExpressionTypeModifierNode(TypeModifierNode):
+class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
 
     def __init__(self, parent_node, filename, ctx, modifier=None):
         super().__init__(parent_node, filename, ctx, modifier)
@@ -18,8 +18,8 @@ class ExpressionTypeModifierNode(TypeModifierNode):
                 return False
 
         # Meaning the Dereference operator
-        if self.modifier_type == TypeModifier.PTR:
-            if node.type_stack_ref().type_stack[-1].type_modifier == TypeModifier.PTR:
+        if self._modifier_type == type_specifier.TypeSpecifier.POINTER:
+            if node.type_stack_ref().type_stack[-1].type_modifier == type_specifier.TypeSpecifier.POINTER:
                 # If we dereference the type loses it's 'ptr' type
                 node.type_stack_ref().type_stack.pop()
                 node.l_value = True
@@ -29,9 +29,9 @@ class ExpressionTypeModifierNode(TypeModifierNode):
                 return False
 
         # Ref operator value becomes an address
-        elif self.modifier_type == TypeModifier.ADDRESS:
+        elif self._modifier_type == type_specifier.TypeSpecifier.ADDRESS:
             if node.l_value:
-                node.type_stack_ref().append(TypeModifier.PTR)
+                node.type_stack_ref().append(type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER))
                 node.l_value = False
 
             else:
@@ -39,15 +39,15 @@ class ExpressionTypeModifierNode(TypeModifierNode):
                 return False
 
         # Function call,
-        elif self.modifier_type == TypeModifier.FUNC:
+        elif self._modifier_type == type_specifier.TypeSpecifier.FUNCTION:
 
-            if node.type_stack_ref()[-1].modifier_type == TypeModifier.FUNC:
-                if self.get_function_signature() == node.type_stack_ref()[-1].get_function_signature():
+            if node.type_stack_ref()[-1] == type_specifier.TypeSpecifier.FUNCTION:
+                if self.get_function_signature() == node.type_stack_ref()[-1].function_signature:
                     node.type_stack_ref().pop()
 
                 else:
                     print(self.get_function_signature())
-                    print(node.type_stack_ref()[-1].get_function_signature())
+                    print(node.type_stack_ref()[-1].function_signature)
                     print(f'{self._line}TODO something about wrong signatures')
 
             else:

@@ -4,10 +4,8 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 
-# import LlvmCode
 import LlvmCode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
-from Specifiers import TypeSpecifier
 
 
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):

@@ -1,7 +1,5 @@
 import typing
-
-import Specifiers
-import Specifiers as TypeSpecifier
+import type_specifier
 
 
 class Attributes:
@@ -10,14 +8,14 @@ class Attributes:
     """
     function_signature: typing.List["Attributes"]
 
-    _base_type: TypeSpecifier
-    _operator_stack: typing.List[Specifiers.TypeModifier]
+    _base_type: type_specifier.TypeSpecifier
+    _operator_stack: typing.List[type_specifier.TypeSpecifier]
 
     _column: int
     _line: int
     _filename: str
 
-    def __init__(self, type_stack: typing.List[Specifiers.TypeModifier],
+    def __init__(self, type_stack: typing.List[type_specifier.TypeSpecifier],
                  filename: str, line: int, column: int):
         """
         Initializer
@@ -104,7 +102,7 @@ class AttributesGlobal(Attributes):
     An extension on attributes for the global table
     """
 
-    def __init__(self, type_stack: typing.List[Specifiers.TypeModifier], filename: str,
+    def __init__(self, type_stack: typing.List[type_specifier.TypeSpecifier], filename: str,
                  line: int, column: int, defined: bool, original_declaration_node):
         super().__init__(type_stack, filename, line, column)
 

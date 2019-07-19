@@ -4,10 +4,10 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 import typing
-import Specifiers
+import type_specifier
 
 
-def convert_operator_stack_to_str(operator_stack: typing.List[Specifiers.TypeModifier]) -> str:
+def convert_operator_stack_to_str(operator_stack: typing.List[type_specifier.TypeSpecifier]) -> str:
     """
     Converts operator stack to a string
     :param operator_stack: The stack of declaratorSpecifiers
@@ -15,7 +15,7 @@ def convert_operator_stack_to_str(operator_stack: typing.List[Specifiers.TypeMod
     """
     ret_str = ""
     for operator in operator_stack:
-        ret_str += operator.modifier_type.value
+        ret_str += operator.value
     return ret_str
 
 
@@ -35,9 +35,9 @@ def llvm_allocate_instruction(target_register: str, operator_stack,
 
 
 def llvm_store_instruction(source_register: str,
-                           source_operator_stack: typing.List[Specifiers.TypeModifier],
+                           source_operator_stack: typing.List[type_specifier.TypeSpecifier],
                            target_register: str,
-                           target_operator_stack: typing.List[Specifiers.TypeModifier],
+                           target_operator_stack: typing.List[type_specifier.TypeSpecifier],
                            indent_string: str) -> str:
     """
 
@@ -88,8 +88,8 @@ def llvm_store_instruction_c(source_type, source_constant: str, target_type, tar
 
 
 def llvm_load_instruction(source_register: str,
-                          source_operator_stack: typing.List[Specifiers.TypeModifier], target_register: str,
-                          target_operator_stack: typing.List[Specifiers.TypeModifier],
+                          source_operator_stack: typing.List[type_specifier.TypeSpecifier], target_register: str,
+                          target_operator_stack: typing.List[type_specifier.TypeSpecifier],
                           indent_string: str) -> str:
     """
 

@@ -7,7 +7,7 @@ import struct
 
 import LlvmCode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
-from Specifiers import TypeSpecifier
+import type_specifier
 
 
 class ConstantExpressionNode(ExpressionNode.ExpressionNode):
@@ -28,7 +28,7 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
     @property
     def llvm_constant(self) -> str:
-        if self._type_stack[0] is TypeSpecifier.CHAR:
+        if self._type_stack[0] is type_specifier.TypeSpecifier.CHAR:
             return str(ord(str(self.constant)[1]))
 
         elif self._type_stack[0] is TypeSpecifier.FLOAT:
@@ -38,9 +38,6 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
             return constant
 
         return str(self.constant)
-
-    def add_base_type(self, base_type):
-        self._type_stack.append(base_type)
 
     def generate_llvm(self) -> str:
         self.increment_register_index()

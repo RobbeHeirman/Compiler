@@ -1,6 +1,7 @@
 import abc
 
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
+import type_specifier
 
 
 class TypedNode(AbstractNode.AbstractNode, abc.ABC):
@@ -27,6 +28,10 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
         return self._type_stack
 
     def set_base_type(self, tp):
+
+        if isinstance(tp, str):
+            tp = type_specifier.TypeSpecifier(tp)
+
         self._type_stack.append(tp)
 
     def _generate_type_modifier_stack(self, messenger):

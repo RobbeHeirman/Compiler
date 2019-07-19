@@ -7,7 +7,7 @@ from typing import List, Union
 
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
-from Specifiers import TypeSpecifier
+import type_specifier
 
 
 class DeclListNode(AbstractNode.AbstractNode):
@@ -15,7 +15,7 @@ class DeclListNode(AbstractNode.AbstractNode):
     Start of a , separated list of declarations.
     this such nodes has ONE base type and a list of declarations
     """
-    base_type: TypeSpecifier
+    base_type: type_specifier.TypeSpecifier
     _declaration_nodes: List[DeclarationNode.DeclarationNode]
     _BASE_LABEL = "decl_list"
 

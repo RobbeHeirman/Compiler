@@ -40,7 +40,7 @@ class DeclarationNode(TypedNode.TypedNode):
     def label(self):
         ret_label = self._BASE_LABEL
         if self._type_stack:
-            ret_label += f"\\n Type: {[val.modifier_type.value for val in self._type_stack]}"
+            ret_label += f"\\n Type: {[val.value for val in self._type_stack]}"
 
         if self.id is not None:
             ret_label += f"\\n Identifier: {self.id}"
@@ -152,7 +152,8 @@ class DeclarationNode(TypedNode.TypedNode):
             if expression_stack and element == expression_stack[-1]:
                 prev_ele = expression_stack.pop()
             else:
-                print(messenger.warning_init_makes_a_from_b(prev_ele.value, self._type_stack[-1].value, self._filename,
+                print(messenger.warning_init_makes_a_from_b(prev_ele.value, self._type_stack[-1].value,
+                                                            self._filename,
                                                             self._line, self._column))
                 break
 
@@ -168,7 +169,7 @@ class DeclarationNode(TypedNode.TypedNode):
         """
 
         ret = self.indent_string() + "; Declaration: {0}{1}\n".format(self._type_stack[0].value,
-                                                                          self.id)
+                                                                      self.id)
 
         # # Special types need other llvm code first
         # if self._type_stack and self._type_stack[-1] is TypeModifierNode.TypeModifier.ARRAY:

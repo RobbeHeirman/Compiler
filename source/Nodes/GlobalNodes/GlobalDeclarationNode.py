@@ -4,28 +4,28 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 import LlvmCode
-import Specifiers
-from Attributes import AttributesGlobal
-from Nodes.DeclarationNodes import DeclarationNode
-from SymbolTable import GlobalActions
-from messages import MessageGenerator
+import type_specifier
+import Attributes
+import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
+import SymbolTable
+import messages
 
 
 class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
     _BASE_LABEL = "GlobalDeclaration"
 
     _DEFAULT_VALUE_MAP = {
-        Specifiers.TypeSpecifier.INT: 0,
-        Specifiers.TypeSpecifier.FLOAT: 0.0,
-        Specifiers.TypeSpecifier.CHAR: 0,
-        Specifiers.TypeModifier.PTR: "null",
-        Specifiers.TypeModifier.FUNC: "null"
+        type_specifier.TypeSpecifier.INT: 0,
+        type_specifier.TypeSpecifier.FLOAT: 0.0,
+        type_specifier.TypeSpecifier.CHAR: 0,
+        type_specifier.TypeSpecifier.POINTER: "null",
+        type_specifier.TypeSpecifier.FUNCTION: "null"
     }
 
     def __init__(self, parent_node, filename, ctx):
         super().__init__(parent_node, filename, ctx)
 
-    def semantic_analysis(self, messenger: MessageGenerator):
+    def semantic_analysis(self, messenger: messages.MessageGenerator):
 
         if not self._generate_type_modifier_stack(messenger):
             return False
@@ -46,12 +46,12 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
             defined = True
 
-        attribute = AttributesGlobal(self._type_stack, self._filename, self._line, self._column,
-                                     defined,
-                                     self)
+        attribute = Attributes.AttributesGlobal(self._type_stack, self._filename, self._line, self._column,
+                                                defined,
+                                                self)
 
         # Function types have something extra, their function signature need to be recorded
-        if self._type_stack and self._type_stack[-1].modifier_type == Specifiers.TypeModifier.FUNC:
+        if self._type_stack and self._type_stack[-1] == type_specifier.TypeSpecifier.FUNCTION:
             function_signature = self._type_modifier_node.get_function_signature()
 
             attribute.function_signature = function_signature
@@ -67,21 +67,21 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
         :return:
         """
         next_action = self._parent_node.add_to_scope_symbol_table(self.id, attribute)
-        if next_action == GlobalActions.DO_NOTHING:
+        if next_action == SymbolTable.GlobalActions.DO_NOTHING:
             return True
 
-        elif next_action == GlobalActions.REMOVE_NODE:
+        elif next_action == SymbolTable.GlobalActions.REMOVE_NODE:
 
             # OPT: some redeclaration's just don't do anything, we can remove those nodes from the AST
             self._parent_node.remove_child(self)
 
             return True
 
-        elif next_action == GlobalActions.REDEFINE_ERROR:
+        elif next_action == SymbolTable.GlobalActions.REDEFINE_ERROR:
             messenger.error_redefinition(self._filename, self._line, self._column, self.id)
             return False
 
-        elif next_action == GlobalActions.WRONG_TYPE:
+        elif next_action == SymbolTable.GlobalActions.WRONG_TYPE:
             messenger.error_conflicting_types(self._filename, self._line, self._column, self.id)
             return False
 
