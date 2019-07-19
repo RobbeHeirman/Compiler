@@ -15,18 +15,15 @@ class Attributes:
     _line: int
     _filename: str
 
-    def __init__(self, type_stack: typing.List[type_specifier.TypeSpecifier],
-                 filename: str, line: int, column: int):
+    def __init__(self, type_stack: typing.List[type_specifier.TypeSpecifier], line: int, column: int):
         """
         Initializer
         :param type_stack: The operators applied on the declaration (*, [], ())
-        :param filename: name of the file lexeme is found
         :param line: the line where de lexeme is found.
         :param column: the column where the lexeme is found.
         """
 
         self._operator_stack = type_stack  # Stacks all the declared operators operators
-        self._filename = filename
         self._line = line
         self._column = column
 
@@ -106,9 +103,9 @@ class AttributesGlobal(Attributes):
     An extension on attributes for the global table
     """
 
-    def __init__(self, type_stack: typing.List[type_specifier.TypeSpecifier], filename: str,
+    def __init__(self, type_stack: typing.List[type_specifier.TypeSpecifier],
                  line: int, column: int, defined: bool, original_declaration_node):
-        super().__init__(type_stack, filename, line, column)
+        super().__init__(type_stack, line, column)
 
         self.function_signature = []
         self.defined = defined

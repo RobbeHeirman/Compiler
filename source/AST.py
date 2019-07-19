@@ -11,12 +11,12 @@ class AST:
     """Representation of the Abstract syntax tree"""
     _root: RootNode.RootNode
 
-    def __init__(self):
+    def __init__(self, filename):
         """
         Initializer
         """
         self._root = None
-        self._messenger = messages.MessageGenerator()
+        self._messenger = messages.MessageGenerator(filename)
 
     def error_count(self) -> int:
         return self._messenger.error_counter

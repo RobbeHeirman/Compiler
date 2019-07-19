@@ -9,8 +9,8 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
     Superclass for all classes who have knowledge about their type. (Declarations right side id's expressions...)
     """
 
-    def __init__(self, parent_node, filename, ctx):
-        super().__init__(parent_node, filename, ctx)
+    def __init__(self, parent_node, ctx):
+        super().__init__(parent_node, ctx)
 
         self._type_modifier_node = None  # Start of the type modifier subtree this can be *, [], ()
         self._type_stack = []

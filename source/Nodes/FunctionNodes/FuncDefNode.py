@@ -16,8 +16,8 @@ import Nodes.GlobalNodes.StatementsNode
 class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
     _id: str
 
-    def __init__(self, parent_node: AbstractNode.AbstractNode, filename, ctx):
-        super().__init__(parent_node, filename, ctx)
+    def __init__(self, parent_node: AbstractNode.AbstractNode, ctx):
+        super().__init__(parent_node, ctx)
 
         self._param_list_node = None
         self._function_signature = []
@@ -63,7 +63,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
                                                              self._param_list_node.get_function_signature()))
 
         self._function_signature = self._param_list_node.get_function_signature()
-        attribute = Attributes.AttributesGlobal(self._type_stack, self._filename, self._line, self._column,
+        attribute = Attributes.AttributesGlobal(self._type_stack, self._line, self._column,
                                                 True,
                                                 self)
 

@@ -25,16 +25,12 @@ class DeclarationNode(TypedNode.TypedNode):
 
     _BASE_LABEL = "Declaration"
 
-    def __init__(self, parent_node, filename, ctx):
-        super().__init__(parent_node, filename, ctx)
+    def __init__(self, parent_node, ctx):
+        super().__init__(parent_node, ctx)
 
         self.id = None
         self._expression_node = None
         # Error message info
-        self._filename = filename
-        start = ctx.start
-        self._line = start.line
-        self._column = start.column
 
     @property
     def label(self):
@@ -153,7 +149,7 @@ class DeclarationNode(TypedNode.TypedNode):
                 prev_ele = expression_stack.pop()
             else:
                 print(messenger.warning_init_makes_a_from_b(prev_ele.value, self._type_stack[-1].value,
-                                                            self._filename,
+
                                                             self._line, self._column))
                 break
 
@@ -161,7 +157,7 @@ class DeclarationNode(TypedNode.TypedNode):
         # TODO mechanism to inform expression node of conversion
 
     def _make_attribute(self):
-        return Attributes.Attributes(self._type_stack, self._filename, self._line, self._column)
+        return Attributes.Attributes(self._type_stack, self._line, self._column)
 
     def generate_llvm(self) -> str:
         """"

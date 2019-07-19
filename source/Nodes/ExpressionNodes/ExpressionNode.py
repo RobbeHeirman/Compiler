@@ -1,36 +1,35 @@
-from enum import Enum, auto
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
-import Specifiers
 
 
-class ExpressionNodeType(Enum):
-    BINARY_OPERATOR = auto()
-    CONSTANT = "Constant: "
-    IDENTIFIER = "Identifier: "
-    PTR = "*"
-    ADDR = "&"
-    ARRAY = "[]"
-    FUNCTION = "()"
-
-    @property
-    def decl_specifier(self):
-        specifier_map = {
-            self.PTR: Specifiers.TypeModifier.PTR,
-            self.ADDR: Specifiers.TypeModifier.ADDRESS,
-            self.ARRAY: Specifiers.TypeModifier.ARRAY,
-            self.FUNCTION: Specifiers.TypeModifier.FUNC
-        }
-        return specifier_map[self]
+# class ExpressionNodeType(Enum):
+#     BINARY_OPERATOR = auto()
+#     CONSTANT = "Constant: "
+#     IDENTIFIER = "Identifier: "
+#     PTR = "*"
+#     ADDR = "&"
+#     ARRAY = "[]"
+#     FUNCTION = "()"
+#
+#     @property
+#     def decl_specifier(self):
+#         specifier_map = {
+#             self.PTR: Specifiers.TypeModifier.PTR,
+#             self.ADDR: Specifiers.TypeModifier.ADDRESS,
+#             self.ARRAY: Specifiers.TypeModifier.ARRAY,
+#             self.FUNCTION: Specifiers.TypeModifier.FUNC
+#         }
+#         return specifier_map[self]
 
 
 class ExpressionNode(TypedNode.TypedNode):
     _BASE_LABEL = "expression"
-    _OPERATOR_TYPES = [ExpressionNodeType.ARRAY,
-                       ExpressionNodeType.PTR, ExpressionNodeType.ADDR, ExpressionNodeType.FUNCTION]
 
-    def __init__(self, parent_node, filename, ctx):
-        super().__init__(parent_node, filename, ctx)
+    # _OPERATOR_TYPES = [ExpressionNodeType.ARRAY,
+    #                    ExpressionNodeType.PTR, ExpressionNodeType.ADDR, ExpressionNodeType.FUNCTION]
+
+    def __init__(self, parent_node, ctx):
+        super().__init__(parent_node, ctx)
 
         self._identifier_node = None
         self._type_modifier_node = None
@@ -50,11 +49,11 @@ class ExpressionNode(TypedNode.TypedNode):
             ret += "Base type: " + self._type_stack[0].value + "\n"
         return ret
 
-    def is_address(self):
-        if self._type_stack and self._type_stack[-1] is Specifiers.TypeModifier.ADDRESS:
-            return True
-
-        return False
+    # def is_address(self):
+    #     if self._type_stack and self._type_stack[-1] is Specifiers.TypeModifier.ADDRESS:
+    #         return True
+    #
+    #     return False
 
     def add_child(self, child, index=None):
 
@@ -68,47 +67,47 @@ class ExpressionNode(TypedNode.TypedNode):
 
         super().add_child(child)
 
-    def get_error_info(self):
-        """
-        :return: A tuple filename, line, column
-        """
-        if self._filename is None:
-            for _ in self._children:
-                # val = child.get_error_info()
-                val = ""
-                if val is not None:
-                    return val
-        else:
-            return self._filename, self._line, self._column
+    # def get_error_info(self):
+    #     """
+    #     :return: A tuple filename, line, column
+    #     """
+    #     if self._filename is None:
+    #         for _ in self._children:
+    #             # val = child.get_error_info()
+    #             val = ""
+    #             if val is not None:
+    #                 return val
+    #     else:
+    #         return self._filename, self._line, self._column
 
-    def _handle_member_operator_node(self):
-        if self._type_modifier_node is not None:
-            if self._type_modifier_node.f_type == Specifiers.TypeModifier.PTR:
-                self.type = ExpressionNodeType.PTR
-                self.remove_child(self._type_modifier_node)
-                self._type_modifier_node = None
-
-            elif self._type_modifier_node.f_type == Specifiers.TypeModifier.ADDRESS:
-                self.type = ExpressionNodeType.ADDR
-                self.remove_child(self._type_modifier_node)
-                self._type_modifier_node = None
-
-            elif self._type_modifier_node.f_type == Specifiers.TypeModifier.ARRAY:
-                self.type = ExpressionNodeType.ARRAY
-
-                self._type_modifier_node.rhs_node.parent = self
-                self.add_child(self._type_modifier_node.rhs_node)
-                self._type_modifier_node.rhs_node.parent_node = self
-                self.remove_child(self._type_modifier_node)
-                self._type_modifier_node = None
-
-            elif self._type_modifier_node.f_type == Specifiers.TypeModifier.FUNCTION:
-                self.type = ExpressionNodeType.FUNCTION
-                self._type_modifier_node.rhs_node.parent = self
-                self.add_child(self._type_modifier_node.rhs_node)
-                self._type_modifier_node.rhs_node.parent_node = self
-                self.remove_child(self._type_modifier_node)
-                self._type_modifier_node = None
+    # def _handle_member_operator_node(self):
+    #     if self._type_modifier_node is not None:
+    #         if self._type_modifier_node.f_type == Specifiers.TypeModifier.PTR:
+    #             self.type = ExpressionNodeType.PTR
+    #             self.remove_child(self._type_modifier_node)
+    #             self._type_modifier_node = None
+    #
+    #         elif self._type_modifier_node.f_type == Specifiers.TypeModifier.ADDRESS:
+    #             self.type = ExpressionNodeType.ADDR
+    #             self.remove_child(self._type_modifier_node)
+    #             self._type_modifier_node = None
+    #
+    #         elif self._type_modifier_node.f_type == Specifiers.TypeModifier.ARRAY:
+    #             self.type = ExpressionNodeType.ARRAY
+    #
+    #             self._type_modifier_node.rhs_node.parent = self
+    #             self.add_child(self._type_modifier_node.rhs_node)
+    #             self._type_modifier_node.rhs_node.parent_node = self
+    #             self.remove_child(self._type_modifier_node)
+    #             self._type_modifier_node = None
+    #
+    #         elif self._type_modifier_node.f_type == Specifiers.TypeModifier.FUNCTION:
+    #             self.type = ExpressionNodeType.FUNCTION
+    #             self._type_modifier_node.rhs_node.parent = self
+    #             self.add_child(self._type_modifier_node.rhs_node)
+    #             self._type_modifier_node.rhs_node.parent_node = self
+    #             self.remove_child(self._type_modifier_node)
+    #             self._type_modifier_node = None
 
     # def first_pass(self):
     #     self._handle_member_operator_node()
@@ -134,4 +133,3 @@ class ExpressionNode(TypedNode.TypedNode):
 
     def is_constant(self):
         return False
-

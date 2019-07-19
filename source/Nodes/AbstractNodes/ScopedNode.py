@@ -17,11 +17,11 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
     """
     _register_index: int
 
-    def __init__(self, parent_node=None, filename=None, ctx=None):
+    def __init__(self, parent_node=None, ctx=None):
         """
         Initializer
         """
-        super().__init__(parent_node, filename, ctx)
+        super().__init__(parent_node, ctx)
         self._symbol_table = SymbolTable.SymbolTable()
         self._register_index = -1
 

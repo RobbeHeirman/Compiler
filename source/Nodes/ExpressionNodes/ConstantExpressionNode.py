@@ -12,8 +12,8 @@ import type_specifier
 
 class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
-    def __init__(self, parent_node, filename, ctx):
-        super().__init__(parent_node, filename, ctx)
+    def __init__(self, parent_node, ctx):
+        super().__init__(parent_node, ctx)
 
         self.constant = ctx.getText()
         self.l_value = False  # Constant's are always r value's

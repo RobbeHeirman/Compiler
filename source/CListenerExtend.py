@@ -46,11 +46,9 @@ class CListenerExtend(CListener):
     def __init__(self, filename: str):
         # Some info about the traversing will be recorded
 
-        self._ast = AST.AST()
-        self._filename = filename
-        root_node = RootNode.RootNode()
-        self._ast.root = root_node
-        self._parent_node = root_node
+        self._ast = AST.AST(filename)
+        self._ast.root = RootNode.RootNode()
+        self._parent_node = self._ast.root
 
         # Will help us determine if we are in the global scope.
         self._scope_counter = 0
@@ -70,7 +68,7 @@ class CListenerExtend(CListener):
         """
 
         self._scope_counter += 1
-        node = StatementNode.StatementsNode(self._parent_node, self._filename, ctx)
+        node = StatementNode.StatementsNode(self._parent_node, ctx)
         self._parent_node.add_child(node)
         self._parent_node = node
 
@@ -80,7 +78,7 @@ class CListenerExtend(CListener):
         self._parent_node = self._parent_node.parent_node
 
     def enterFunc_def(self, ctx: CParser.Func_defContext):
-        func_node = FuncDefNode.FuncDefNode(self._parent_node, self._filename, ctx)
+        func_node = FuncDefNode.FuncDefNode(self._parent_node, ctx)
         self._parent_node.add_child(func_node)
         self._parent_node = func_node
         self._func_def_node = func_node
@@ -108,7 +106,7 @@ class CListenerExtend(CListener):
 
     def enterRet_statement(self, ctx: CParser.Ret_statementContext):
 
-        ret_node = ReturnNode.ReturnNode(self._parent_node, self._filename, ctx)
+        ret_node = ReturnNode.ReturnNode(self._parent_node, ctx)
         self._parent_node.add_child(ret_node)
         self._parent_node = ret_node
 
@@ -116,7 +114,7 @@ class CListenerExtend(CListener):
         self._parent_node = self._parent_node.parent_node
 
     def enterParam(self, ctx: CParser.ParamContext):
-        decl_node = DeclarationNode.DeclarationNode(self._parent_node, self._filename, ctx)
+        decl_node = DeclarationNode.DeclarationNode(self._parent_node, ctx)
         self._parent_node.add_child(decl_node)
         self._parent_node = decl_node
 
@@ -146,9 +144,9 @@ class CListenerExtend(CListener):
         :param ctx: context of the node
         """
 
-        declaration_node = GlobalDeclarationNode.GlobalDeclarationNode(self._parent_node, self._filename, ctx) \
+        declaration_node = GlobalDeclarationNode.GlobalDeclarationNode(self._parent_node, ctx) \
             if self._scope_counter == 0 \
-            else DeclarationNode.DeclarationNode(self._parent_node, self._filename, ctx)
+            else DeclarationNode.DeclarationNode(self._parent_node, ctx)
 
         self._parent_node.add_child(declaration_node)
         self._parent_node = declaration_node
@@ -180,7 +178,7 @@ class CListenerExtend(CListener):
         """
         # column = start.column
         if ctx.getChild(0).getText() is not "(":  # parenthesis are just used to order
-            node = TypeModifierNode.TypeModifierNode(self._parent_node, self._filename, ctx)
+            node = TypeModifierNode.TypeModifierNode(self._parent_node, ctx)
             self._parent_node.add_child(node)
             self._parent_node = node
 
@@ -264,7 +262,7 @@ class CListenerExtend(CListener):
         This is filled in later by the prefix rule itself.
 
         """
-        prefix_node = ExpressionTypeModifierNode.ExpressionTypeModifierNode(self._parent_node, self._filename, ctx)
+        prefix_node = ExpressionTypeModifierNode.ExpressionTypeModifierNode(self._parent_node, ctx)
         # The expression Node gets linked on exit (and found as well)
         if isinstance(self._parent_node, TypeModifierNode.TypeModifierNode):
             self._parent_node.add_child(prefix_node)
@@ -288,7 +286,7 @@ class CListenerExtend(CListener):
         self._parent_node = self._parent_node.parent_node
 
     def enterConstant(self, ctx: CParser.ConstantContext):
-        c_node = ConstantExpressionNode.ConstantExpressionNode(self._parent_node, self._filename, ctx)
+        c_node = ConstantExpressionNode.ConstantExpressionNode(self._parent_node, ctx)
         self._parent_node.add_child(c_node)
         c_node.parent_node = self._parent_node
         self._parent_node = c_node
@@ -309,7 +307,7 @@ class CListenerExtend(CListener):
         self._parent_node.set_base_type(type_specifier.TypeSpecifier.INT)
 
     def enterId_expression(self, ctx: CParser.Id_expressionContext):
-        id_node = IdentifierExpressionNode.IdentifierExpressionNode(self._parent_node, self._filename, ctx)
+        id_node = IdentifierExpressionNode.IdentifierExpressionNode(self._parent_node, ctx)
         self._parent_node.add_child(id_node)
         self._parent_node = id_node
 

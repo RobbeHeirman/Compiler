@@ -8,7 +8,6 @@
 import typing
 from enum import Enum, auto
 import Attributes
-import type_specifier
 
 
 class SymbolTable:
@@ -45,7 +44,7 @@ class SymbolTable:
         return lexeme in self._container.keys()
 
     def get_attribute(self, lexeme) -> Attributes:
-        return self._container.get(lexeme, Attributes.Attributes([type_specifier.TypeSpecifier], "dummy", 0, 0))
+        return self._container.get(lexeme, Attributes.Attributes([], 0, 0))
 
 
 class GlobalActions(Enum):

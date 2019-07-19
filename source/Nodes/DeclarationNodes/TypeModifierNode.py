@@ -22,12 +22,12 @@ class TypeModifierNode(AbstractNode.AbstractNode):
 
     _BASE_LABEL = "TypeModifier"
 
-    def __init__(self, parent_node, filename, ctx, mod_type: type_specifier.TypeSpecifier = None):
+    def __init__(self, parent_node, ctx, mod_type: type_specifier.TypeSpecifier = None):
         """
         Initializer
         :param parent_node: the parent node
         """
-        super().__init__(parent_node, filename, ctx)
+        super().__init__(parent_node, ctx)
 
         self._type_modifier_node = None  # Child type_modifier_node. Used for nested type modifiers
         self._rhs_node = None

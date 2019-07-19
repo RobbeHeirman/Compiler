@@ -4,7 +4,6 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
-import Specifiers
 from Nodes.ExpressionNodes.ExpressionNode import ExpressionNode
 from Nodes.GlobalNodes.StatementsNode import StatementsNode
 
@@ -12,12 +11,8 @@ from Nodes.GlobalNodes.StatementsNode import StatementsNode
 class ReturnNode(AbstractNode.AbstractNode):
     label = "return"
 
-    def __init__(self, parent_node: AbstractNode.AbstractNode, filename, ctx):
-        super().__init__(parent_node, filename, ctx)
-
-    @property
-    def base_type(self):
-        return Specifiers.TypeSpecifier.DEFAULT
+    def __init__(self, parent_node: AbstractNode.AbstractNode, ctx):
+        super().__init__(parent_node, ctx)
 
     def semantic_analysis(self, messenger):
 
@@ -28,7 +23,7 @@ class ReturnNode(AbstractNode.AbstractNode):
         self._parent_node: StatementsNode
         child: ExpressionNode
         if not child.type_stack == self._parent_node.get_return_type():
-            messenger.error_conflicting_return_type(self._filename, self._line, self._column)
+            messenger.error_conflicting_return_type(self._line, self._column)
             return False
         return True
 

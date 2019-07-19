@@ -20,7 +20,9 @@ class MessageGenerator:
     Generates messages for the compiler. Keeps track of amount of error message calls.
     """
 
-    def __init__(self):
+    def __init__(self, filename):
+        self._filename = filename
+
         self.color_scheme = ColorScheme
         self._error_counter = 0
         self._warning_counter = 0
@@ -48,18 +50,18 @@ class MessageGenerator:
 
     def error(self, attribute: "Attributes.Attributes"):
         """Defines of type error"""
-        return self.error_f(attribute.filename, attribute.line, attribute.column)
+        return self.error_f(attribute.line, attribute.column)
 
-    def error_f(self, filename, line, column):
+    def error_f(self, line, column):
         self._error_counter += 1
-        return "{0}error: ".format(MessageGenerator.file_info_f(filename, line, column))
+        return "{0}error: ".format(MessageGenerator.file_info_f(self._filename, line, column))
 
     def error_redeclaration(self, lexeme, attribute):
         print(self.color_scheme.FAIL + "{0}redeclaration of \'{1}\' ".format(self.error(attribute), lexeme)
               + self.color_scheme.ENDC)
 
-    def error_undeclared_var(self, lexeme, filename, line, column):
-        print(self.color_scheme.FAIL + "{0}'{1}' undeclared".format(self.error_f(filename, line, column),
+    def error_undeclared_var(self, lexeme, line, column):
+        print(self.color_scheme.FAIL + "{0}'{1}' undeclared".format(self.error_f(line, column),
                                                                     lexeme) + self.color_scheme.ENDC)
 
     def error_redeclared_diff_symbol(self, lexeme, attribute):
@@ -111,9 +113,9 @@ class MessageGenerator:
         print(self.color_scheme.FAIL + "{0}lvalue required as unary'&' operand".format(self.error(attribute))
               + self.color_scheme.ENDC)
 
-    def error_non_void_return(self, lexeme, filename, line, column):
+    def error_non_void_return(self, lexeme, line, column):
         print(self.color_scheme.FAIL + "{0}non-void function '{1}' should return a value".format(
-            self.error_f(filename, line, column), lexeme) + self.color_scheme.ENDC)
+            self.error_f(line, column), lexeme) + self.color_scheme.ENDC)
 
     def error_no_conversion_int_ptr(self, attribute: "Attributes.Attributes",
                                     expression_type: type_specifier.TypeSpecifier):
@@ -129,24 +131,24 @@ class MessageGenerator:
               .format(self.error(attribute), attribute.decl_type.value, expression_type.value)
               + self.color_scheme.ENDC)
 
-    def error_lvalue_required_addr_operand(self, filename, line, column):
+    def error_lvalue_required_addr_operand(self, line, column):
         print(self.color_scheme.FAIL + "{0}lvalue required as unary '&' operand"
-              .format(self.error_f(filename, line, column)) + self.color_scheme.ENDC)
+              .format(self.error_f(line, column)) + self.color_scheme.ENDC)
 
-    def error_init_is_not_constant(self, filename, line, column):
-        print(self.color_scheme.FAIL + self.error_f(filename, line, column) + "initializer element is not constant"
+    def error_init_is_not_constant(self, line, column):
+        print(self.color_scheme.FAIL + self.error_f(line, column) + "initializer element is not constant"
               + self.color_scheme.ENDC)
 
-    def error_redefinition(self, filename, line, column, id):
-        print(self.color_scheme.FAIL + self.error_f(filename, line, column) + "redefinition of '" + str(id) + "'"
+    def error_redefinition(self, line, column, id_i):
+        print(self.color_scheme.FAIL + self.error_f(line, column) + "redefinition of '" + str(id_i) + "'"
               + self.color_scheme.ENDC)
 
-    def error_conflicting_types(self, filename, line, column, node_id):
-        print(self.color_scheme.FAIL + self.error_f(filename, line, column) + "conflicting types for '" + str(node_id)
+    def error_conflicting_types(self, line, column, node_id):
+        print(self.color_scheme.FAIL + self.error_f(line, column) + "conflicting types for '" + str(node_id)
               + "'" + self.color_scheme.ENDC)
 
-    def error_conflicting_return_type(self, filename, line, column):
-        print("{0}{1}conflicting return types{2}".format(self.color_scheme.FAIL, self.error_f(filename, line, column),
+    def error_conflicting_return_type(self, line, column):
+        print("{0}{1}conflicting return types{2}".format(self.color_scheme.FAIL, self.error_f(line, column),
                                                          self.color_scheme.ENDC))
 
     # Warnings
@@ -155,9 +157,9 @@ class MessageGenerator:
         self._warning_counter += 1
         return self.color_scheme.WARNING + "{0}warning: ".format(MessageGenerator.file_info_f(filename, line, column))
 
-    def warning_init_makes_a_from_b(self, a_type, b_type, filename, line, column):
+    def warning_init_makes_a_from_b(self, a_type, b_type, line, column):
         return "{0}initialization makes {1} from {2} without a cast".format(
-            self.warning_f(filename, line, column), b_type, a_type) + self.color_scheme.ENDC
+            self.warning_f(self._filename, line, column), b_type, a_type) + self.color_scheme.ENDC
 
     @staticmethod
     def note(attribute: "Attributes.Attributes"):

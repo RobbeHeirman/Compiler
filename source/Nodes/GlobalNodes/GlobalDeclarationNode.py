@@ -22,8 +22,8 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
         type_specifier.TypeSpecifier.FUNCTION: "null"
     }
 
-    def __init__(self, parent_node, filename, ctx):
-        super().__init__(parent_node, filename, ctx)
+    def __init__(self, parent_node, ctx):
+        super().__init__(parent_node, ctx)
 
     def semantic_analysis(self, messenger: messages.MessageGenerator):
 
@@ -39,14 +39,14 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
             # Need a constant
             if not self._expression_node.is_constant():
-                messenger.error_init_is_not_constant(self._filename, self._line, self._column)
+                messenger.error_init_is_not_constant(self._line, self._column)
                 return False
 
             self.analyze_initializer(messenger)
 
             defined = True
 
-        attribute = Attributes.AttributesGlobal(self._type_stack, self._filename, self._line, self._column,
+        attribute = Attributes.AttributesGlobal(self._type_stack, self._line, self._column,
                                                 defined,
                                                 self)
 
@@ -78,11 +78,11 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             return True
 
         elif next_action == SymbolTable.GlobalActions.REDEFINE_ERROR:
-            messenger.error_redefinition(self._filename, self._line, self._column, self.id)
+            messenger.error_redefinition(self._line, self._column, self.id)
             return False
 
         elif next_action == SymbolTable.GlobalActions.WRONG_TYPE:
-            messenger.error_conflicting_types(self._filename, self._line, self._column, self.id)
+            messenger.error_conflicting_types(self._line, self._column, self.id)
             return False
 
         else:  # next action == DEFINE_PREV_DECLARED

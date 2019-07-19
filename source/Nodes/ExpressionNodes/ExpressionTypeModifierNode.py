@@ -9,8 +9,8 @@ import type_specifier
 
 class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
 
-    def __init__(self, parent_node, filename, ctx, modifier=None):
-        super().__init__(parent_node, filename, ctx, modifier)
+    def __init__(self, parent_node, ctx, modifier=None):
+        super().__init__(parent_node, ctx, modifier)
 
     def generate_type_operator_stack(self, node, messenger):
         if self._type_modifier_node:
@@ -35,7 +35,7 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
                 node.l_value = False
 
             else:
-                messenger.error_lvalue_required_addr_operand(node.filename, node.line, node.column)
+                messenger.error_lvalue_required_addr_operand(node.line, node.column)
                 return False
 
         # Function call,
