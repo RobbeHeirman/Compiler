@@ -9,21 +9,18 @@ import subprocess
 from importlib import util
 
 from antlr4 import *
-import build
 import AST
-# Auto runs build to get dependant gen files
-if util.find_spec("gen") is None:
-    build.main()
 
 from gen.CLexer import CLexer
 from gen.CParser import CParser
 import CListenerExtend as CListenerExtend
 
 
-def create_ast(input_file: str) -> AST.AST:
+def create_ast(input_file: str, string_stream=None) -> AST.AST:
     """
     Function will create the AST from the listener and returns the ast
-    :param: input_file is the name of the input C file
+    :param input_file: is the name of the input C file
+    :param string_stream: a possible string stream to write errors to
     :return: the corresponding AST
     """
 
@@ -33,7 +30,7 @@ def create_ast(input_file: str) -> AST.AST:
     parser = CParser(stream)
     tree = parser.root()
 
-    listener = CListenerExtend.CListenerExtend(input_file)
+    listener = CListenerExtend.CListenerExtend(input_file, string_stream)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
 

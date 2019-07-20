@@ -5,11 +5,20 @@ Academic Year: 2018-2019
 """
 import os
 import subprocess
-import sys
+import traceback
 import unittest
 
 import main
 
+
+# class TracePrints(object):
+#   def __init__(self):
+#     self.stdout = sys.stdout
+#   def write(self, s):
+#     self.stdout.write("Writing %r\n" % s)
+#     traceback.print_stack(file=self.stdout)
+#
+# sys.stdout = TracePrints()
 
 class SAbstractTest(unittest.TestCase):
 
@@ -20,16 +29,13 @@ class SAbstractTest(unittest.TestCase):
         self.path = "C_files/semantic/"
 
     def _run_analysis(self, filename, errors=0, warnings=0):
-        orig_stdout = sys.stdout
         if not os.path.exists(self.result_path):
             os.makedirs(self.result_path)
         f = open(self.result_path + filename[:-2] + "_error.log", "w+")
-        sys.stdout = f
         file_name = self.path + filename
-        ast = main.create_ast(file_name)
+        ast = main.create_ast(file_name, f)
         ast.semantic_analysis()
         f.close()
-        sys.stdout = orig_stdout
         try:
             self.assertEqual(ast.error_count(), errors)
             self.assertEqual(ast.warning_count(), warnings)

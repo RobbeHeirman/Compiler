@@ -6,6 +6,7 @@ Academic Year: 2018-2019
 
 import LlvmCode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
+import messages
 
 
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
@@ -24,12 +25,17 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         return ret
 
-    def semantic_analysis(self, messenger):
-        self._type_stack = self.get_attribute(self.id).operator_stack
-        self._generate_type_modifier_stack(messenger)  # the modifiers applied in the expression
+    def semantic_analysis(self, messenger: messages.MessageGenerator) -> bool:
+
+        # First check if the id was declared
         if not self.is_in_table(self.id):
             messenger.error_undeclared_var(self.id, self._line, self._column)
             return False
+
+        self._type_stack = self.get_attribute(self.id).operator_stack
+        if not self._generate_type_modifier_stack(messenger):  # the modifiers applied in the expression
+            return False
+
         return True
 
     def generate_llvm(self):

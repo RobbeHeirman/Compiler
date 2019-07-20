@@ -148,9 +148,8 @@ class DeclarationNode(TypedNode.TypedNode):
             if expression_stack and element == expression_stack[-1]:
                 prev_ele = expression_stack.pop()
             else:
-                print(messenger.warning_init_makes_a_from_b(prev_ele.value, self._type_stack[-1].value,
-
-                                                            self._line, self._column))
+                messenger.warning_init_makes_a_from_b(prev_ele.value,
+                                                      self._type_stack[-1].value, self._line, self._column)
                 break
 
         return True

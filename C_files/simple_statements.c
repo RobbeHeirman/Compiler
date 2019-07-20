@@ -1,9 +1,16 @@
+int a(char c, int *b){
 
-int * a(){
+    return 42;
 }
 
 
-int main() {
+char b(){
 
-    return 0;
+    return 'd';
+}
+
+int main(){
+
+    char k = b(112);
+    return a();
 }

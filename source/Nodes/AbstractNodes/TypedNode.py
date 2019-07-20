@@ -34,11 +34,11 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
 
         self._type_stack.append(tp)
 
-    def _generate_type_modifier_stack(self, messenger):
+    def _generate_type_modifier_stack(self, messenger) -> bool:
         """
         Generates the type modifier stack. This is a stack of type modifier types that will determine the modifiers
         applied on the node. See the TypeModifier enum for choices.
-        :return: None
+        :return: Bool
         """
         if self._type_modifier_node:
             return self._type_modifier_node.generate_type_operator_stack(self, messenger)

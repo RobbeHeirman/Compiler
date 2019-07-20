@@ -43,10 +43,10 @@ class CListenerExtend(CListener):
     _ast: AST.AST
     _parent_node: AbstractNode.AbstractNode
 
-    def __init__(self, filename: str):
+    def __init__(self, filename: str, string_stream=None):
         # Some info about the traversing will be recorded
 
-        self._ast = AST.AST(filename)
+        self._ast = AST.AST(filename, string_stream)
         self._ast.root = RootNode.RootNode()
         self._parent_node = self._ast.root
 

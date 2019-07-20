@@ -28,9 +28,7 @@ class MessageGenerator:
         self._error_counter = 0
         self._warning_counter = 0
 
-        self._writer_c = sys.stdout
-        if string_stream:
-            self._writer = string_stream
+        self._writer_c = string_stream if string_stream else sys.stdout
 
     @property
     def error_counter(self):
@@ -98,14 +96,21 @@ class MessageGenerator:
     # Errors in expression's
     # ==================================================================================================================
 
-    def error_undeclared_var(self, lexeme, line, column):
+    def error_undeclared_var(self, lexeme: str, line: int, column: int) -> None:
+        """
+        Any scope:
+            int a = b; // Not allowed, b is not declared
+        :param lexeme: id of variable with error
+        :param line: line the line of the error
+        :param column column of error
+        """
         self._writer("{0}'{1}' undeclared".format(self._error(line, column), lexeme))
 
     def error_unary_not_ptr(self, line, column):
         self._writer("{0}Invalid type argument of unary '*'".format(self._error(line, column)))
 
-    def error_object_not_function(self, lexeme, line, column):
-        self._writer(f"{self._error(line, column)}called object '{lexeme}' is not a function or function pointer")
+    def error_object_not_function(self, line, column):
+        self._writer(f"{self._error(line, column)}called object is not a function or function pointer")
 
     def error_lvalue_required_addr(self, line, column):
         self._writer("{0}lvalue required as unary'&' operand".format(self._error(line, column)))
@@ -126,8 +131,8 @@ class MessageGenerator:
     def error_func_initialized_like_var(self, lexeme, line, column):
         self._writer("{0}function '{1}' is initialized like a variable".format(self._error(line, column), lexeme))
 
-    def error_signature_does_not_match(self, lexeme, line, column):
-        self._writer("{0} function '{1}' signature does not match".format(self._error(line, column), lexeme))
+    def error_signature_does_not_match(self, line, column):
+        self._writer("{0} function signature does not match".format(self._error(line, column)))
 
     def error_func_to_few_arguments(self, lexeme, line, column):
         self._writer("{0}too few arguments to function '{1}' ".format(self._error(line, column), lexeme))
