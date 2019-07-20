@@ -18,7 +18,6 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
         self.constant = ctx.getText()
         self.l_value = False  # Constant's are always r value's
 
-
     @property
     def label(self) -> str:
         ret = super().label
@@ -39,18 +38,20 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
         return str(self.constant)
 
-    def generate_llvm(self) -> str:
-        self.increment_register_index()
-        ret = self.indent_string() + ";... {0}\n".format(self.constant)
-        ret += LlvmCode.llvm_allocate_instruction(str(self.register_index), self._type_stack, self.indent_string())
-        ret += LlvmCode.llvm_store_instruction_c(self._type_stack, self.llvm_constant,
-                                                 self._type_stack, str(self.register_index), self.indent_string())
-        prev_index = self.register_index
-        self.increment_register_index()
-        ret += LlvmCode.llvm_load_instruction(str(prev_index), self._type_stack, str(self.register_index),
-                                              self._type_stack, self.indent_string())
+    def generate_llvm(self, store_reg: str = None) -> str:
+        # Part of commenting.
+        return_string = self.indent_string() + ";... {0}\n".format(self.constant)
+        write_register = store_reg
+        if not store_reg:
+            self.increment_register_index()
+            return_string += LlvmCode.llvm_allocate_instruction(str(self.register_index), self._type_stack,
+                                                                self.indent_string())
+            write_register = self.register_index
 
-        return ret
+        return_string += LlvmCode.llvm_store_instruction_c(self._type_stack, self.llvm_constant, self._type_stack,
+                                                           str(write_register), self.indent_string())
+
+        return return_string
 
     def is_constant(self):
         return True

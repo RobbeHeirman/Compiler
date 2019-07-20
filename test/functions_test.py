@@ -3,10 +3,12 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from test.AbstractTests import SAbstractTest
+import os
+
+from test.AbstractTests import SAbstractTest, LLVMAbstractExecTest
 
 
-class FunctionTest(SAbstractTest):
+class SFunctionTest(SAbstractTest):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,3 +32,19 @@ class FunctionTest(SAbstractTest):
 
     def test_signature_call(self):
         return self._run_analysis("signature_call_conflict.c", 2)
+
+    def test_call_non_function(self):
+        return self._run_analysis('call_non_function.c', 1)
+
+
+class LLVMFunctionTest(LLVMAbstractExecTest):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.path += "Function/"
+        self.result_path += "function/"
+
+        if not os.path.exists(self.result_path):
+            os.makedirs(self.result_path)
+
+    def test_main_happy_day_llvm(self):
+        return self._build_and_run_llvm("main_happy_day.c", 0)

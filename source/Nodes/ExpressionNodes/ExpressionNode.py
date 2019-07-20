@@ -1,3 +1,5 @@
+import abc
+
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 
@@ -22,7 +24,7 @@ import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 #         return specifier_map[self]
 
 
-class ExpressionNode(TypedNode.TypedNode):
+class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     _BASE_LABEL = "expression"
 
     # _OPERATOR_TYPES = [ExpressionNodeType.ARRAY,

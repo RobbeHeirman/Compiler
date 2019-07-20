@@ -78,3 +78,33 @@ class LLVMAbstractTest(unittest.TestCase):
 
             except Exception:
                 subprocess.call(["clang", "-S", "-emit-llvm", file_name])
+
+
+class LLVMAbstractExecTest(LLVMAbstractTest):
+
+    def _compile_llvm(self, filename):
+        file_name = self.path + filename
+        ast = main.create_ast(file_name)
+        if ast.semantic_analysis():
+            code = ast.generate_llvm()
+            result_file = self.result_path + filename[:-2] + ".ll"
+            with open(result_file, "w+") as file:
+                file.write(code)
+
+            ret = subprocess.call(["clang", "-S", "-emit-llvm", file_name])
+            # Should compile with exit code 0
+            self.assertEqual(ret, 0)
+            return True if ret is 0 else False
+
+    def _build_and_run_llvm(self, filename, exit_code_exec):
+
+        slug = filename[: -2]  # - .c
+        exec_name = self.result_path + slug + ".exe"
+
+        if self._compile_llvm(filename):
+            subprocess.call(["clang", "-Wno-override-module", self.result_path + slug + ".ll", "-o", exec_name])
+        else:
+            return
+
+        ret_code = subprocess.call([exec_name])
+        self.assertEqual(ret_code, exit_code_exec)
