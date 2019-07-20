@@ -26,4 +26,7 @@ class FunctionTest(SAbstractTest):
         return self._run_analysis("redefinition.c", 1, 0)
 
     def test_return_conflict(self):
-        return self._run_analysis("redefinition.c", 1)
+        return self._run_analysis("return_conflict.c", 1)
+
+    def test_signature_call(self):
+        return self._run_analysis("signature_call_conflict.c", 2)

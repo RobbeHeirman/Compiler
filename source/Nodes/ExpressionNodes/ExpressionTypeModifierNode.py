@@ -35,7 +35,7 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
                 node.l_value = False
 
             else:
-                messenger.error_lvalue_required_addr_operand(node.line, node.column)
+                messenger.error_lvalue_required_addr(node.line, node.column)
                 return False
 
         # Function call,
@@ -47,8 +47,6 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
                     node.type_stack_ref().pop()
 
                 else:
-                    print(f' Right side: {self.get_function_signature()}')
-                    print(node.type_stack_ref()[-1].function_signature)
                     print(f'{self._line}TODO something about wrong signatures')
 
             else:
