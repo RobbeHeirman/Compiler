@@ -47,6 +47,15 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         else:
             return self._parent_node.is_in_table(lexeme)
 
+    def is_in_global_table(self, lexeme: str):
+
+        if self._symbol_table.is_in_symbol_table(lexeme):
+            return False
+
+        else:
+            return self._parent_node.is_in_table(lexeme)
+
+
     @property
     def register_index(self):
         return self._register_index

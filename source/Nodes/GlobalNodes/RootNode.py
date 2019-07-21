@@ -28,6 +28,9 @@ class RootNode(ScopedNode.ScopedNode):
 
         return self._symbol_table.is_in_symbol_table(lexeme)
 
+    def is_in_global_table(self, lexeme: str):
+        return self.is_in_table(lexeme)
+
     def get_attribute(self, lexeme):
         return self._symbol_table.get_attribute(lexeme)
 

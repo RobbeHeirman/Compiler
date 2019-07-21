@@ -116,6 +116,9 @@ class AbstractNode(abc.ABC):
     def is_in_table(self, lexeme: str) -> bool:
         return self._parent_node.is_in_table(lexeme)
 
+    def is_in_global_table(self, lexeme: str) -> bool:
+        return self._parent_node.is_in_global_table(lexeme)
+
     def add_to_scope_symbol_table(self, lexeme: str, attribute: Attributes.Attributes) -> bool:
         """
         Hook to add a lexeme to symbol table. Child classes may need to implement this.
