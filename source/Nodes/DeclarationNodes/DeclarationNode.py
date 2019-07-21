@@ -136,30 +136,12 @@ class DeclarationNode(TypedNode.TypedNode):
         # Comment string, maybe we can find another mechanism for this
         ret = self.code_indent_string() + "; Declaration: {0} {1}\n".format(self._type_stack[0].value,
                                                                             self.id)
-        #
         ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())
 
-        if self._expression_node is not None:
-
-            # Saves us some instruction's we can just place it directly.
-            if isinstance(self._expression_node, IdentifierExpressionNode.IdentifierExpressionNode):
-                ret += LlvmCode.llvm_store_instruction(self._expression_node.id, self._expression_node.type_stack,
-                                                       self.id, self._type_stack, self.code_indent_string())
-
-                ret += self.code_indent_string() + f"; = {self._expression_node.id}\n"
-
-            elif isinstance(self._expression_node, ConstantExpressionNode.ConstantExpressionNode):
-                ret += LlvmCode.llvm_store_instruction_c(self._expression_node.llvm_constant,
-                                                         self._expression_node.type_stack,
-                                                         self.id, self._type_stack, self.code_indent_string())
-
-                ret += self.code_indent_string() + f"; = {self._expression_node.constant}\n"
-
-            else:
-
-                ret += self._expression_node.generate_llvm()
-                if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
-                    ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, self.id,
-                                                           self._type_stack, self.code_indent_string())
-            ret += self.code_indent_string() + "; end declaration\n"
+        if self._expression_node:
+            ret += self._expression_node.generate_llvm()
+            if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
+                ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, self.id,
+                                                       self._type_stack, self.code_indent_string())
+        ret += self.code_indent_string() + "; end declaration\n"
         return ret

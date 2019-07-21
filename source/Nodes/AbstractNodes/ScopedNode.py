@@ -51,8 +51,8 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
     def register_index(self):
         return self._register_index
 
-    def increment_register_index(self):
-        self._register_index += 1
+    def increment_register_index(self, amount=1):
+        self._register_index += amount
 
     def get_attribute(self, lexeme):
         if self._symbol_table.is_in_symbol_table(lexeme):  # Is declared in this scope.

@@ -34,13 +34,14 @@ class AbstractNode(abc.ABC):
         self._line = start.line
         self._column = start.column
 
-    @classmethod
-    def code_indent_string(cls):
-        return "  " * cls._indent_level
+    @staticmethod
+    def code_indent_string():
+        return "  " * AbstractNode._indent_level
 
-    @classmethod
-    def increase_code_indent(cls):
-        cls._indent_level += 1
+    @staticmethod
+    def increase_code_indent():
+        AbstractNode._indent_level += 1
+
 
     @property
     def line(self):
@@ -108,6 +109,9 @@ class AbstractNode(abc.ABC):
         :return: THe removed Node
         """
         return self._children.pop(index)
+
+    def child_count(self):
+        return len(self._children)
 
     def is_in_table(self, lexeme: str) -> bool:
         return self._parent_node.is_in_table(lexeme)

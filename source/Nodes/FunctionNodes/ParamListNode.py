@@ -4,6 +4,8 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 from typing import List, Union, TYPE_CHECKING
+
+import LlvmCode
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 
 if TYPE_CHECKING:
@@ -26,15 +28,24 @@ class ParamListNode(AbstractNode.AbstractNode):
         self._children: List[DeclarationNode]
         return [child.base_type for child in self._children]
 
-    def generate_llvm(self):
+    def generate_llvm_function_signature(self):
         ret = ""
         for child in self._children:
-
             ret += "{0}".format(child.type_stack[0].llvm_type)
             for d_type in child.type_stack[1:]:
                 ret += d_type.value
-            ret += " %{0}".format(child.id)
+            # ret += " %{0}".format(child.id)
 
             ret += ", "
         ret = ret[:-2]
         return ret
+
+    def llvm_alloc_params(self):
+
+        return "".join([LlvmCode.llvm_allocate_instruction(child.id, child.type_stack, self.code_indent_string())
+                        for child in self._children])
+
+    def llvm_store_params(self):
+        return "".join([LlvmCode.llvm_store_instruction(str(index), child.type_stack, child.id, child.type_stack,
+                                                        self.code_indent_string())
+                        for index, child in enumerate(self._children)])

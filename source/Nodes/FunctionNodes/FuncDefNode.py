@@ -15,6 +15,7 @@ import Nodes.GlobalNodes.StatementsNode
 
 class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
     _id: str
+    _param_list_node: ParamListNode.ParamListNode
 
     def __init__(self, parent_node: AbstractNode.AbstractNode, ctx):
         super().__init__(parent_node, ctx)
@@ -84,8 +85,13 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
     def generate_llvm(self):
         self.increment_register_index()
         ret = self.code_indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self.id)
-        ret += "{0}){{\n".format(self._param_list_node.generate_llvm())
+        ret += "{0}){{\n".format(self._param_list_node.generate_llvm_function_signature())
         self.increase_code_indent()
+        ret += self._param_list_node.llvm_alloc_params()
+        ret += self._param_list_node.llvm_store_params()
+
+        self.increment_register_index(self._param_list_node.child_count())
+
         for child in self._children[1:]:
             ret += child.generate_llvm()
 

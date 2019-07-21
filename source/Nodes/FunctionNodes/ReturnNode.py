@@ -38,22 +38,24 @@ class ReturnNode(AbstractNode.AbstractNode):
     def generate_llvm(self):
 
         ret_type = self._parent_node.get_return_type()
+        ret_type_str = ret_type[0].llvm_type
+        ret_type_str += "".join([c_type.value for c_type in ret_type[1:]])
+
         if isinstance(self._children[0], ConstantExpressionNode.ConstantExpressionNode):
             child: ConstantExpressionNode.ConstantExpressionNode = self._children[0]
-            return self.code_indent_string() + "ret {0} {1}\n".format(ret_type[0].llvm_type, child.llvm_constant)
+            return self.code_indent_string() + "ret {0} {1}\n".format(ret_type_str, child.llvm_constant)
 
         elif isinstance(self._children[0], IdentifierExpressionNode.IdentifierExpressionNode):
             child: IdentifierExpressionNode.IdentifierExpressionNode = self._children[0]
-            return self.code_indent_string() + "ret {0} %{1}\n".format(ret_type[0].llvm_type, child.id)
+            return_string = ""
+            self.increment_register_index()
+            return_string += LlvmCode.llvm_load_instruction(child.id, ret_type, str(self.register_index), ret_type,
+                                                            self.code_indent_string())
 
-        return_string = ""
-        prev_index = self.register_index
-        self.increment_register_index()
-        return_string += LlvmCode.llvm_load_instruction(str(prev_index), ret_type, str(self.register_index), ret_type,
-                                                        self.code_indent_string())
+            return_string += self.code_indent_string() + "ret {0} %{1}\n".format(ret_type_str, self.register_index)
+            return return_string
 
-        return_string += self.code_indent_string() + "ret {0} %{1}\n".format(ret_type[0].llvm_type, self.register_index)
-        return return_string
+        return "TODO"
 
     def has_return(self):
         if self._children:
