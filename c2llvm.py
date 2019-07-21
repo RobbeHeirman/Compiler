@@ -83,6 +83,6 @@ if __name__ == "__main__":
         # Test llvm generated language
         runner = subprocess.run(["clang", "-Wno-override-module", ll_file, "-o", path + slug + ".exe"])
         if runner.returncode is 0:
-            subprocess.call(["./" + path + slug + ".exe"])
-
+            code = subprocess.call(["./" + path + slug + ".exe"])
+            print(code)
     sys.exit(0)

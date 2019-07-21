@@ -8,8 +8,6 @@ import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
-import Nodes.ExpressionNodes.IdentifierExpressionNode as IdentifierExpressionNode
-import Nodes.ExpressionNodes.ConstantExpressionNode as ConstantExpressionNode
 
 import LlvmCode
 import Attributes as Attributes
@@ -23,11 +21,15 @@ class DeclarationNode(TypedNode.TypedNode):
     Has 1 or 2 children a declarator (will become a stack of pre and postfix type specifiers after first pass)
     An optional initializer as 2d child.
     """
+
+    # Type annotations members
     _type_modifier_node: "TypeModifierNode"
     _lexeme: str
 
     _BASE_LABEL = "Declaration"
 
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
 
@@ -35,6 +37,8 @@ class DeclarationNode(TypedNode.TypedNode):
         self._expression_node = None
         # Error message info
 
+    # AST Visuals
+    # ==================================================================================================================
     @property
     def label(self):
         ret_label = self._BASE_LABEL
@@ -46,10 +50,8 @@ class DeclarationNode(TypedNode.TypedNode):
 
         return ret_label
 
-    @property
-    def type_string_llvm(self):
-        return self._type_stack[0].llvm_type + "*" * len(self._type_stack)
-
+    # AST Generation
+    # ==================================================================================================================
     def add_id(self, identifier):
 
         self.id = identifier
@@ -79,6 +81,8 @@ class DeclarationNode(TypedNode.TypedNode):
 
         super().remove_child(child)
 
+    # Semantic analysis
+    # ==================================================================================================================
     def semantic_analysis(self, messenger: messages.MessageGenerator) -> bool:
         """
         On a declaration, a new identifier is introduced into the scope. This has to be an unique identifier
@@ -129,13 +133,14 @@ class DeclarationNode(TypedNode.TypedNode):
     def _make_attribute(self):
         return Attributes.Attributes(self._type_stack, self._line, self._column)
 
+    # LLVM Generation
+    # ==================================================================================================================
     def generate_llvm(self) -> str:
         """"
         This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
         """
         # Comment string, maybe we can find another mechanism for this
-        ret = self.code_indent_string() + "; Declaration: {0} {1}\n".format(self._type_stack[0].value,
-                                                                            self.id)
+        ret = self.code_indent_string() + "; Declaration: {0} {1}\n".format(self._type_stack[0].value, self.id)
         ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())
 
         if self._expression_node:

@@ -69,6 +69,7 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
                 # extension
                 if self.get_function_signature() == node.type_stack_ref()[-1].function_signature:
                     node.type_stack_ref().pop()
+
                 else:
                     messenger.error_signature_does_not_match(self._line, self._column)
                     return False

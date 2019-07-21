@@ -9,19 +9,31 @@ import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 import type_specifier
 
+from typing import TYPE_CHECKING
+
+from type_specifier import TypeSpecifier
+
+if TYPE_CHECKING:
+    import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
+    import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
+
 
 class TypeModifierNode(AbstractNode.AbstractNode):
     """
     We use this node to handle prefix/postfix hierarchy.
     We can omit this in a future pass. This node has no actual info about the program.
     """
-    _specifier_node: AbstractNode
+
+    # TypeAnnotations
+    _parent_node: typing.Union["TypeModifierNode", "DeclarationNode.DeclarationNode", "ExpressionNode.ExpressionNode"]
     _type_modifier_node: "TypeModifierNode"
-    # noinspection PyUnresolvedReferences
-    _parent_node: typing.Union["TypeModifierNode", "DeclarationNode.DeclarationNode", "ExpressionNode"]
+    _param_list_node: ParamListNode
+    _modifier_type: TypeSpecifier
 
     _BASE_LABEL = "TypeModifier"
 
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, parent_node, ctx, mod_type: type_specifier.TypeSpecifier = None):
         """
         Initializer
@@ -30,8 +42,7 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         super().__init__(parent_node, ctx)
 
         self._type_modifier_node = None  # Child type_modifier_node. Used for nested type modifiers
-        self._rhs_node = None
-        self._param_list_node = None
+        self._param_list_node = None  # if the typemod is a function call this ref keeps track of the call signature
 
         self._modifier_type = mod_type
         self._is_implicit_conversion = False
@@ -44,24 +55,8 @@ class TypeModifierNode(AbstractNode.AbstractNode):
 
         return False
 
-    @property
-    def modifier_type(self):
-        return self._modifier_type
-
-    @modifier_type.setter
-    def modifier_type(self, val):
-
-        if isinstance(val, str):
-            val = type_specifier.TypeSpecifier(val)
-
-        self._modifier_type = val
-
-    def get_function_signature(self):
-        if self._param_list_node:
-            return self._param_list_node.get_function_signature()
-
-        return []
-
+    # AST-Visuals
+    # ==================================================================================================================
     @property
     def label(self):
 
@@ -75,8 +70,17 @@ class TypeModifierNode(AbstractNode.AbstractNode):
             ret += "(implicit conversion)"
         return ret
 
-    def _add_id_node(self, child):
-        self._id_node = child
+    # AST-Generation
+    # ==================================================================================================================
+    @property
+    def modifier_type(self):
+        return self._modifier_type
+
+    @modifier_type.setter
+    def modifier_type(self, val):
+        if isinstance(val, str):
+            val = type_specifier.TypeSpecifier(val)
+        self._modifier_type = val
 
     def remove_child(self, child):
 
@@ -89,7 +93,6 @@ class TypeModifierNode(AbstractNode.AbstractNode):
 
         if isinstance(child, TypeModifierNode):
             self._type_modifier_node = child
-            self._rhs_node = child
 
         elif isinstance(child, ParamListNode.ParamListNode):
             self._param_list_node = child
@@ -104,6 +107,17 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         """
         self._parent_node.add_id(identifier)
 
+    # def _add_id_node(self, child):
+    #     self._id_node = child
+
+    # semantic analysis
+    # ==================================================================================================================
+    def get_function_signature(self):
+        if self._param_list_node:
+            return self._param_list_node.get_function_signature()
+
+        return []
+
     def generate_type_operator_stack(self, node, messenger):
         """
         This function generates the operators stack.
@@ -117,39 +131,12 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         node.type_stack_ref().append(self._modifier_type)
         return True
 
-    def array_has_length(self) -> bool:
-        if self._type_modifier_node is not None:
-            return self._type_modifier_node.array_has_length()
-        else:  # This is the last of the nodes.
-            if self._rhs_node is None:
-                return False
-            else:
-                return True
+    # LLVM Code generations
+    # ==================================================================================================================
 
-    # def implicit_param_ptr_conversion(self):
-    #
-    #     if self.declarator_type is DeclaratorSpecifier.ARRAY:
-    #         self.declarator_type = DeclaratorSpecifier.PTR
-    #         self._is_implicit_conversion = True
-    #         if self._rhs_node:
-    #             self._rhs_node = None
-    #         return
-    #     else:
-    #         if self._declarator_node:
-    #             self._declarator_node.implicit_param_ptr_conversion()
-    #     return
-
-    def llvm_code_value(self):
-        pass
-
-    """def find_decl_type(self, val) -> DeclType:
-        match = re.search(r"\((.)*\)", val)
-        if match is not None:
-            self._value = self._value[:match.span()[0]]
-            self._extra_label = "function:"
-            return DeclType.FUNCTION
-        else:
-            return DeclType.SIMPLE"""
-
-    def llvm_type(self):
-        pass
+    def is_function_call(self):
+        if self._type_modifier_node:
+            return self._type_modifier_node.is_function_call()
+        elif self.modifier_type == type_specifier.TypeSpecifier.FUNCTION:
+            return True
+        return False

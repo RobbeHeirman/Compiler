@@ -13,6 +13,6 @@ int c (char q, int a){
 
 
 int main(){
-    int b = a;
-    return 0;
+    int a = c(q, a);
+    return a;
 }

@@ -89,10 +89,11 @@ def llvm_store_instruction_c(source_constant: str, source_type, target_register:
 
 def llvm_load_instruction(source_register: str,
                           source_operator_stack: typing.List[type_specifier.TypeSpecifier], target_register: str,
-                          target_operator_stack: typing.List[type_specifier.TypeSpecifier],
+                          target_operator_stack: typing.List[type_specifier.TypeSpecifier], is_global: bool,
                           indent_string: str) -> str:
     """
 
+      :param is_global: if the parameter is loaded from the global symbol table
       :param indent_string: The indentation string of the code
       :param source_register: The register of the source
       :param source_operator_stack: The extra operator stack (*, [], () ...)
@@ -103,16 +104,10 @@ def llvm_load_instruction(source_register: str,
     s_operator_string = convert_operator_stack_to_str(source_operator_stack)
     t_operator_string = convert_operator_stack_to_str(target_operator_stack)
 
-    ret = indent_string + "%{0} = load {1}{2}, {3}{4}* %{5}\n".format(
-        target_register,
-        source_operator_stack[0].llvm_type,
-        t_operator_string,
+    reg_siqn = '@' if is_global else '%'
+    ret = indent_string + f"%{target_register} = load {source_operator_stack[0].llvm_type}{t_operator_string}, " \
+        f"{source_operator_stack[0].llvm_type}{s_operator_string}* {reg_siqn}{source_register}\n"
 
-        source_operator_stack[0].llvm_type,
-        s_operator_string,
-        source_register,
-        # source_type.llvm_alignment
-    )
 
     return ret
 
