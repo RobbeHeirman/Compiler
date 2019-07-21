@@ -55,6 +55,8 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         if self._is_function_call():
             print("llvm for a function call")
+            remember_reg = self.register_index
+
         else:
             ret = self.code_indent_string() + ";... {0}\n".format(self.id)
             ret += LlvmCode.llvm_load_instruction(self.id, self.type_stack, str(self.register_index), self.type_stack,

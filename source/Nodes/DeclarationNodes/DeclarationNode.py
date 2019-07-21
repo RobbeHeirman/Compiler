@@ -100,7 +100,7 @@ class DeclarationNode(TypedNode.TypedNode):
                 return False
             self.analyze_initializer(messenger)
 
-        if not self._parent_node.add_to_scope_symbol_table(self.id, attr):
+        if self.id and not self._parent_node.add_to_scope_symbol_table(self.id, attr):
             messenger.error_redeclaration(self.id, self._line, self._column)
             ret = False
 
@@ -113,11 +113,9 @@ class DeclarationNode(TypedNode.TypedNode):
         """
         # print(self.__class__.warning_count())
         expression_stack = self._expression_node.type_stack
-        try:
-            prev_ele = expression_stack[-1]
-        except IndexError:
-            print(self.id)
-            raise IndexError
+        prev_ele = expression_stack[-1]
+        print(expression_stack)
+        print(self._type_stack)
         for element in reversed(self._type_stack):
 
             if expression_stack and element == expression_stack[-1]:

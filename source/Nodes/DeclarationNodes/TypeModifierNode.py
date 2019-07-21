@@ -42,7 +42,7 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         super().__init__(parent_node, ctx)
 
         self._type_modifier_node = None  # Child type_modifier_node. Used for nested type modifiers
-        self._param_list_node = None  # if the typemod is a function call this ref keeps track of the call signature
+        self._param_list_node = None  # if the type modifier is a function call ref keeps track of the call signature
 
         self._modifier_type = mod_type
         self._is_implicit_conversion = False
@@ -140,3 +140,8 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         elif self.modifier_type == type_specifier.TypeSpecifier.FUNCTION:
             return True
         return False
+
+    def get_param_node(self):
+        if self._type_modifier_node:
+            return self._type_modifier_node.get_param_node()
+        return self._param_list_node

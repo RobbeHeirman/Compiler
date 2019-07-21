@@ -50,6 +50,7 @@ declarator // optional prefix operator sequence + optional postfix operator
     | ptr_decl declarator
     //| LPARANT id_decl RPARANT
     | id_decl
+    |
     ;
 
 ptr_decl

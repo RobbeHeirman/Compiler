@@ -179,14 +179,14 @@ class CListenerExtend(CListener):
         :return:
         """
         # column = start.column
-        if ctx.getChild(0).getText() is not "(":  # parenthesis are just used to order
+        if ctx.children and ctx.getChild(0).getText() is not "(":  # parenthesis are just used to order
             node = TypeModifierNode.TypeModifierNode(self._parent_node, ctx)
             self._parent_node.add_child(node)
             self._parent_node = node
 
     def exitDeclarator(self, ctx: CParser.DeclaratorContext):
 
-        if ctx.getChild(0).getText() is not "(":
+        if ctx.children and ctx.getChild(0).getText() is not "(":
             self._parent_node = self._parent_node.parent_node
 
     def enterPtr_decl(self, ctx: CParser.Ptr_declContext):
@@ -205,6 +205,7 @@ class CListenerExtend(CListener):
 
         if self._func_def_node:
             self._parent_node = self._prev_node
+            self._func_def_node = None
 
     def enterArray_operator(self, ctx: CParser.Array_operatorContext):
 

@@ -14,19 +14,25 @@ if TYPE_CHECKING:
 
 
 class ParamListNode(AbstractNode.AbstractNode):
-    label = "Param list"
+    # Type annotations
     _children: Union[List['DeclarationNode.DeclarationNode'], List['ExpressionNode.ExpressionNode']]
 
+    label = "Param list"
+
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
 
+    # Semantic analysis
+    # ==================================================================================================================
     def get_function_signature(self):
         self._children: List[DeclarationNode]
         return [child.type_stack for child in self._children]
 
-    def get_signature_list(self):
-        self._children: List[DeclarationNode]
-        return [child.base_type for child in self._children]
+    # def get_signature_list(self):
+    #     self._children: List[DeclarationNode]
+    #     return [child.base_type for child in self._children]
 
     def generate_llvm_function_signature(self):
         ret = ""
@@ -49,3 +55,6 @@ class ParamListNode(AbstractNode.AbstractNode):
         return "".join([LlvmCode.llvm_store_instruction(str(index), child.type_stack, child.id, child.type_stack,
                                                         self.code_indent_string())
                         for index, child in enumerate(self._children)])
+
+    def llvm_call_param_nodes(self) -> str:
+        return "".join([child.generate_llvm() for child in self._children])
