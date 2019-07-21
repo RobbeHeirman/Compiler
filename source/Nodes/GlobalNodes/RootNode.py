@@ -14,8 +14,8 @@ class RootNode(ScopedNode.ScopedNode):
     """
     label = "Root"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, ctx):
+        super().__init__(None, ctx)
 
         self._symbol_table = SymbolTable.GlobalSymbolTable()
 

@@ -5,7 +5,6 @@ Academic Year: 2018-2019
 """
 from typing import List, Union, TYPE_CHECKING
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
-import type_specifier
 
 if TYPE_CHECKING:
     import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
@@ -16,8 +15,8 @@ class ParamListNode(AbstractNode.AbstractNode):
     label = "Param list"
     _children: Union[List['DeclarationNode.DeclarationNode'], List['ExpressionNode.ExpressionNode']]
 
-    def __init__(self, parent_node):
-        super().__init__(parent_node)
+    def __init__(self, parent_node, ctx):
+        super().__init__(parent_node, ctx)
 
     def get_function_signature(self):
         self._children: List[DeclarationNode]
@@ -31,10 +30,9 @@ class ParamListNode(AbstractNode.AbstractNode):
         ret = ""
         for child in self._children:
 
-            ret += "{0}".format(child.type_stack[0])
-            for d_type in child.type_stack:
-                if d_type == type_specifier.TypeSpecifier.POINTER:
-                    ret += "*"
+            ret += "{0}".format(child.type_stack[0].llvm_type)
+            for d_type in child.type_stack[1:]:
+                ret += d_type.value
             ret += " %{0}".format(child.id)
 
             ret += ", "

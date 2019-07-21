@@ -3,14 +3,17 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-import LlvmCode
+
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
+import Nodes.ExpressionNodes.IdentifierExpressionNode as IdentifierExpressionNode
+import Nodes.ExpressionNodes.ConstantExpressionNode as ConstantExpressionNode
 
+import LlvmCode
 import Attributes as Attributes
-from messages import MessageGenerator
+import messages
 
 
 class DeclarationNode(TypedNode.TypedNode):
@@ -76,7 +79,7 @@ class DeclarationNode(TypedNode.TypedNode):
 
         super().remove_child(child)
 
-    def semantic_analysis(self, messenger: MessageGenerator) -> bool:
+    def semantic_analysis(self, messenger: messages.MessageGenerator) -> bool:
         """
         On a declaration, a new identifier is introduced into the scope. This has to be an unique identifier
         on this scope lvl. But it can overshadow higher scoped (global...) declared variables with the same identifier.
@@ -93,45 +96,13 @@ class DeclarationNode(TypedNode.TypedNode):
                 return False
             self.analyze_initializer(messenger)
 
-            # # 2) Explicit list init if array has no init size if type is array .
-            # if self._type_stack[-1] is Specifiers.TypeModifier.ARRAY:
-            #     # Last element is top of the stack.
-            #     # If array size is not specified MUST have array init rhs.
-            #     if not self._type_modifier_node.array_has_length():
-            #         if self._expression_node is None:
-            #             if not isinstance(self._parent_node, ParamListNode.ParamListNode):
-            #                 DeclarationNode._messages.error_array_size_missing(self.id, attr)
-            #                 ret = False
-            #
-            #     if not isinstance(self._expression_node, ArrayInitNode.ArrayInitNode):
-            #         tpl = self._expression_node.get_error_info()
-            #         t_file = attr.filename
-            #         attr.filename = tpl[0]
-            #         t_line = attr.line
-            #         attr.line = tpl[1]
-            #         t_column = attr.column
-            #         attr.column = tpl[2]
-            #         DeclarationNode._messages.error_invalid_initializer(self.id, attr)
-            #         attr.filename = t_file
-            #         attr.line = t_line
-            #         attr.column = t_column
-            #         ret = False
-            #
-            # # Functions are allowed to be declared but definitions are not handled by this node
-            # elif self._type_stack[-1] is Specifiers.TypeModifier.FUNC:
-            #     DeclarationNode._messages.error_func_initialized_like_var(self.id, attr)
-            #     attr.function_signature = self._type_modifier_node.get_function_signature()
-            #     ret = False
-
-        # Add to the scopes symbol_table.
-
         if not self._parent_node.add_to_scope_symbol_table(self.id, attr):
-            messenger.error_redeclaration(self.id, attr)
+            messenger.error_redeclaration(self.id, self._line, self._column)
             ret = False
 
         return ret
 
-    def analyze_initializer(self, messenger: MessageGenerator):
+    def analyze_initializer(self, messenger: messages.MessageGenerator):
         """
         Here we will check if the type of the initializer is conform with te type of the declaration
         :return:
@@ -162,30 +133,33 @@ class DeclarationNode(TypedNode.TypedNode):
         """"
         This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
         """
-
-        ret = self.indent_string() + "; Declaration: {0}{1}\n".format(self._type_stack[0].value,
-                                                                      self.id)
-
-        # # Special types need other llvm code first
-        # if self._type_stack and self._type_stack[-1] is TypeModifierNode.TypeModifier.ARRAY:
-        #     # Find the type
-        #     size = 0
-        #     if self._expression_node:
-        #         size = self._expression_node.size()  # Size of array if declared trough list
-        #     r_type = self.base_type.llvm_type + ptr
-        #     secondary_type = "[ " + str(size) + " x " + r_type + " ]"  # This is how we init an array
-        #     ret += self.indent_string() + "%{0} = alloca {1}\n".format(
-        #         self.id, secondary_type, self.base_type.llvm_alignment)
-
-        # else:
-
-        ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.indent_string())
+        # Comment string, maybe we can find another mechanism for this
+        ret = self.code_indent_string() + "; Declaration: {0} {1}\n".format(self._type_stack[0].value,
+                                                                            self.id)
+        #
+        ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())
 
         if self._expression_node is not None:
-            ret += self.indent_string() + "; = ...\n"
-            ret += self._expression_node.generate_llvm()
-            if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
-                ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, self.id,
-                                                       self._type_stack, self.indent_string())
-        ret += self.indent_string() + "; end declaration\n"
+
+            # Saves us some instruction's we can just place it directly.
+            if isinstance(self._expression_node, IdentifierExpressionNode.IdentifierExpressionNode):
+                ret += LlvmCode.llvm_store_instruction(self._expression_node.id, self._expression_node.type_stack,
+                                                       self.id, self._type_stack, self.code_indent_string())
+
+                ret += self.code_indent_string() + f"; = {self._expression_node.id}\n"
+
+            elif isinstance(self._expression_node, ConstantExpressionNode.ConstantExpressionNode):
+                ret += LlvmCode.llvm_store_instruction_c(self._expression_node.llvm_constant,
+                                                         self._expression_node.type_stack,
+                                                         self.id, self._type_stack, self.code_indent_string())
+
+                ret += self.code_indent_string() + f"; = {self._expression_node.constant}\n"
+
+            else:
+
+                ret += self._expression_node.generate_llvm()
+                if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
+                    ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, self.id,
+                                                           self._type_stack, self.code_indent_string())
+            ret += self.code_indent_string() + "; end declaration\n"
         return ret

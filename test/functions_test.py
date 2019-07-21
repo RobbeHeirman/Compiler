@@ -48,3 +48,6 @@ class LLVMFunctionTest(LLVMAbstractExecTest):
 
     def test_main_happy_day_llvm(self):
         return self._build_and_run_llvm("main_happy_day.c", 0)
+
+    def test_main_happy_day_regres_llvm(self):
+        return self._build_and_run_llvm("happy_day_regres.c", 0)

@@ -99,10 +99,11 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
         val = self._expression_node.llvm_constant if self._expression_node else \
             self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1].modifier_type]
 
-        ret += self.indent_string() + "; Global declaration " + str(self.type_stack[0]) + " " + self.id + " = " + str(
+        ret += self.code_indent_string() + "; Global declaration " + str(
+            self.type_stack[0]) + " " + self.id + " = " + str(
             val) + "\n "
         ret += LlvmCode.llvm_allocate_instruction_global(self.id, self._type_stack, str(val),
-                                                         self.indent_string())
-        ret += self.indent_string() + "; end declaration" + "\n"
+                                                         self.code_indent_string())
+        ret += self.code_indent_string() + "; end declaration" + "\n"
 
         return ret

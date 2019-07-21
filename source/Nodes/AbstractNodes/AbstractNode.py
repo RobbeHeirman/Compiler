@@ -30,12 +30,17 @@ class AbstractNode(abc.ABC):
         self._parent_node = parent
         self._children = list()
 
-        self._line = None
-        self._column = None
-        if ctx:
-            start = ctx.start
-            self._line = start.line
-            self._column = start.column
+        start = ctx.start
+        self._line = start.line
+        self._column = start.column
+
+    @classmethod
+    def code_indent_string(cls):
+        return "  " * cls._indent_level
+
+    @classmethod
+    def increase_code_indent(cls):
+        cls._indent_level += 1
 
     @property
     def line(self):
@@ -75,10 +80,6 @@ class AbstractNode(abc.ABC):
             ret += child.dot_string()
 
         return ret
-
-    def indent_string(self):
-
-        return "  " * self._indent_level
 
     def get_child_index(self, child):
         return self._children.index(child)

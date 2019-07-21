@@ -27,10 +27,10 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
     @property
     def llvm_constant(self) -> str:
-        if self._type_stack[0] is type_specifier.TypeSpecifier.CHAR:
+        if self._type_stack[0] == type_specifier.TypeSpecifier.CHAR:
             return str(ord(str(self.constant)[1]))
 
-        elif self._type_stack[0] is type_specifier.TypeSpecifier.FLOAT:
+        elif self._type_stack[0] == type_specifier.TypeSpecifier.FLOAT:
             constant = float(self.constant)
             constant = struct.unpack('f', struct.pack('f', constant))[0]
             constant = hex(struct.unpack('Q', struct.pack('d', constant))[0])
@@ -40,16 +40,16 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
     def generate_llvm(self, store_reg: str = None) -> str:
         # Part of commenting.
-        return_string = self.indent_string() + ";... {0}\n".format(self.constant)
+        return_string = self.code_indent_string() + ";... {0}\n".format(self.constant)
         write_register = store_reg
         if not store_reg:
             self.increment_register_index()
             return_string += LlvmCode.llvm_allocate_instruction(str(self.register_index), self._type_stack,
-                                                                self.indent_string())
+                                                                self.code_indent_string())
             write_register = self.register_index
 
         return_string += LlvmCode.llvm_store_instruction_c(self._type_stack, self.llvm_constant, self._type_stack,
-                                                           str(write_register), self.indent_string())
+                                                           str(write_register), self.code_indent_string())
 
         return return_string
 

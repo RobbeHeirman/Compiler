@@ -19,8 +19,8 @@ class DeclListNode(AbstractNode.AbstractNode):
     _declaration_nodes: List[DeclarationNode.DeclarationNode]
     _BASE_LABEL = "decl_list"
 
-    def __init__(self, parent_node):
-        super().__init__(parent_node)
+    def __init__(self, parent_node, ctx):
+        super().__init__(parent_node, ctx)
 
         self.base_type = None
         self._declaration_nodes = list()

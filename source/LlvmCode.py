@@ -62,7 +62,7 @@ def llvm_store_instruction(source_register: str,
     return ret
 
 
-def llvm_store_instruction_c(source_type, source_constant: str, target_type, target_register: str, indent_string: str) \
+def llvm_store_instruction_c(source_constant: str, source_type, target_register: str, target_type, indent_string: str) \
         -> str:
     """
 

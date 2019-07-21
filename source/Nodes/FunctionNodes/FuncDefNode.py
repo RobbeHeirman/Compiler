@@ -83,9 +83,9 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
     def generate_llvm(self):
         self.increment_register_index()
-        ret = self.indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self.id)
-        ret += "{0}){{\n".format(self._children[0].generate_llvm())
-        self.__class__._indent_level += 1
+        ret = self.code_indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self.id)
+        ret += "{0}){{\n".format(self._param_list_node.generate_llvm())
+        self.increase_code_indent()
         for child in self._children[1:]:
             ret += child.generate_llvm()
 

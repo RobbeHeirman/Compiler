@@ -47,8 +47,6 @@ class CListenerExtend(CListener):
         # Some info about the traversing will be recorded
 
         self._ast = AST.AST(filename, string_stream)
-        self._ast.root = RootNode.RootNode()
-        self._parent_node = self._ast.root
 
         # Will help us determine if we are in the global scope.
         self._scope_counter = 0
@@ -60,6 +58,10 @@ class CListenerExtend(CListener):
     @property
     def ast(self):
         return self._ast
+
+    def enterRoot(self, ctx: CParser.RootContext):
+        self._ast.root = RootNode.RootNode(ctx)
+        self._parent_node = self._ast.root
 
     def enterStatements(self, ctx: CParser.StatementContext):
         """
@@ -97,7 +99,7 @@ class CListenerExtend(CListener):
         self.exitDeclarator(ctx)
 
     def enterParameter_list(self, ctx: CParser.Parameter_listContext):
-        node = ParamListNode.ParamListNode(self._parent_node)
+        node = ParamListNode.ParamListNode(self._parent_node, ctx)
         self._parent_node.add_child(node)
         self._parent_node = node
 
@@ -129,7 +131,7 @@ class CListenerExtend(CListener):
         :param ctx:
         :return:
         """
-        decl_l_node = DeclListNode.DeclListNode(self._parent_node)
+        decl_l_node = DeclListNode.DeclListNode(self._parent_node, ctx)
         self._parent_node.add_child(decl_l_node)
         self._parent_node = decl_l_node
 
@@ -326,7 +328,7 @@ class CListenerExtend(CListener):
 
     def enterExpression_param_list(self, ctx: CParser.Expression_param_listContext):
 
-        node = ParamListNode.ParamListNode(self._parent_node)
+        node = ParamListNode.ParamListNode(self._parent_node, ctx)
         self._parent_node.add_child(node)
         self._parent_node = node
 

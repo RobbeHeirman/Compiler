@@ -40,8 +40,8 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
     def generate_llvm(self):
         self.increment_register_index()
-        ret = self.indent_string() + ";... {0}\n".format(self.id)
+        ret = self.code_indent_string() + ";... {0}\n".format(self.id)
         ret += LlvmCode.llvm_load_instruction(self.id, self.type_stack, str(self.register_index), self.type_stack,
-                                              self.indent_string())
+                                              self.code_indent_string())
 
         return ret
