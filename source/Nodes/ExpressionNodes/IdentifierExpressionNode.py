@@ -4,10 +4,12 @@ Project: Simple C Compiler
 Academic Year: 2018-2019
 """
 
-import LlvmCode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
+import Nodes.FunctionNodes.ParamListNode as ParamListNode
+
+import LlvmCode
 import messages
-import type_specifier
+
 
 
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
@@ -55,6 +57,14 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         if self._is_function_call():
             print("llvm for a function call")
+
+            # We pop off the function type since it's a call
+            self._type_stack.pop()
+            # This node will load all the value's in place
+            param_node = self._get_param_node()
+            ret = param_node.llvm_call_param_nodes()
+
+            # This is the base register the functions will load from
             remember_reg = self.register_index
 
         else:
@@ -64,10 +74,14 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         return ret
 
+    def generate_llvm_store(self):
+        pass
+        raise NotImplementedError("Need to implement the store instruction for identifiers")
+
     def _is_function_call(self) -> bool:
         if self._type_modifier_node:
             return self._type_modifier_node.is_function_call()
         return False
 
-    def _get_param_node(self):
+    def _get_param_node(self) -> ParamListNode.ParamListNode:
         return self._type_modifier_node.get_param_node()

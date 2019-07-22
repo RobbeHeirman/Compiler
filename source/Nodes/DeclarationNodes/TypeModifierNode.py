@@ -125,10 +125,12 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         :param messenger:
         :return: the type_stack
         """
+        if self.modifier_type == type_specifier.TypeSpecifier.FUNCTION:
+            self.modifier_type.function_signature = self._param_list_node.get_function_signature()
+        node.type_stack_ref().append(self._modifier_type)
         if self._type_modifier_node is not None:
             self._type_modifier_node.generate_type_operator_stack(node, messenger)
 
-        node.type_stack_ref().append(self._modifier_type)
         return True
 
     # LLVM Code generations

@@ -13,63 +13,35 @@ class AbstractNode(abc.ABC):
     Abstract class of a node of the AST.
     Should be overridden by specific nodes of the AST.
     """
-    _children: typing.List["AbstractNode"]
-    _parent_node: "AbstractNode"
-
-    _index_counter = 0
+    _index_counter = -1
     _indent_level = 0
 
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, parent: "AbstractNode" = None, ctx=None):
         """
         Initializer
         """
 
-        # Block for graphviz dot representation.
-        self._index = AbstractNode._index_counter
         AbstractNode._index_counter += 1
-        self._parent_node = parent
-        self._children = list()
+
+        # Block for graphviz dot representation.
+        self._index: int = AbstractNode._index_counter
+
+        self._parent_node: "AbstractNode" = parent
+        self._children: typing.List["AbstractNode"] = list()
 
         start = ctx.start
-        self._line = start.line
-        self._column = start.column
+        self._line: int = start.line
+        self._column: int = start.column
 
-    @staticmethod
-    def code_indent_string():
-        return "  " * AbstractNode._indent_level
-
-    @staticmethod
-    def increase_code_indent():
-        AbstractNode._indent_level += 1
-
-
-    @property
-    def line(self):
-        return self._line
-
-    @property
-    def column(self):
-        return self._column
-
-    @property
-    def index(self):
-        return self._index
-
-    @property
-    @abc.abstractmethod
-    def label(self):  # Enforcing every node defines a label
-        pass
-
-    @property
-    def parent_node(self) -> "AbstractNode":
-        return self._parent_node
-
-    @parent_node.setter
-    def parent_node(self, value: "AbstractNode"):
-        self._parent_node = value
-
+    # AST Visuals
+    # ==================================================================================================================
     def dot_string(self) -> str:
-        """Generates the visual representation of the node in .dot"""
+        """
+        Generates the visual representation of the subtree in .dot.
+        :return: str A string representing the dot representation of the subtree.
+        """
         ret = "{0}[label = \"{1}\"];\n".format(self._index, self.label)
         ret += "{0}--{{".format(self._index)
         for child in self._children:
@@ -82,25 +54,97 @@ class AbstractNode(abc.ABC):
 
         return ret
 
-    def get_child_index(self, child):
+    @property
+    def index(self) -> int:
+        """
+        .Dot index mainly. But every node has an unique index number so can be used for other utils.
+        :return: int Integer index of node
+        """
+        return self._index
+
+    @property
+    @abc.abstractmethod
+    def label(self) -> str:  # Enforcing every node defines a label
+        """
+        Label of the AST. Used in the DOT representation.
+        :return: string label representation of node in DOT
+        """
+        pass
+
+    # AST Generation
+    # ==================================================================================================================
+    @property
+    def parent_node(self) -> "AbstractNode":
+        return self._parent_node
+
+    @parent_node.setter
+    def parent_node(self, value: "AbstractNode") -> None:
+        self._parent_node = value
+
+    def get_child_index(self, child: "AbstractNode") -> int:
+        """
+        Returns the index in the children container of child
+        :param: child AbstractNode
+        :return: int integer index of child
+        """
         return self._children.index(child)
 
-    def add_child(self, child: "AbstractNode", index: int = None):
+    def add_child(self, child: "AbstractNode", index: int = None) -> None:
         """
         Add a child node to the AST.
-        :param index: is needs to be placed at a certain location
-        :param child: a ASTNode that functions as a child
+        :param child AbstractNode a ASTNode that functions as a child
+        :param index int is needs to be placed at a certain location
         """
         if index is None:
             self._children.append(child)
         else:
             self._children.insert(index, child)
 
-    def remove_child(self, child):
+    def remove_child(self, child: "AbstractNode") -> None:
         """
         Removes a child by value (reference of child node)
+        :param child AbstractNode the node that needs to be removed from the child list
         """
         self._children.remove(child)
+
+    # Semantic analysis
+    # ==================================================================================================================
+    @property
+    def line(self) -> int:
+        """
+        Line in C code this node is generated from.
+        :return: int the line number.
+        """
+        return self._line
+
+    @property
+    def column(self) -> int:
+        """
+        Place in line in C code where this node is generated from.
+        :return: the index on line
+        """
+        return self._column
+
+    # LLVM Code Generation
+    # ==================================================================================================================
+
+    @staticmethod
+    def code_indent_string() -> str:
+        """
+        Used to manage indentation in LLVM Code generation
+        :return: string A string of whitespaces matching the indent level
+        """
+        return "  " * AbstractNode._indent_level
+
+    @staticmethod
+    def increase_code_indent() -> None:
+        """
+        Called by all scope enclosing nodes. Will increase the indentation string.
+        :return: None
+        """
+        AbstractNode._indent_level += 1
+
+
 
     def pop_child(self, index: int = -1) -> "AbstractNode":
         """

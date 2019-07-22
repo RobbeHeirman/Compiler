@@ -57,6 +57,10 @@ class TypeSpecifier:
     def function_signature(self):
         return self._function_signature
 
+    @function_signature.setter
+    def function_signature(self, val):
+        self._function_signature = val
+
     @property
     def llvm_type(self) -> str:
         _LLVM_TYPE = {

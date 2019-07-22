@@ -114,8 +114,6 @@ class DeclarationNode(TypedNode.TypedNode):
         # print(self.__class__.warning_count())
         expression_stack = self._expression_node.type_stack
         prev_ele = expression_stack[-1]
-        print(expression_stack)
-        print(self._type_stack)
         for element in reversed(self._type_stack):
 
             if expression_stack and element == expression_stack[-1]:
@@ -139,12 +137,12 @@ class DeclarationNode(TypedNode.TypedNode):
         """
         # Comment string, maybe we can find another mechanism for this
         ret = self.code_indent_string() + "; Declaration: {0} {1}\n".format(self._type_stack[0].value, self.id)
+
+        self.increment_register_index()
         ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())
 
         if self._expression_node:
-            ret += self._expression_node.generate_llvm()
-            if not (isinstance(self._expression_node, ArrayInitNode.ArrayInitNode)):
-                ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, self.id,
-                                                       self._type_stack, self.code_indent_string())
+            ret += self.code_indent_string() + "; = "
+            ret += self._expression_node.generate_llvm_store(self.id)
         ret += self.code_indent_string() + "; end declaration\n"
         return ret

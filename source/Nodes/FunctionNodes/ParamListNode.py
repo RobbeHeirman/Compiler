@@ -30,10 +30,8 @@ class ParamListNode(AbstractNode.AbstractNode):
         self._children: List[DeclarationNode]
         return [child.type_stack for child in self._children]
 
-    # def get_signature_list(self):
-    #     self._children: List[DeclarationNode]
-    #     return [child.base_type for child in self._children]
-
+    # LLVM Code
+    # ==================================================================================================================
     def generate_llvm_function_signature(self):
         ret = ""
         for child in self._children:
@@ -47,7 +45,6 @@ class ParamListNode(AbstractNode.AbstractNode):
         return ret
 
     def llvm_alloc_params(self):
-
         return "".join([LlvmCode.llvm_allocate_instruction(child.id, child.type_stack, self.code_indent_string())
                         for child in self._children])
 

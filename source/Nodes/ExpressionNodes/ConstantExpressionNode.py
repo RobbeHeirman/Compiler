@@ -5,19 +5,24 @@ Academic Year: 2018-2019
 """
 import struct
 
-import LlvmCode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
+
+import LlvmCode
 import type_specifier
 
 
 class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
 
-        self.constant = ctx.getText()
-        self.l_value = False  # Constant's are always r value's
+        self.constant: str = ctx.getText()
+        self.l_value: bool = False  # Constant's are always r value's
 
+    # AST-visuals
+    # ==================================================================================================================
     @property
     def label(self) -> str:
         ret = super().label
@@ -25,6 +30,13 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
         ret += "{0}\n".format(self.constant)
         return ret
 
+    # Semantic-analysis
+    # ==================================================================================================================
+    def is_constant(self):
+        return True
+
+    # LLVM Code-Generation
+    # ==================================================================================================================
     @property
     def llvm_constant(self) -> str:
         if self._type_stack[0] == type_specifier.TypeSpecifier.CHAR:
@@ -38,20 +50,16 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
         return str(self.constant)
 
-    def generate_llvm(self, store_reg: str = None) -> str:
+    def generate_llvm_store(self, store_addr: str) -> str:
+        """
+        Stores the constant directly in to given addr
+        :param store_addr:
+        :return:
+        """
+
         # Part of commenting.
         return_string = self.code_indent_string() + ";... {0}\n".format(self.constant)
-        write_register = store_reg
-        if not store_reg:
-            self.increment_register_index()
-            return_string += LlvmCode.llvm_allocate_instruction(str(self.register_index), self._type_stack,
-                                                                self.code_indent_string())
-            write_register = self.register_index
-
-        return_string += LlvmCode.llvm_store_instruction_c(self._type_stack, self.llvm_constant, self._type_stack,
-                                                           str(write_register), self.code_indent_string())
+        return_string += LlvmCode.llvm_store_instruction_c(self.llvm_constant, self._type_stack, str(store_addr),
+                                                           self._type_stack, self.code_indent_string())
 
         return return_string
-
-    def is_constant(self):
-        return True

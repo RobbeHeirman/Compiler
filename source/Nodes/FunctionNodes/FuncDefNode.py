@@ -87,6 +87,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         ret = self.code_indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self.id)
         ret += "{0}){{\n".format(self._param_list_node.generate_llvm_function_signature())
         self.increase_code_indent()
+
         ret += self._param_list_node.llvm_alloc_params()
         ret += self._param_list_node.llvm_store_params()
 

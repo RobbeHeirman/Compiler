@@ -8,6 +8,6 @@ int c (char q, int a){
 
 
 int main(){
-    int (*t)(char, int) = c;
-    return 12;
+    int b = 4;
+    return b;
     }
