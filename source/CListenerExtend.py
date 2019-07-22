@@ -136,7 +136,7 @@ class CListenerExtend(CListener):
         self._parent_node = decl_l_node
 
     def exitDecl_list(self, ctx: CParser.Decl_listContext):
-        self._parent_node.cleanup()
+        self._parent_node._cleanup()
         self._parent_node = self._parent_node.parent_node
 
     def enterSimple_declaration(self, ctx: CParser.Simple_declarationContext):

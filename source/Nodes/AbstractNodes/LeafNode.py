@@ -39,13 +39,5 @@ class LeafNode(AbstractNode.AbstractNode, ABC):
     def filename(self):
         return self._filename
 
-    @property
-    def line(self):
-        return self._line
-
-    @property
-    def column(self):
-        return self._column
-
     def generate_llvm(self):
         return ""

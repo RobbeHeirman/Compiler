@@ -61,7 +61,6 @@ if __name__ == "__main__":
     # Visuals
     if args.visual_ast:
         main.generate_ast_visuals(ast, path + slug)
-        ast.first_pass()  # Some cleanup hope to deprecate this
         main.generate_ast_visuals(ast, path + slug + "2")
 
     # If the semantic analysis fails

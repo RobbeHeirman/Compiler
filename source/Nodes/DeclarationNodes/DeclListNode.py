@@ -36,7 +36,7 @@ class DeclListNode(AbstractNode.AbstractNode):
         self._declaration_nodes.append(child)
         super().add_child(child, index)
 
-    def cleanup(self):
+    def _cleanup(self):
         """
         On the first pass we need to decide the type of the list. And prepend what we found to the declarations.
         Since the list is just an abstract way of handling a multi declaration on a single line.
@@ -53,6 +53,5 @@ class DeclListNode(AbstractNode.AbstractNode):
             decl_node.parent_node = self._parent_node
             self._parent_node.add_child(decl_node, index)
             index += 1
-            decl_node.first_pass()
 
         self._parent_node.remove_child(self)

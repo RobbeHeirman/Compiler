@@ -102,8 +102,47 @@ class AbstractNode(abc.ABC):
         """
         self._children.remove(child)
 
+    def pop_child(self, index: int = -1) -> "AbstractNode":
+        """
+        Follows list pop syntax. Removes child at index and returns it
+        :param index: index where we want to remove
+        :return: THe removed Node
+        """
+        return self._children.pop(index)
+
+    def child_count(self) -> int:
+        """
+        :return: int The amount of children a node has.
+        """
+        return len(self._children)
+
+    def get_attribute(self, lexeme: str) -> typing.Union[Attributes.Attributes]:
+        """
+        Get's an attribute from the symbol table enclosing this scope. The derived scoped nodes have the symbol
+        tables to look into
+        :param lexeme: str A string representation ID of the symbol we look for
+        :return: Attributes Returns the attributes of the id
+        """
+        return self._parent_node.get_attribute(lexeme)
+
+    def _cleanup(self):
+        """
+        Some nodes need to clean stuff up
+        :return:
+        """
+        raise Exception("{0} type does not have cleanup implemented".format(type(self)))
+
     # Semantic analysis
     # ==================================================================================================================
+    def semantic_analysis(self, messenger) -> bool:
+        """
+        Not all nodes check for semantic correctness. Those who do not just forward the check to their children.
+        this function NEEDS to be overwritten by nodes who do check on semantics.
+        :return: Returns the amount of errors generated.
+        """
+        ret = all([child.semantic_analysis(messenger) for child in list(self._children)])
+        return ret
+
     @property
     def line(self) -> int:
         """
@@ -119,38 +158,6 @@ class AbstractNode(abc.ABC):
         :return: the index on line
         """
         return self._column
-
-    # LLVM Code Generation
-    # ==================================================================================================================
-
-    @staticmethod
-    def code_indent_string() -> str:
-        """
-        Used to manage indentation in LLVM Code generation
-        :return: string A string of whitespaces matching the indent level
-        """
-        return "  " * AbstractNode._indent_level
-
-    @staticmethod
-    def increase_code_indent() -> None:
-        """
-        Called by all scope enclosing nodes. Will increase the indentation string.
-        :return: None
-        """
-        AbstractNode._indent_level += 1
-
-
-
-    def pop_child(self, index: int = -1) -> "AbstractNode":
-        """
-        Follows list pop syntax. Removes child at index and returns it
-        :param index: index where we want to remove
-        :return: THe removed Node
-        """
-        return self._children.pop(index)
-
-    def child_count(self):
-        return len(self._children)
 
     def is_in_table(self, lexeme: str) -> bool:
         return self._parent_node.is_in_table(lexeme)
@@ -169,39 +176,15 @@ class AbstractNode(abc.ABC):
         """
         return self._parent_node.add_to_scope_symbol_table(lexeme, attribute)
 
-    @property
-    def register_index(self) -> int:
-        return self._parent_node.register_index
-
-    def increment_register_index(self):
-        self._parent_node.increment_register_index()
-
-    def get_attribute(self, lexeme) -> typing.Union[Attributes.Attributes, Attributes.AttributesGlobal]:
-        return self._parent_node.get_attribute(lexeme)
-
-    def cleanup(self):
+    def is_global(self) -> bool:
         """
-        Some nodes need to clean stuff up
+        Check is a Node is global declared or local declared
         :return:
         """
-        raise Exception("{0} type does not have cleanup implemented".format(type(self)))
+        return self._parent_node.is_global()
 
-    def first_pass(self):
-        """
-        AST cleanup.
-        :return:
-        """
-        for child in self._children:
-            child.first_pass()
-
-    def semantic_analysis(self, messenger) -> bool:
-        """
-        Not all nodes check for semantic correctness. Those who do not just forward the check to their children.
-        this function NEEDS to be overwritten by nodes who do check on semantics.
-        :return: Returns the amount of errors generated.
-        """
-        ret = all([child.semantic_analysis(messenger) for child in list(self._children)])
-        return ret
+    # LLVM Code Generation
+    # ==================================================================================================================
 
     def generate_llvm(self) -> str:
         """
@@ -214,5 +197,34 @@ class AbstractNode(abc.ABC):
 
         return ret
 
-    def _is_global(self) -> bool:
-        return self._parent_node._is_global()
+    @staticmethod
+    def code_indent_string() -> str:
+        """
+        Used to manage indentation in LLVM Code generation
+        :return: string A string of whitespaces matching the indent level
+        """
+        return "  " * AbstractNode._indent_level
+
+    @staticmethod
+    def increase_code_indent() -> None:
+        """
+        Called by all scope enclosing nodes. Will increase the indentation string.
+        :return: None
+        """
+        AbstractNode._indent_level += 1
+
+    @property
+    def register_index(self) -> int:
+        """
+        Returns the top register index.
+        Used to assign temporal register indexes
+        :return: int the register index integer
+        """
+        return self._parent_node.register_index
+
+    def increment_register_index(self) -> None:
+        """
+        If we need a new register we can increment the register indexes
+        :return: None
+        """
+        self._parent_node.increment_register_index()

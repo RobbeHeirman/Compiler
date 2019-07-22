@@ -39,11 +39,6 @@ class AssignmentNode(AbstractNode.AbstractNode):
     def _find_id(self):
         self._id = self._lhs_node.find_id()
 
-    def first_pass(self):
-
-        super().first_pass()
-        self._find_id()
-
     def generate_llvm(self):
 
         ret = self._children[0].generate_llvm()

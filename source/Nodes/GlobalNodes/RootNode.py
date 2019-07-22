@@ -34,5 +34,5 @@ class RootNode(ScopedNode.ScopedNode):
     def get_attribute(self, lexeme):
         return self._symbol_table.get_attribute(lexeme)
 
-    def _is_global(self):
+    def is_global(self):
         return True
