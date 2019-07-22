@@ -14,20 +14,24 @@ import Nodes.GlobalNodes.StatementsNode
 
 
 class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
-    _id: str
-    _param_list_node: ParamListNode.ParamListNode
 
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, parent_node: AbstractNode.AbstractNode, ctx):
         super().__init__(parent_node, ctx)
 
-        self._param_list_node = None
+        self._param_list_node: ParamListNode.ParamListNode = None
         self._function_signature = []
 
+    # AST-Visuals
+    # ==================================================================================================================
     @property
     def label(self):
         return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, [el.value for el in
                                                                              self._type_stack[:-1]])
 
+    # AST-generation
+    # ==================================================================================================================
     @property
     def base_type(self):
         return self._type_stack[0]
@@ -46,6 +50,8 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
         super().add_child(child, index)
 
+    # Semantic analysis
+    # ==================================================================================================================
     def semantic_analysis(self, messenger) -> bool:
         """
         Semantic analysis of a function definition.
@@ -59,14 +65,13 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         if not self._param_list_node.semantic_analysis(messenger):
             return False
 
+        # Applies all special types to the function definition
         self._generate_type_modifier_stack(messenger)
         self._type_stack.append(type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.FUNCTION,
                                                              self._param_list_node.get_function_signature()))
 
         self._function_signature = self._param_list_node.get_function_signature()
-        attribute = Attributes.AttributesGlobal(self._type_stack, self._line, self._column,
-                                                True,
-                                                self)
+        attribute = Attributes.AttributesGlobal(self._type_stack, self._line, self._column, True, self)
 
         attribute.function_signature = self._function_signature
         if not self._add_to_table(attribute, messenger):
@@ -83,14 +88,17 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         return self._type_stack[:-1]
 
     def generate_llvm(self):
-        self.increment_register_index()
-        ret = self.code_indent_string() + "define {0} @{1}(".format(self.base_type.llvm_type, self.id)
-        ret += "{0}){{\n".format(self._param_list_node.generate_llvm_function_signature())
+
+        # Code for a function Def in LLVM: Example: LLVM: Define i32 @main(int) {...} <=> C: int main(int){...}
+        ret = f'{self.code_indent_string()} define {self.base_type.llvm_type} @{self.id}'
+        ret += f'({self._param_list_node.generate_llvm_function_signature()}){{\n'
         self.increase_code_indent()
 
+        # Read and store the parameters to their respective registers.
         ret += self._param_list_node.llvm_alloc_params()
         ret += self._param_list_node.llvm_store_params()
 
+        # We need to increment our register for each param
         self.increment_register_index(self._param_list_node.child_count())
 
         for child in self._children[1:]:
