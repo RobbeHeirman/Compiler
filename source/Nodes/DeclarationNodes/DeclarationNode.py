@@ -141,7 +141,7 @@ class DeclarationNode(TypedNode.TypedNode):
         ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())
 
         if self._expression_node:
-            ret += self.code_indent_string() + "; = "
+            ret += f'; ={self.code_indent_string()} {self._expression_node}   \n '
             ret += self._expression_node.generate_llvm_store(self.id)
         ret += self.code_indent_string() + "; end declaration\n"
         return ret

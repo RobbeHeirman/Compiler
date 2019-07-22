@@ -24,6 +24,9 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         self.id = ctx.getText()
         self._l_value = True  # As it's base form an identifier is an Lvalue
 
+    def __str__(self):
+        return self.id
+
     # AST visuals
     # ==================================================================================================================
     @property
@@ -69,14 +72,25 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         else:
             ret = self.code_indent_string() + ";... {0}\n".format(self.id)
-            ret += LlvmCode.llvm_load_instruction(self.id, self.type_stack, str(self.register_index), self.type_stack,
-                                                  self.is_in_global_table(self.id), self.code_indent_string())
+            ret += self.llvm_load()
 
         return ret
 
-    def generate_llvm_store(self):
-        pass
-        raise NotImplementedError("Need to implement the store instruction for identifiers")
+    def llvm_load(self) -> str:
+        """
+        Will load this variable into a register
+        :return: a string that loaded the value of the var into the register
+        """
+        self.increment_register_index()
+        return LlvmCode.llvm_load_instruction(self.id, self.type_stack, str(self.register_index), self.type_stack,
+                                              self.is_in_global_table(self.id), self.code_indent_string())
+
+    def generate_llvm_store(self, addr: str):
+
+        ret = self.llvm_load()
+        ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, addr, self._type_stack,
+                                               self.code_indent_string())
+        return ret
 
     def _is_function_call(self) -> bool:
         if self._type_modifier_node:

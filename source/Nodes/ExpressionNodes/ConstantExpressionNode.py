@@ -21,6 +21,9 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
         self.constant: str = ctx.getText()
         self.l_value: bool = False  # Constant's are always r value's
 
+    def __str__(self):
+        return self.constant
+
     # AST-visuals
     # ==================================================================================================================
     @property

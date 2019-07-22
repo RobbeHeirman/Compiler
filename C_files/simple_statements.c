@@ -1,7 +1,6 @@
-// Regressive test all previous implemented features
-
-
 int main(){
-    int b = 4;
-    return b;
-    }
+
+    int a = 48;
+    int b = a;
+    return a;
+}
