@@ -44,14 +44,9 @@ class AbstractNode(abc.ABC):
         """
         ret = "{0}[label = \"{1}\"];\n".format(self._index, self.label)
         ret += "{0}--{{".format(self._index)
-        for child in self._children:
-            ret += "{0} ".format(child.index)
-
+        ret += ''.join([f'{child.index} ' for child in self._children])
         ret += "}\n"
-
-        for child in self._children:
-            ret += child.dot_string()
-
+        ret += ''.join([child.dot_string() for child in self._children])
         return ret
 
     @property
