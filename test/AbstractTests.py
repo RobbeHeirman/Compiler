@@ -83,6 +83,7 @@ class LLVMAbstractTest(unittest.TestCase):
 class LLVMAbstractExecTest(LLVMAbstractTest):
 
     def _compile_llvm(self, filename):
+        slug = filename[: -2]  # - .c
         file_name = self.path + filename
         ast = main.create_ast(file_name)
         if ast.semantic_analysis():
@@ -91,10 +92,10 @@ class LLVMAbstractExecTest(LLVMAbstractTest):
             with open(result_file, "w+") as file:
                 file.write(code)
 
-            ret = subprocess.call(["clang", "-S", "-emit-llvm", file_name])
-            # Should compile with exit code 0
-            self.assertEqual(ret, 0)
-            return True if ret is 0 else False
+            return True
+        else:
+            self.assertTrue(False, 'Semantics are wrong in an excecution test')
+            return False
 
     def _build_and_run_llvm(self, filename, exit_code_exec):
 
@@ -106,5 +107,7 @@ class LLVMAbstractExecTest(LLVMAbstractTest):
         else:
             return
 
-        ret_code = subprocess.call([exec_name])
+        si = subprocess.STARTUPINFO()
+        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        ret_code = subprocess.call([exec_name], startupinfo=si)
         self.assertEqual(ret_code, exit_code_exec)

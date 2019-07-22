@@ -138,7 +138,6 @@ class DeclarationNode(TypedNode.TypedNode):
         # Comment string, maybe we can find another mechanism for this
         ret = self.code_indent_string() + "; Declaration: {0} {1}\n".format(self._type_stack[0].value, self.id)
 
-        self.increment_register_index()
         ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())
 
         if self._expression_node:
