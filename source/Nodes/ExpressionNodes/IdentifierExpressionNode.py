@@ -3,13 +3,13 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+from typing import List
 
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 
 import LlvmCode
 import messages
-
 
 
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
@@ -23,6 +23,8 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         super().__init__(parent_node, ctx)
         self.id = ctx.getText()
         self._l_value = True  # As it's base form an identifier is an Lvalue
+
+        self._temporal_reg_num: int = None
 
     def __str__(self):
         return self.id
@@ -54,7 +56,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
     # LLVM Code generation
     # ==================================================================================================================
-    def generate_llvm(self, c_comment: bool):
+    def generate_llvm(self, c_comment: bool = True):
 
         self.increment_register_index()
 
@@ -82,10 +84,28 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         :return: a string that loaded the value of the var into the register
         """
         self.increment_register_index()
+        self._temporal_reg_num = self.register_index
+
+        if self._is_function_call():
+            param_node = self._get_param_node()
+
+            param_node.llvm_load_params()
+            call_string = '('
+
+            child_list: List[ExpressionNode] = param_node.get_children()
+            call_string += ', '.join([child.llvm_value for child in child_list])
+            call_string += ')'
+            print(call_string)
+
+            return f'%{self._temporal_reg_num} = call {self._type_stack[0].llvm_type} @{self.id}{call_string}\n'
+
         return LlvmCode.llvm_load_instruction(self.id, self.type_stack, str(self.register_index), self.type_stack,
                                               self.is_in_global_table(self.id), self.code_indent_string())
 
     def generate_llvm_store(self, addr: str):
+        print("???")
+        if self._is_function_call():
+            print("llvm for a function call")
 
         ret = self.llvm_load()
         ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, addr, self._type_stack,
@@ -99,3 +119,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
     def _get_param_node(self) -> ParamListNode.ParamListNode:
         return self._type_modifier_node.get_param_node()
+
+    def llvm_value(self):
+        return f'@{self._temporal_reg_num}' if self.is_in_global_table(self.id) else f'%{self._temporal_reg_num}'

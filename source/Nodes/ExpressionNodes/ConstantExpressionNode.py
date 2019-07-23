@@ -41,7 +41,7 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
     # LLVM Code-Generation
     # ==================================================================================================================
     @property
-    def llvm_constant(self) -> str:
+    def llvm_value(self) -> str:
         if self._type_stack[0] == type_specifier.TypeSpecifier.CHAR:
             return str(ord(str(self.constant)[1]))
 
@@ -60,5 +60,5 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
         :return:
         """
 
-        return LlvmCode.llvm_store_instruction_c(self.llvm_constant, self._type_stack, str(store_addr),
+        return LlvmCode.llvm_store_instruction_c(self.llvm_value, self._type_stack, str(store_addr),
                                                  self._type_stack, self.code_indent_string())

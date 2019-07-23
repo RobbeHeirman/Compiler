@@ -119,6 +119,13 @@ class AbstractNode(abc.ABC):
         """
         return len(self._children)
 
+    def get_children(self) -> typing.List["AbstractNode"]:
+        """
+        Returns a copy of the children list
+        :return:
+        """
+        return list(self._children)
+
     def get_attribute(self, lexeme: str) -> typing.Union[Attributes.Attributes]:
         """
         Get's an attribute from the symbol table enclosing this scope. The derived scoped nodes have the symbol

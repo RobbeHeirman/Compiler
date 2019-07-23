@@ -99,7 +99,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         self.increase_code_indent()
 
         # Read and store the parameters to their respective registers.
-        ret += self._param_list_node.llvm_alloc_params()
+        ret += self._param_list_node.llvm_load_params()
         ret += self._param_list_node.llvm_store_params()
 
         # We need to increment our register for each param

@@ -1,6 +1,8 @@
-int main(){
 
-    int a = 48;
-    int b = a;
-    return b;
+int a(){
+    return 132;
+}
+
+int main(){
+    return a();
 }

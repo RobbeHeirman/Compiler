@@ -8,6 +8,7 @@ from typing import List, Union, TYPE_CHECKING
 import LlvmCode
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 
+
 if TYPE_CHECKING:
     import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
     import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
@@ -44,9 +45,18 @@ class ParamListNode(AbstractNode.AbstractNode):
         ret = ret[:-2]
         return ret
 
-    def llvm_alloc_params(self):
-        return "".join([LlvmCode.llvm_allocate_instruction(child.id, child.type_stack, self.code_indent_string())
-                        for child in self._children])
+    def llvm_load_params(self) -> str:
+        """
+        Will load all parameters that are variables to temporal registers
+        :return:
+        """
+        import Nodes.ExpressionNodes.IdentifierExpressionNode as IdentifierExpressionNode
+
+        ret = ""
+        for child in self._children:
+            if isinstance(child, IdentifierExpressionNode.IdentifierExpressionNode):
+                ret += child.llvm_load()
+        return ret
 
     def llvm_store_params(self):
         return "".join([LlvmCode.llvm_store_instruction(str(index), child.type_stack, child.id, child.type_stack,

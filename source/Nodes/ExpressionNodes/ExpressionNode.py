@@ -4,32 +4,11 @@ import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 
 
-# class ExpressionNodeType(Enum):
-#     BINARY_OPERATOR = auto()
-#     CONSTANT = "Constant: "
-#     IDENTIFIER = "Identifier: "
-#     PTR = "*"
-#     ADDR = "&"
-#     ARRAY = "[]"
-#     FUNCTION = "()"
-#
-#     @property
-#     def decl_specifier(self):
-#         specifier_map = {
-#             self.PTR: Specifiers.TypeModifier.PTR,
-#             self.ADDR: Specifiers.TypeModifier.ADDRESS,
-#             self.ARRAY: Specifiers.TypeModifier.ARRAY,
-#             self.FUNCTION: Specifiers.TypeModifier.FUNC
-#         }
-#         return specifier_map[self]
-
-
 class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     _BASE_LABEL = "expression"
 
-    # _OPERATOR_TYPES = [ExpressionNodeType.ARRAY,
-    #                    ExpressionNodeType.PTR, ExpressionNodeType.ADDR, ExpressionNodeType.FUNCTION]
-
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
 
@@ -40,9 +19,8 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
         self.l_value = True
 
-    @property
-    def type_string_llvm(self):
-        return self._type_stack[0].llvm_type + "*" * len(self._type_stack)
+    # AST-Visuals
+    # ==================================================================================================================
 
     @property
     def label(self):
@@ -51,12 +29,8 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
             ret += "Base type: " + self._type_stack[0].value + "\n"
         return ret
 
-    # def is_address(self):
-    #     if self._type_stack and self._type_stack[-1] is Specifiers.TypeModifier.ADDRESS:
-    #         return True
-    #
-    #     return False
-
+    # AST-Generation
+    # ==================================================================================================================
     def add_child(self, child, index=None):
 
         if isinstance(child, TypeModifierNode.TypeModifierNode):
@@ -69,53 +43,8 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
         super().add_child(child)
 
-    # def get_error_info(self):
-    #     """
-    #     :return: A tuple filename, line, column
-    #     """
-    #     if self._filename is None:
-    #         for _ in self._children:
-    #             # val = child.get_error_info()
-    #             val = ""
-    #             if val is not None:
-    #                 return val
-    #     else:
-    #         return self._filename, self._line, self._column
-
-    # def _handle_member_operator_node(self):
-    #     if self._type_modifier_node is not None:
-    #         if self._type_modifier_node.f_type == Specifiers.TypeModifier.PTR:
-    #             self.type = ExpressionNodeType.PTR
-    #             self.remove_child(self._type_modifier_node)
-    #             self._type_modifier_node = None
-    #
-    #         elif self._type_modifier_node.f_type == Specifiers.TypeModifier.ADDRESS:
-    #             self.type = ExpressionNodeType.ADDR
-    #             self.remove_child(self._type_modifier_node)
-    #             self._type_modifier_node = None
-    #
-    #         elif self._type_modifier_node.f_type == Specifiers.TypeModifier.ARRAY:
-    #             self.type = ExpressionNodeType.ARRAY
-    #
-    #             self._type_modifier_node.rhs_node.parent = self
-    #             self.add_child(self._type_modifier_node.rhs_node)
-    #             self._type_modifier_node.rhs_node.parent_node = self
-    #             self.remove_child(self._type_modifier_node)
-    #             self._type_modifier_node = None
-    #
-    #         elif self._type_modifier_node.f_type == Specifiers.TypeModifier.FUNCTION:
-    #             self.type = ExpressionNodeType.FUNCTION
-    #             self._type_modifier_node.rhs_node.parent = self
-    #             self.add_child(self._type_modifier_node.rhs_node)
-    #             self._type_modifier_node.rhs_node.parent_node = self
-    #             self.remove_child(self._type_modifier_node)
-    #             self._type_modifier_node = None
-
-    # def first_pass(self):
-    #     self._handle_member_operator_node()
-    #     for child in self._children:
-    #         child.first_pass()
-
+    # Semantic-Analysis
+    # ==================================================================================================================
     def semantic_analysis(self, messenger) -> bool:
         """
         Semantic analysis in expressive nodes is looking up if the signature of the identifier matches the
@@ -135,3 +64,18 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
     def is_constant(self):
         return False
+
+    # LLVM-code
+    # ==================================================================================================================
+
+    @property
+    @abc.abstractmethod
+    def llvm_value(self) -> str:
+        """
+        Returns te LLVM value as a string can either be the constant directly or be a register
+        :return:
+        """
+        pass
+    # @property
+    # def type_string_llvm(self):
+    #     return self._type_stack[0].llvm_type + "*" * len(self._type_stack)

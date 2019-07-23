@@ -46,14 +46,11 @@ class ReturnNode(AbstractNode.AbstractNode):
 
         if isinstance(self._children[0], ConstantExpressionNode.ConstantExpressionNode):
             child: ConstantExpressionNode.ConstantExpressionNode = self._children[0]
-            return_string += self.code_indent_string() + "ret {0} {1}\n".format(ret_type_str, child.llvm_constant)
+            return_string += self.code_indent_string() + "ret {0} {1}\n".format(ret_type_str, child.llvm_value)
 
         elif isinstance(self._children[0], IdentifierExpressionNode.IdentifierExpressionNode):
             child: IdentifierExpressionNode.IdentifierExpressionNode = self._children[0]
-            self.increment_register_index()
-            return_string += LlvmCode.llvm_load_instruction(child.id, ret_type, str(self.register_index), ret_type,
-                                                            child.is_in_global_table(child.id),
-                                                            self.code_indent_string())
+            return_string += child.llvm_load()
 
             return_string += self.code_indent_string() + "ret {0} %{1}\n".format(ret_type_str, self.register_index)
 
