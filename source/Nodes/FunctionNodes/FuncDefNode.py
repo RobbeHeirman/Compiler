@@ -87,11 +87,15 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
         return self._type_stack[:-1]
 
-    def generate_llvm(self):
+    def generate_llvm(self, c_comment: bool):
 
         # Code for a function Def in LLVM: Example: LLVM: Define i32 @main(int) {...} <=> C: int main(int){...}
+        # Commenting...
+        function_signature = self._param_list_node.generate_llvm_function_signature()
+        self.__class__.llvm_comment(f'{self.base_type} {self.id}({function_signature}){{...}}', c_comment)
+
         ret = f'{self.code_indent_string()} define {self.base_type.llvm_type} @{self.id}'
-        ret += f'({self._param_list_node.generate_llvm_function_signature()}){{\n'
+        ret += f'({function_signature}){{\n'
         self.increase_code_indent()
 
         # Read and store the parameters to their respective registers.

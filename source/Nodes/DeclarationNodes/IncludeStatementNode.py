@@ -14,5 +14,5 @@ class IncludeStatementNode(LeafNode.LeafNode):
     def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
         super().__init__(parent_node, filename, ctx)
 
-    def generate_llvm(self):
+    def generate_llvm(self, c_comment: bool):
         return "declare i32 @printf(i8*, ...)\ndeclare i32 @scanf(i8*, ...)\n"

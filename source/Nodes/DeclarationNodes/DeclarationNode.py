@@ -131,7 +131,7 @@ class DeclarationNode(TypedNode.TypedNode):
 
     # LLVM Generation
     # ==================================================================================================================
-    def generate_llvm(self) -> str:
+    def generate_llvm(self, is_comment: bool) -> str:
         """"
         This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
         """

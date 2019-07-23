@@ -39,5 +39,5 @@ class LeafNode(AbstractNode.AbstractNode, ABC):
     def filename(self):
         return self._filename
 
-    def generate_llvm(self):
+    def generate_llvm(self, c_comment: bool):
         return ""

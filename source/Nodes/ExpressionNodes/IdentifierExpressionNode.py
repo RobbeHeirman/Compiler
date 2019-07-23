@@ -54,7 +54,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
     # LLVM Code generation
     # ==================================================================================================================
-    def generate_llvm(self):
+    def generate_llvm(self, c_comment: bool):
 
         self.increment_register_index()
 

@@ -86,14 +86,14 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             return False
 
         else:  # next action == DEFINE_PREV_DECLARED
-            prev_declare = self.get_attribute(self.id)
+            prev_declare: Attributes.AttributesGlobal = self.get_attribute(self.id)
             prev_declare.original_declaration_node.add_child(self._expression_node)
             # This node is obsolete afterwards
             self._parent_node.remove_child(self)
 
         return True
 
-    def generate_llvm(self):
+    def generate_llvm(self, is_comment: bool):
 
         ret = ""
         val = self._expression_node.llvm_constant if self._expression_node else \

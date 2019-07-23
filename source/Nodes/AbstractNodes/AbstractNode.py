@@ -6,6 +6,7 @@ Academic Year: 2018-2019
 import abc
 import typing
 import Attributes
+import messages
 
 
 class AbstractNode(abc.ABC):
@@ -134,10 +135,11 @@ class AbstractNode(abc.ABC):
 
     # Semantic analysis
     # ==================================================================================================================
-    def semantic_analysis(self, messenger) -> bool:
+    def semantic_analysis(self, messenger: messages.MessageGenerator) -> bool:
         """
         Not all nodes check for semantic correctness. Those who do not just forward the check to their children.
         this function NEEDS to be overwritten by nodes who do check on semantics.
+        :param MessageGenerator messenger: Responsible for generation of error messages
         :return: Returns the amount of errors generated.
         """
         ret = all([child.semantic_analysis(messenger) for child in list(self._children)])
@@ -186,14 +188,15 @@ class AbstractNode(abc.ABC):
     # LLVM Code Generation
     # ==================================================================================================================
 
-    def generate_llvm(self) -> str:
+    def generate_llvm(self, c_comment: bool = True) -> str:
         """
         Generates the corresponding node into llvm instructions.
-        :return: generates the instructions as a string
+        :param bool c_comment: Will generate The Compiled C code in comment's next to the instructions
+        :return str: generates the instructions as a string
         """
         ret = ""
         for child in self._children:
-            ret += child.generate_llvm()
+            ret += child.generate_llvm(c_comment)
 
         return ret
 
@@ -228,3 +231,14 @@ class AbstractNode(abc.ABC):
         :return: None
         """
         self._parent_node.increment_register_index()
+
+    @staticmethod
+    def llvm_comment(comment_string: str, do_comment: bool) -> str:
+        """
+        Generates a comment string.
+        :param string comment_string:
+        :param bool do_comment: Must we generate the comment string?
+        :return: a comment string if write comment's is enabled otherwise a empty string
+        """
+
+        return f'{AbstractNode.code_indent_string};{comment_string}\n' if do_comment else ""

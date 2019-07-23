@@ -35,7 +35,7 @@ class ReturnNode(AbstractNode.AbstractNode):
             return False
         return True
 
-    def generate_llvm(self):
+    def generate_llvm(self, c_comment: bool):
 
         ret_type = self._parent_node.get_return_type()
         ret_type_str = ret_type[0].llvm_type

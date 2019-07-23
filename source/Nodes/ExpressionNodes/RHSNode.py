@@ -56,7 +56,7 @@ class RHSNode(ExpressionNode.ExpressionNode):
 
         super().add_child(child)
 
-    def generate_llvm(self):
+    def generate_llvm(self, c_comment: bool):
         ret = ""
 
         if self.type is ExpressionNode.ExpressionNodeType.CONSTANT or self.type is ExpressionNode.ExpressionNodeType.IDENTIFIER:

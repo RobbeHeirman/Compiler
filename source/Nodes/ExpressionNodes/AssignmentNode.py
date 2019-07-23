@@ -39,9 +39,9 @@ class AssignmentNode(AbstractNode.AbstractNode):
     def _find_id(self):
         self._id = self._lhs_node.find_id()
 
-    def generate_llvm(self):
+    def generate_llvm(self, c_comment: bool) -> str:
 
-        ret = self._children[0].generate_llvm()
+        ret = self._children[0].generate_llvm(bool)
         ret += 'store {0} %{1}, {2}* %{3}\n'.format(self._base_type.llvm_type,
                                                     self.register_index,
                                                     self._base_type.llvm_type,

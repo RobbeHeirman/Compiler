@@ -19,7 +19,7 @@ class ArrayInitNode(AbstractNode.AbstractNode):
     def size(self):
         return len(self._children)
 
-    def generate_llvm(self):
+    def generate_llvm(self, c_comment: bool):
         ret = ""
         for index, child in enumerate(self._children):
             ret += child.generate_llvm()
