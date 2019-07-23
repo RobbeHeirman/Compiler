@@ -93,7 +93,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
         return True
 
-    def generate_llvm(self, is_comment: bool):
+    def generate_llvm(self, c_comment: bool):
 
         ret = ""
         val = self._expression_node.llvm_constant if self._expression_node else \

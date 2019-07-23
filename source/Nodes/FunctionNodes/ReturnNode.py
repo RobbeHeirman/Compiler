@@ -35,7 +35,10 @@ class ReturnNode(AbstractNode.AbstractNode):
             return False
         return True
 
-    def generate_llvm(self, c_comment: bool):
+    def generate_llvm(self, c_comment: bool = True):
+
+        # Commenting
+        return_string = self.__class__.llvm_comment(f'return {self._children[0]}', c_comment)
 
         ret_type = self._parent_node.get_return_type()
         ret_type_str = ret_type[0].llvm_type
@@ -43,20 +46,18 @@ class ReturnNode(AbstractNode.AbstractNode):
 
         if isinstance(self._children[0], ConstantExpressionNode.ConstantExpressionNode):
             child: ConstantExpressionNode.ConstantExpressionNode = self._children[0]
-            return self.code_indent_string() + "ret {0} {1}\n".format(ret_type_str, child.llvm_constant)
+            return_string += self.code_indent_string() + "ret {0} {1}\n".format(ret_type_str, child.llvm_constant)
 
         elif isinstance(self._children[0], IdentifierExpressionNode.IdentifierExpressionNode):
             child: IdentifierExpressionNode.IdentifierExpressionNode = self._children[0]
-            return_string = ""
             self.increment_register_index()
             return_string += LlvmCode.llvm_load_instruction(child.id, ret_type, str(self.register_index), ret_type,
                                                             child.is_in_global_table(child.id),
                                                             self.code_indent_string())
 
             return_string += self.code_indent_string() + "ret {0} %{1}\n".format(ret_type_str, self.register_index)
-            return return_string
 
-        return "TODO"
+        return return_string
 
     def has_return(self):
         if self._children:

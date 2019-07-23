@@ -60,9 +60,5 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
         :return:
         """
 
-        # Part of commenting.
-        return_string = self.code_indent_string() + ";... {0}\n".format(self.constant)
-        return_string += LlvmCode.llvm_store_instruction_c(self.llvm_constant, self._type_stack, str(store_addr),
-                                                           self._type_stack, self.code_indent_string())
-
-        return return_string
+        return LlvmCode.llvm_store_instruction_c(self.llvm_constant, self._type_stack, str(store_addr),
+                                                 self._type_stack, self.code_indent_string())

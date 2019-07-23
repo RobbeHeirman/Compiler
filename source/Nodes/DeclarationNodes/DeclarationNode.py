@@ -131,17 +131,20 @@ class DeclarationNode(TypedNode.TypedNode):
 
     # LLVM Generation
     # ==================================================================================================================
-    def generate_llvm(self, is_comment: bool) -> str:
-        """"
-        This is allocating addresses, form is : %{lexeme} = alloca {type}, align {alignment}
+    def generate_llvm(self, c_comment: bool = True) -> str:
         """
-        # Comment string, maybe we can find another mechanism for this
-        ret = self.code_indent_string() + "; Declaration: {0} {1}\n".format(self._type_stack[0].value, self.id)
+        Generates The llvm code for declaration
+        :param bool c_comment: Need to generate C comments?
+        :return string: Returns the code string
+        """
+        # Handling code comments
+        expression_c = f' = {self._expression_node}' if self._expression_node else ''
+        ret = self.__class__.llvm_comment(f'{self._type_stack[0].value} {self.id}{expression_c}', c_comment)
 
+        # Allocate at id
         ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())
 
+        # handle expression node and store it in address of declaration id
         if self._expression_node:
-            ret += f'; ={self.code_indent_string()} {self._expression_node}   \n '
             ret += self._expression_node.generate_llvm_store(self.id)
-        ret += self.code_indent_string() + "; end declaration\n"
         return ret
