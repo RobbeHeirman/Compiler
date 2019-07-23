@@ -60,6 +60,9 @@ class RootNode(ScopedNode.ScopedNode):
     def increase_code_indent(self):
         self._indent_level += 1
 
+    def decrease_code_indent(self):
+        self._indent_level -= 1
+
     @property
     def code_indent_level(self):
         return self._indent_level

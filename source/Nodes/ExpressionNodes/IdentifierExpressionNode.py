@@ -93,11 +93,12 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
             call_string = '('
 
             child_list: List[ExpressionNode] = param_node.get_children()
-            call_string += ', '.join([child.llvm_value for child in child_list])
+            call_string += ', '.join([f'{child.type_stack[0].llvm_type} {child.llvm_value}' for child in child_list])
             call_string += ')'
             print(call_string)
 
-            return f'%{self._temporal_reg_num} = call {self._type_stack[0].llvm_type} @{self.id}{call_string}\n'
+            return f'{self.code_indent_string()}%{self._temporal_reg_num} = call {self._type_stack[0].llvm_type}' \
+                f' @{self.id}{call_string}\n'
 
         return LlvmCode.llvm_load_instruction(self.id, self.type_stack, str(self.register_index), self.type_stack,
                                               self.is_in_global_table(self.id), self.code_indent_string())

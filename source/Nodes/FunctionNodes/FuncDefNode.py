@@ -112,5 +112,5 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         #     ret += self.indent_string() + "  ret {0} 0\n".format(self.base_type.llvm_type)
 
         ret += "}\n"
-        self.increase_code_indent()
+        self.decrease_code_indent()
         return ret

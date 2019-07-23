@@ -227,6 +227,9 @@ class AbstractNode(abc.ABC):
         """
         self._parent_node.increase_code_indent()
 
+    def decrease_code_indent(self) -> None:
+        self._parent_node.decrease_code_indent()
+
     @property
     def register_index(self) -> int:
         """

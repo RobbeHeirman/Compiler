@@ -1,8 +1,8 @@
 
-int a(){
-    return 132;
+int a(int b){
+    return b;
 }
 
 int main(){
-    return a();
+    return a(44);
 }

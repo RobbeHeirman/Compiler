@@ -7,10 +7,10 @@ from typing import List, Union, TYPE_CHECKING
 
 import LlvmCode
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
+import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
 
 
 if TYPE_CHECKING:
-    import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
     import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
 
@@ -56,6 +56,9 @@ class ParamListNode(AbstractNode.AbstractNode):
         for child in self._children:
             if isinstance(child, IdentifierExpressionNode.IdentifierExpressionNode):
                 ret += child.llvm_load()
+
+            elif isinstance(child, DeclarationNode.DeclarationNode):
+                ret += child.generate_llvm()
         return ret
 
     def llvm_store_params(self):
