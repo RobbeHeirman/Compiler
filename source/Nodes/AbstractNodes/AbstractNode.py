@@ -241,4 +241,4 @@ class AbstractNode(abc.ABC):
         :return: a comment string if write comment's is enabled otherwise a empty string
         """
 
-        return f'{AbstractNode.code_indent_string};{comment_string}\n' if do_comment else ""
+        return f'{AbstractNode.code_indent_string()}; {comment_string}\n' if do_comment else ""
