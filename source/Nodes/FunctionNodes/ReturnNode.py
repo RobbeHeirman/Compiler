@@ -38,7 +38,7 @@ class ReturnNode(AbstractNode.AbstractNode):
     def generate_llvm(self, c_comment: bool = True):
 
         # Commenting
-        return_string = self.__class__.llvm_comment(f'return {self._children[0]}', c_comment)
+        return_string = self.llvm_comment(f'return {self._children[0]}', c_comment)
 
         ret_type = self._parent_node.get_return_type()
         ret_type_str = ret_type[0].llvm_type

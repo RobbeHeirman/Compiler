@@ -5,6 +5,7 @@ Academic Year: 2018-2019
 """
 import os
 import subprocess
+import threading
 import traceback
 import unittest
 
@@ -107,7 +108,11 @@ class LLVMAbstractExecTest(LLVMAbstractTest):
         else:
             return
 
-        si = subprocess.STARTUPINFO()
-        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        ret_code = subprocess.call([exec_name], startupinfo=si)
-        self.assertEqual(ret_code, exit_code_exec)
+        def _run():
+            si = subprocess.STARTUPINFO()
+            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            ret_code = subprocess.call([exec_name], startupinfo=si)
+            self.assertEqual(ret_code, exit_code_exec)
+
+        thread1 = threading.Thread(target=_run())
+        thread1.start()

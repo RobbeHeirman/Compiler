@@ -14,8 +14,6 @@ class AbstractNode(abc.ABC):
     Abstract class of a node of the AST.
     Should be overridden by specific nodes of the AST.
     """
-    _index_counter = -1
-    _indent_level = 0
 
     # Built-ins
     # ==================================================================================================================
@@ -23,14 +21,11 @@ class AbstractNode(abc.ABC):
         """
         Initializer
         """
-
-        AbstractNode._index_counter += 1
-
-        # Block for graphviz dot representation.
-        self._index: int = AbstractNode._index_counter
-
         self._parent_node: "AbstractNode" = parent
         self._children: typing.List["AbstractNode"] = list()
+
+        # Block for graphviz dot representation.
+        self._index: int = self.assign_index()
 
         start = ctx.start
         self._line: int = start.line
@@ -57,6 +52,13 @@ class AbstractNode(abc.ABC):
         :return: int Integer index of node
         """
         return self._index
+
+    def assign_index(self) -> int:
+        """
+        Assigns the node a new index on creation
+        :return: the assigned integer index
+        """
+        return self._parent_node.assign_index()
 
     @property
     @abc.abstractmethod
@@ -200,21 +202,23 @@ class AbstractNode(abc.ABC):
 
         return ret
 
-    @staticmethod
-    def code_indent_string() -> str:
+    @property
+    def code_indent_level(self):
+        return self._parent_node.code_indent_level
+
+    def code_indent_string(self) -> str:
         """
         Used to manage indentation in LLVM Code generation
         :return: string A string of whitespaces matching the indent level
         """
-        return "  " * AbstractNode._indent_level
+        return "  " * self._parent_node.code_indent_level
 
-    @staticmethod
-    def increase_code_indent() -> None:
+    def increase_code_indent(self) -> None:
         """
         Called by all scope enclosing nodes. Will increase the indentation string.
         :return: None
         """
-        AbstractNode._indent_level += 1
+        self._parent_node.increase_code_indent()
 
     @property
     def register_index(self) -> int:
@@ -232,8 +236,7 @@ class AbstractNode(abc.ABC):
         """
         self._parent_node.increment_register_index()
 
-    @staticmethod
-    def llvm_comment(comment_string: str, do_comment: bool) -> str:
+    def llvm_comment(self, comment_string: str, do_comment: bool) -> str:
         """
         Generates a comment string.
         :param string comment_string:
@@ -241,4 +244,4 @@ class AbstractNode(abc.ABC):
         :return: a comment string if write comment's is enabled otherwise a empty string
         """
 
-        return f'{AbstractNode.code_indent_string()}; {comment_string}\n' if do_comment else ""
+        return f'{self.code_indent_string()}; {comment_string}\n' if do_comment else ""

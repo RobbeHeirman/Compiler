@@ -139,7 +139,7 @@ class DeclarationNode(TypedNode.TypedNode):
         """
         # Handling code comments
         expression_c = f' = {self._expression_node}' if self._expression_node else ''
-        ret = self.__class__.llvm_comment(f'{self._type_stack[0].value} {self.id}{expression_c}', c_comment)
+        ret = self.llvm_comment(f'{self._type_stack[0].value} {self.id}{expression_c}', c_comment)
 
         # Allocate at id
         ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())

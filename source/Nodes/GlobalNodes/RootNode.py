@@ -13,12 +13,29 @@ class RootNode(ScopedNode.ScopedNode):
     The root of our program. Root is a ScopedNode, the base scope of our C program.
     """
     label = "Root"
+    _index_counter = 0
+    _indent_level = 0
 
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, ctx):
         super().__init__(None, ctx)
 
         self._symbol_table = SymbolTable.GlobalSymbolTable()
 
+        self._index_counter: int = 0
+        self._indent_level: int = 0
+
+        self._index = 0
+
+    # Ast-visuals
+    # ==================================================================================================================
+    def assign_index(self):
+        self._index_counter += 1
+        return self._index_counter
+
+    # Semantic analysis
+    # ==================================================================================================================
     def is_in_table(self, lexeme: str) -> bool:
         """
         Checks if a lexeme is already in the symbol table
@@ -36,3 +53,13 @@ class RootNode(ScopedNode.ScopedNode):
 
     def is_global(self):
         return True
+
+    # LLVM Code
+    # ==================================================================================================================
+
+    def increase_code_indent(self):
+        self._indent_level += 1
+
+    @property
+    def code_indent_level(self):
+        return self._indent_level

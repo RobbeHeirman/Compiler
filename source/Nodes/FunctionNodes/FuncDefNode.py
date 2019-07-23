@@ -92,7 +92,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # Code for a function Def in LLVM: Example: LLVM: Define i32 @main(int) {...} <=> C: int main(int){...}
         # Commenting...
         function_signature = self._param_list_node.generate_llvm_function_signature()
-        ret = self.__class__.llvm_comment(f'{self.base_type.value} {self.id}({function_signature}){{...}}', c_comment)
+        ret = self.llvm_comment(f'{self.base_type.value} {self.id}({function_signature}){{...}}', c_comment)
 
         ret += f'{self.code_indent_string()} define {self.base_type.llvm_type} @{self.id}'
         ret += f'({function_signature}){{\n'
@@ -112,5 +112,5 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         #     ret += self.indent_string() + "  ret {0} 0\n".format(self.base_type.llvm_type)
 
         ret += "}\n"
-        self.__class__._indent_level -= 1
+        self.increase_code_indent()
         return ret
