@@ -4,6 +4,7 @@ int a(int b){
 }
 
 int main(){
-    int b = a(88);
+    int d = 456;
+    int b = a(d);
     return b;
 }

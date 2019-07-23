@@ -83,20 +83,22 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         Will load this variable into a register
         :return: a string that loaded the value of the var into the register
         """
-        self.increment_register_index()
-        self._temporal_reg_num = self.register_index
 
         if self._is_function_call():
             param_node = self._get_param_node()
-
-            param_node.llvm_load_params()
+            ret_string = param_node.llvm_load_params()
             call_string = '('
-
+            self.increment_register_index()
+            self._temporal_reg_num = self.register_index
             child_list: List[ExpressionNode] = param_node.get_children()
             call_string += ', '.join([f'{child.type_stack[0].llvm_type} {child.llvm_value}' for child in child_list])
             call_string += ')'
-            return f'{self.code_indent_string()}%{self._temporal_reg_num} = call {self._type_stack[0].llvm_type}' \
-                f' @{self.id}{call_string}\n'
+            ret_string += f'{self.code_indent_string()}%{self._temporal_reg_num} = call {self._type_stack[0].llvm_type}'
+            ret_string += f' @{self.id}{call_string}\n'
+            return ret_string
+
+        self.increment_register_index()
+        self._temporal_reg_num = self.register_index
 
         return LlvmCode.llvm_load_instruction(self.id, self.type_stack, str(self.register_index), self.type_stack,
                                               self.is_in_global_table(self.id), self.code_indent_string())
@@ -115,5 +117,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     def _get_param_node(self) -> ParamListNode.ParamListNode:
         return self._type_modifier_node.get_param_node()
 
+    @property
     def llvm_value(self):
         return f'@{self._temporal_reg_num}' if self.is_in_global_table(self.id) else f'%{self._temporal_reg_num}'
