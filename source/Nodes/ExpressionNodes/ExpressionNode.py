@@ -79,3 +79,6 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     # @property
     # def type_string_llvm(self):
     #     return self._type_stack[0].llvm_type + "*" * len(self._type_stack)
+
+    def taking_address(self) -> bool:
+        return self._type_modifier_node.taking_address()

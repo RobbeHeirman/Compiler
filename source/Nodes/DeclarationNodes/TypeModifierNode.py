@@ -147,7 +147,17 @@ class TypeModifierNode(AbstractNode.AbstractNode):
             return True
         return False
 
+    def taking_address(self):
+        if self._type_modifier_node:
+            return self._type_modifier_node.taking_address()
+        elif self.modifier_type == type_specifier.TypeSpecifier.ADDRESS:
+            return True
+        return False
+
     def get_param_node(self):
         if self._type_modifier_node:
             return self._type_modifier_node.get_param_node()
         return self._param_list_node
+
+    def llvm_generate_expression_code(self) -> str:
+        pass
