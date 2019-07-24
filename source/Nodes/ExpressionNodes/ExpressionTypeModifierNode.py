@@ -37,9 +37,9 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
         # Meaning the Dereference operator
         if self._modifier_type == type_specifier.TypeSpecifier.POINTER:
             # We can only dereference pointer types.
-            if node.type_stack_ref().type_stack[-1].type_modifier == type_specifier.TypeSpecifier.POINTER:
+            if node.type_stack_ref()[-1].value == type_specifier.TypeSpecifier.POINTER:
                 # If we dereference the type loses it's 'ptr' type
-                node.type_stack_ref().type_stack.pop()
+                node.type_stack_ref().pop()
                 # Dereference operator returns a lvalue
                 node.l_value = True
 

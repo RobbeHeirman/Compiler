@@ -75,11 +75,13 @@ class DeclarationNode(TypedNode.TypedNode):
         super().add_child(child)
 
     def remove_child(self, child):
-
-        if isinstance(child, TypeModifierNode.TypeModifierNode):
-            self._type_modifier_node = None
-
-        super().remove_child(child)
+        try:
+            super().remove_child(child)
+            if isinstance(child, TypeModifierNode.TypeModifierNode):
+                print(self.id)
+                self._type_modifier_node = None
+        except ValueError:
+            pass
 
     # Semantic analysis
     # ==================================================================================================================
@@ -111,8 +113,9 @@ class DeclarationNode(TypedNode.TypedNode):
         Here we will check if the type of the initializer is conform with te type of the declaration
         :return:
         """
-        # print(self.__class__.warning_count())
         expression_stack = self._expression_node.type_stack
+        print(expression_stack)
+        print(self._type_stack)
         prev_ele = expression_stack[-1]
         for element in reversed(self._type_stack):
 

@@ -31,6 +31,8 @@ class AbstractNode(abc.ABC):
         self._line: int = start.line
         self._column: int = start.column
 
+        self._is_drawn = False
+
     # AST Visuals
     # ==================================================================================================================
     def dot_string(self) -> str:
@@ -38,11 +40,14 @@ class AbstractNode(abc.ABC):
         Generates the visual representation of the subtree in .dot.
         :return: str A string representing the dot representation of the subtree.
         """
+
         ret = "{0}[label = \"{1}\"];\n".format(self._index, self.label)
         ret += "{0}--{{".format(self._index)
         ret += ''.join([f'{child.index} ' for child in self._children])
         ret += "}\n"
+        self._is_drawn = True
         ret += ''.join([child.dot_string() for child in self._children])
+
         return ret
 
     @property

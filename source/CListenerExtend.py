@@ -280,10 +280,14 @@ class CListenerExtend(CListener):
 
         # We can do this bcz exit is bottom up, and the recursive calls stops at a non type modifier expression.
         expressive_node = self._parent_node.pop_child(0)
-
         expressive_node.add_child(self._parent_node)  # parent node is the type modifier
 
         self._parent_node.parent_node.add_child(expressive_node)
+        try:
+            self._parent_node.parent_node.remove_child(self._parent_node)
+        except ValueError:
+            pass
+
         expressive_node.parent_node = self._parent_node.parent_node
 
         self._parent_node = self._parent_node.parent_node

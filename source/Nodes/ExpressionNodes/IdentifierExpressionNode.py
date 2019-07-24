@@ -52,6 +52,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         if not self._generate_type_modifier_stack(messenger):  # the modifiers applied in the expression
 
             return False
+
         return True
 
     # LLVM Code generation

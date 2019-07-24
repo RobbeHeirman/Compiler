@@ -47,13 +47,12 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         self._modifier_type = mod_type
         self._is_implicit_conversion = False
 
-    def __eq__(self, o):
+    def __repr__(self):
+        try:
+            return self._modifier_type.value
 
-        if self._modifier_type == o.modifier_type:
-            if self.get_function_signature() == o.get_function_signature():
-                return True
-
-        return False
+        except AttributeError:
+            return "huh"
 
     # AST-Visuals
     # ==================================================================================================================
@@ -84,10 +83,15 @@ class TypeModifierNode(AbstractNode.AbstractNode):
 
     def remove_child(self, child):
 
-        if isinstance(child, TypeModifierNode):
-            self._type_modifier_node = None
+        try:
+            super().remove_child(child)
+            if isinstance(child, TypeModifierNode):
+                self._type_modifier_node = None
+        except:
+            print("should be called")
+            pass
 
-        super().remove_child(child)
+
 
     def add_child(self, child, index=None):
 
@@ -128,6 +132,7 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         if self.modifier_type == type_specifier.TypeSpecifier.FUNCTION:
             self.modifier_type.function_signature = self._param_list_node.get_function_signature()
         node.type_stack_ref().append(self._modifier_type)
+        print(f'hello : {node.type_stack_ref}')
         if self._type_modifier_node is not None:
             self._type_modifier_node.generate_type_operator_stack(node, messenger)
 
