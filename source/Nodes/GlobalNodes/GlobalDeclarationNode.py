@@ -28,7 +28,6 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
     def semantic_analysis(self, messenger: messages.MessageGenerator):
 
         if not self._generate_type_modifier_stack(messenger):
-
             return False
 
         defined = False
@@ -95,17 +94,12 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
         return True
 
-    def generate_llvm(self, c_comment: bool = True):
+    def generate_llvm(self, c_comment: bool = True) -> str:
 
-        ret = ""
         val = self._expression_node.llvm_value if self._expression_node else \
             self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1].value]
 
-        ret += self.code_indent_string() + "; Global declaration " + str(
-            self.type_stack[0]) + " " + self.id + " = " + str(
-            val) + "\n "
-        ret += LlvmCode.llvm_allocate_instruction_global(self.id, self._type_stack, str(val),
-                                                         self.code_indent_string())
-        ret += self.code_indent_string() + "; end declaration" + "\n"
-
+        ret = self.llvm_comment(f'{[child.value for child in self._type_stack]} {self.id} = {self._expression_node}',
+                                c_comment)
+        ret += LlvmCode.llvm_allocate_instruction_global(self.id, self._type_stack, str(val), self.code_indent_string())
         return ret
