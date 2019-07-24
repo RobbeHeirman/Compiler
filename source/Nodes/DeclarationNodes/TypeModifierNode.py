@@ -132,7 +132,6 @@ class TypeModifierNode(AbstractNode.AbstractNode):
         if self.modifier_type == type_specifier.TypeSpecifier.FUNCTION:
             self.modifier_type.function_signature = self._param_list_node.get_function_signature()
         node.type_stack_ref().append(self._modifier_type)
-        print(f'hello : {node.type_stack_ref}')
         if self._type_modifier_node is not None:
             self._type_modifier_node.generate_type_operator_stack(node, messenger)
 

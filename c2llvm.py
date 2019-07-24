@@ -8,14 +8,17 @@ import traceback
 
 import main
 
-# class TracePrints(object):
-#   def __init__(self):
-#     self.stdout = sys.stdout
-#   def write(self, s):
-#     self.stdout.write("Writing %r\n" % s)
-#     traceback.print_stack(file=self.stdout)
-#
-# sys.stdout = TracePrints()
+
+class TracePrints(object):
+    def __init__(self):
+        self.stdout = sys.stdout
+
+    def write(self, s):
+        self.stdout.write("Writing %r\n" % s)
+        traceback.print_stack(file=self.stdout)
+
+
+sys.stdout = TracePrints()
 
 if __name__ == "__main__":
 
@@ -73,7 +76,6 @@ if __name__ == "__main__":
         main.generate_llvm(ast, path + slug)
 
     if args.ref_test:
-        print("hier")
         name_reference = path + slug + "_ref.ll"
         subprocess.call(["clang", args.input_file, "-S", "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion", "-ansi",
                          "-o", name_reference])  # Test compiler errors

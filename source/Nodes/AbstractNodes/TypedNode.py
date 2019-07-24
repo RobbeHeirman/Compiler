@@ -44,9 +44,7 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
         applied on the node. See the TypeModifier enum for choices.
         :return: Bool
         """
-        print(self._line)
         if self._type_modifier_node:
-            print()
             return self._type_modifier_node.generate_type_operator_stack(self, messenger)
 
         return True

@@ -78,7 +78,6 @@ class DeclarationNode(TypedNode.TypedNode):
         try:
             super().remove_child(child)
             if isinstance(child, TypeModifierNode.TypeModifierNode):
-                print(self.id)
                 self._type_modifier_node = None
         except ValueError:
             pass
@@ -114,8 +113,6 @@ class DeclarationNode(TypedNode.TypedNode):
         :return:
         """
         expression_stack = self._expression_node.type_stack
-        print(expression_stack)
-        print(self._type_stack)
         prev_ele = expression_stack[-1]
         for element in reversed(self._type_stack):
 
