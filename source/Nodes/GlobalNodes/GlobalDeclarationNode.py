@@ -28,6 +28,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
     def semantic_analysis(self, messenger: messages.MessageGenerator):
 
         if not self._generate_type_modifier_stack(messenger):
+
             return False
 
         defined = False
@@ -57,6 +58,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             attribute.function_signature = function_signature
 
         self._add_to_table(attribute, messenger)
+        return True
 
         # adding to the parent's symbol table prevents from global nodes with own symbol tables to add themselves.
 

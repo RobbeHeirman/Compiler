@@ -5,8 +5,6 @@ Academic Year: 2018-2019
 """
 import os
 import subprocess
-import threading
-import traceback
 import unittest
 
 import main

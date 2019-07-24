@@ -61,5 +61,11 @@ class LLVMFunctionTest(LLVMAbstractExecTest):
     def test_call_with_constant(self):
         return self._build_and_run_llvm("call_with_constants.c", 454)
 
+    def test_call_with_variables(self):
+        return self._build_and_run_llvm("call_with_variables.c", 1000)
+
+    def test_mixed_calls(self):
+        return self._build_and_run_llvm("call_mixed.c", 88)
+
     # def test_main_happy_day_regres_llvm(self):
     #     return self._build_and_run_llvm("happy_day_regres.c", 0)
