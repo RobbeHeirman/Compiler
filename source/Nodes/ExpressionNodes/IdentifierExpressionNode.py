@@ -119,4 +119,4 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
     @property
     def llvm_value(self):
-        return f'@{self._temporal_reg_num}' if self.is_in_global_table(self.id) else f'%{self._temporal_reg_num}'
+        return f'%{self._temporal_reg_num}'

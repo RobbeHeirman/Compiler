@@ -95,11 +95,11 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
         return True
 
-    def generate_llvm(self, c_comment: bool):
+    def generate_llvm(self, c_comment: bool = True):
 
         ret = ""
         val = self._expression_node.llvm_value if self._expression_node else \
-            self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1].modifier_type]
+            self.__class__._DEFAULT_VALUE_MAP[self._type_stack[-1].value]
 
         ret += self.code_indent_string() + "; Global declaration " + str(
             self.type_stack[0]) + " " + self.id + " = " + str(
