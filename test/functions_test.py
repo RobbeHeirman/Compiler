@@ -58,5 +58,8 @@ class LLVMFunctionTest(LLVMAbstractExecTest):
     def test_return_stored_variable(self):
         return self._build_and_run_llvm("return_stored_var.c", 48)
 
+    def test_call_with_constant(self):
+        return self._build_and_run_llvm("call_with_constants.c", 454)
+
     # def test_main_happy_day_regres_llvm(self):
     #     return self._build_and_run_llvm("happy_day_regres.c", 0)

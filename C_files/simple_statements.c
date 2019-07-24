@@ -1,10 +1,11 @@
 
-int a(int b){
-    return b;
+int a(int* b){
+    return *b;
 }
 
 int main(){
     int d = 456;
-    int b = a(d);
+    int *e = &d;
+    int b = a(e);
     return b;
 }
