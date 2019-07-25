@@ -15,7 +15,7 @@ import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
 import Nodes.ExpressionNodes.AssignmentNode as AssignmentNode
 import Nodes.ExpressionNodes.ConstantExpressionNode as ConstantExpressionNode
 import Nodes.DeclarationNodes.DeclListNode as DeclListNode
-import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
+import Nodes.DeclarationNodes.DeclarationTypeModifierNode as TypeModifierNode
 import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
 import Nodes.ExpressionNodes.IdentifierExpressionNode as IdentifierExpressionNode
 import Nodes.ExpressionNodes.LHSNode as LhsNode
@@ -86,17 +86,19 @@ class CListenerExtend(CListener):
         self._func_def_node = func_node
 
     def exitFunc_def(self, ctx: CParser.Func_defContext):
+        self._parent_node: FuncDefNode.FuncDefNode
+        self._parent_node.remove_modifier_node()
         self._parent_node = self._parent_node.parent_node
         self._func_def_node = None
 
     def enterFunc_declarator(self, ctx: CParser.Func_declaratorContext):
         # noinspection PyTypeChecker
-        self.enterDeclarator(ctx)
+        self.enterNormal_declarator(ctx)
 
     def exitFunc_declarator(self, ctx: CParser.Func_declaratorContext):
 
         # noinspection PyTypeChecker
-        self.exitDeclarator(ctx)
+        self.exitNormal_declarator(ctx)
 
     def enterParameter_list(self, ctx: CParser.Parameter_listContext):
         node = ParamListNode.ParamListNode(self._parent_node, ctx)
@@ -136,6 +138,7 @@ class CListenerExtend(CListener):
         self._parent_node = decl_l_node
 
     def exitDecl_list(self, ctx: CParser.Decl_listContext):
+
         self._parent_node._cleanup()
         self._parent_node = self._parent_node.parent_node
 
@@ -172,25 +175,27 @@ class CListenerExtend(CListener):
         self._parent_node: TypedNode.TypedNode
         self._parent_node.set_base_type(type_specifier.TypeSpecifier(value))
 
-    def enterDeclarator(self, ctx: CParser.DeclaratorContext):
+    def enterNormal_declarator(self, ctx: CParser.Normal_declaratorContext):
         """
         Declarator leaf. Enters a declarator leaf to the AST tree.
         :param ctx:
         :return:
         """
         # column = start.column
-        if ctx.children and ctx.getChild(0).getText() is not "(":  # parenthesis are just used to order
-            node = TypeModifierNode.TypeModifierNode(self._parent_node, ctx)
-            self._parent_node.add_child(node)
-            self._parent_node = node
 
-    def exitDeclarator(self, ctx: CParser.DeclaratorContext):
+        node = TypeModifierNode.TypeModifierNode(self._parent_node, ctx)
+        self._parent_node.add_child(node)
+        self._parent_node = node
 
-        if ctx.children and ctx.getChild(0).getText() is not "(":
-            self._parent_node = self._parent_node.parent_node
+    def exitNormal_declarator(self, ctx: CParser.DeclaratorContext):
+
+        self._parent_node = self._parent_node.parent_node
+
+        if isinstance(self._parent_node, TypeModifierNode.TypeModifierNode):
+            if not self._parent_node.modifier_type:
+                raise ValueError("Modifier Types should have their types filled in")
 
     def enterPtr_decl(self, ctx: CParser.Ptr_declContext):
-
         self._parent_node.modifier_type = type_specifier.TypeSpecifier.POINTER
 
     def enterFunction_operator(self, ctx: CParser.Function_operatorContext):
@@ -215,7 +220,6 @@ class CListenerExtend(CListener):
         self._parent_node: Union[DeclarationNode.DeclarationNode, TypeModifierNode.TypeModifierNode]
         self._parent_node.add_id(ctx.getText())
         # Is just a stub. We propagated the identifier. So the node is no necessary.
-        self._parent_node.parent_node.remove_child(self._parent_node)
 
     # Initialize a declaration
     # ======================================================================================================================
@@ -267,8 +271,8 @@ class CListenerExtend(CListener):
         """
         prefix_node = ExpressionTypeModifierNode.ExpressionTypeModifierNode(self._parent_node, ctx)
         # The expression Node gets linked on exit (and found as well)
-        if isinstance(self._parent_node, TypeModifierNode.TypeModifierNode):
-            self._parent_node.add_child(prefix_node)
+
+        self._parent_node.add_child(prefix_node)
 
         prefix_node.parent_node = self._parent_node
         self._parent_node = prefix_node
@@ -283,11 +287,8 @@ class CListenerExtend(CListener):
         expressive_node.add_child(self._parent_node)  # parent node is the type modifier
 
         self._parent_node.parent_node.add_child(expressive_node)
-        try:
-            self._parent_node.parent_node.remove_child(self._parent_node)
-        except ValueError:
-            pass
 
+        self._parent_node.parent_node.remove_child(self._parent_node)
         expressive_node.parent_node = self._parent_node.parent_node
 
         self._parent_node = self._parent_node.parent_node

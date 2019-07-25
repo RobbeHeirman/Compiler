@@ -101,7 +101,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         self.increment_register_index()
         self._temporal_reg_num = self.register_index
 
-        print(self._type_stack)
+
 
         return LlvmCode.llvm_load_instruction(self.id, self.type_stack, str(self.register_index), self.type_stack,
                                               self.is_in_global_table(self.id), self.code_indent_string())
@@ -109,11 +109,23 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     def generate_llvm_store(self, addr: str):
 
         if self.taking_address():
-            self.increment_register_index()
             ret = LlvmCode.llvm_store_instruction(str(self.id), self._type_stack, str(addr), self._type_stack,
                                                   self.code_indent_string())
             return ret
 
+        elif self.do_we_dereference():
+            self._type_stack = self.get_attribute(self.id).operator_stack
+            print(self._type_stack)
+            self.increment_register_index()
+
+            ret = LlvmCode.llvm_load_instruction(str(self.id), self._type_stack, str(self.register_index),
+                                                 self._type_stack, False, self.code_indent_string())
+
+            self.remove_modifier_node()
+            print("should remove" + str(self._type_modifier_node))
+            ret += self.generate_llvm_store(addr)
+
+            return ret
         ret = self.llvm_load()
         ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, addr, self._type_stack,
                                                self.code_indent_string())

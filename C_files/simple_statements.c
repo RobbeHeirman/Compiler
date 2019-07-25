@@ -2,9 +2,8 @@
 
 int main(){
 
+    char z ='a';
+    char * p_4 = &z;
 
-
-     int k = 77;
-     int* d = &k;
-    return 40;
+    return 12;
 }

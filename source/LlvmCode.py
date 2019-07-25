@@ -103,7 +103,6 @@ def llvm_load_instruction(source_register: str,
       """
     s_operator_string = convert_operator_stack_to_str(source_operator_stack)
     t_operator_string = convert_operator_stack_to_str(target_operator_stack)
-
     reg_siqn = '@' if is_global else '%'
     ret = indent_string + f"%{target_register} = load {source_operator_stack[0].llvm_type}{t_operator_string}, " \
         f"{source_operator_stack[0].llvm_type}{s_operator_string}* {reg_siqn}{source_register}\n"

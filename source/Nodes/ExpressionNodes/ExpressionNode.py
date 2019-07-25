@@ -1,7 +1,7 @@
 import abc
 
 import Nodes.AbstractNodes.TypedNode as TypedNode
-import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
+import Nodes.DeclarationNodes.DeclarationTypeModifierNode as TypeModifierNode
 
 
 class ExpressionNode(TypedNode.TypedNode, abc.ABC):
@@ -11,10 +11,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     # ==================================================================================================================
     def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
-
         self._identifier_node = None
-        self._type_modifier_node = None
-
         self.type = None
 
         self.l_value = True
@@ -36,10 +33,6 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         if isinstance(child, TypeModifierNode.TypeModifierNode):
             temp = self._type_modifier_node
             self._type_modifier_node = child
-            if temp is not None:
-                self.remove_child(temp)
-                self._type_modifier_node.add_child(temp)
-                temp.parent_node = self._type_modifier_node
 
         super().add_child(child)
 
@@ -81,4 +74,13 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     #     return self._type_stack[0].llvm_type + "*" * len(self._type_stack)
 
     def taking_address(self) -> bool:
-        return self._type_modifier_node.taking_address()
+        if self._type_modifier_node:
+            return self._type_modifier_node.taking_address()
+        else:
+            return False
+
+    def do_we_dereference(self) -> bool:
+        if self._type_modifier_node:
+            return self._type_modifier_node.do_we_dereference()
+        else:
+            return False

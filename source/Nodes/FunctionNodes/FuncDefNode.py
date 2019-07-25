@@ -27,6 +27,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
     # ==================================================================================================================
     @property
     def label(self):
+        print(self._type_stack)
         return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, [el.value for el in
                                                                              self._type_stack[:-1]])
 

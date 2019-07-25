@@ -6,18 +6,21 @@ Academic Year: 2018-2019
 import os
 import subprocess
 import unittest
-
+import traceback
+import sys
 import main
 
 
-# class TracePrints(object):
-#   def __init__(self):
-#     self.stdout = sys.stdout
-#   def write(self, s):
-#     self.stdout.write("Writing %r\n" % s)
-#     traceback.print_stack(file=self.stdout)
-#
-# sys.stdout = TracePrints()
+class TracePrints(object):
+    def __init__(self):
+        self.stdout = sys.stdout
+
+    def write(self, s):
+        self.stdout.write("Writing %r\n" % s)
+        traceback.print_stack(file=self.stdout)
+
+
+sys.stdout = TracePrints()
 
 class SAbstractTest(unittest.TestCase):
 

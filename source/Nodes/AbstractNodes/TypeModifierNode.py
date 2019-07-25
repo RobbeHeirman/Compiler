@@ -3,10 +3,12 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+from Nodes.AbstractNodes import AbstractNode
+
 import typing
 
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
-import Nodes.FunctionNodes.ParamListNode as ParamListNode
+
 import type_specifier
 
 from typing import TYPE_CHECKING
@@ -19,15 +21,10 @@ if TYPE_CHECKING:
 
 
 class TypeModifierNode(AbstractNode.AbstractNode):
-    """
-    We use this node to handle prefix/postfix hierarchy.
-    We can omit this in a future pass. This node has no actual info about the program.
-    """
-
     # TypeAnnotations
-    _parent_node: typing.Union["TypeModifierNode", "DeclarationNode.DeclarationNode", "ExpressionNode.ExpressionNode"]
+    _parent_node: typing.Union[
+        "TypeModifierNode", "DeclarationNode.DeclarationNode", "ExpressionNode.ExpressionNode"]
     _type_modifier_node: "TypeModifierNode"
-    _param_list_node: ParamListNode
     _modifier_type: TypeSpecifier
 
     _BASE_LABEL = "TypeModifier"
@@ -91,14 +88,12 @@ class TypeModifierNode(AbstractNode.AbstractNode):
             print("should be called")
             pass
 
-
-
     def add_child(self, child, index=None):
 
         if isinstance(child, TypeModifierNode):
             self._type_modifier_node = child
 
-        elif isinstance(child, ParamListNode.ParamListNode):
+        else:
             self._param_list_node = child
 
         super().add_child(child)
@@ -154,10 +149,23 @@ class TypeModifierNode(AbstractNode.AbstractNode):
             return True
         return False
 
+    def do_we_dereference(self):
+        if self._type_modifier_node:
+            return self._type_modifier_node.taking_address()
+        elif self.modifier_type == type_specifier.TypeSpecifier.POINTER:
+            return True
+        return False
+
     def get_param_node(self):
         if self._type_modifier_node:
             return self._type_modifier_node.get_param_node()
         return self._param_list_node
 
-    def llvm_generate_expression_code(self) -> str:
-        pass
+    def remove_bottom_node(self):
+
+        if self._type_modifier_node:
+            if self._type_modifier_node._type_modifier_node:
+                return self._type_modifier_node.remove_bottom_node()
+
+            else:
+                self.remove_child(self._type_modifier_node)

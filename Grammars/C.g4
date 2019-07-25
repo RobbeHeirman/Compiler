@@ -45,12 +45,12 @@ base_type
     ;
 
 declarator // optional prefix operator sequence + optional postfix operator
-    : LPARANT declarator RPARANT
-    | declarator postfix_operator
-    | ptr_decl declarator
+    : LPARANT declarator RPARANT # ignore_declarator
+    | declarator postfix_operator # normal_declarator
+    | ptr_decl declarator         # normal_declarator
     //| LPARANT id_decl RPARANT
-    | id_decl
-    |
+    | id_decl  # id_declarator
+    | # epsilon
     ;
 
 ptr_decl

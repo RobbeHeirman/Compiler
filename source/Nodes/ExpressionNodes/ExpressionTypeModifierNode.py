@@ -3,7 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
+import Nodes.AbstractNodes.TypeModifierNode as TypeModifierNode
 import messages
 import type_specifier
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode

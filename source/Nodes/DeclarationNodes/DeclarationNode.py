@@ -5,13 +5,14 @@ Academic Year: 2018-2019
 """
 
 import Nodes.AbstractNodes.TypedNode as TypedNode
-import Nodes.DeclarationNodes.TypeModifierNode as TypeModifierNode
 import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
 import LlvmCode
 import Attributes as Attributes
 import messages
+from Nodes.AbstractNodes.AbstractNode import AbstractNode
+from Nodes.ExpressionNodes.ExpressionTypeModifierNode import ExpressionTypeModifierNode
 
 
 class DeclarationNode(TypedNode.TypedNode):
@@ -23,7 +24,7 @@ class DeclarationNode(TypedNode.TypedNode):
     """
 
     # Type annotations members
-    _type_modifier_node: "TypeModifierNode"
+
     _lexeme: str
 
     _BASE_LABEL = "Declaration"
@@ -62,11 +63,11 @@ class DeclarationNode(TypedNode.TypedNode):
         :param index: index where to add
         :param child: An abstractNode
         """
+        if isinstance(child, ExpressionTypeModifierNode):
+            AbstractNode.add_child(self, child)
+            return
 
-        if isinstance(child, TypeModifierNode.TypeModifierNode):
-            self._type_modifier_node = child
-
-        elif isinstance(child, ExpressionNode.ExpressionNode) or isinstance(child, ArrayInitNode.ArrayInitNode):
+        if isinstance(child, ExpressionNode.ExpressionNode) or isinstance(child, ArrayInitNode.ArrayInitNode):
             self._expression_node = child
 
         elif child is None:
@@ -74,13 +75,13 @@ class DeclarationNode(TypedNode.TypedNode):
 
         super().add_child(child)
 
-    def remove_child(self, child):
-        try:
+    def remove_child(self, child: "AbstractNode"):
+
+        if isinstance(child, ExpressionTypeModifierNode):
+            AbstractNode.remove_child(self, child)
+        else:
             super().remove_child(child)
-            if isinstance(child, TypeModifierNode.TypeModifierNode):
-                self._type_modifier_node = None
-        except ValueError:
-            pass
+            return
 
     # Semantic analysis
     # ==================================================================================================================
@@ -94,7 +95,6 @@ class DeclarationNode(TypedNode.TypedNode):
         self._generate_type_modifier_stack(messenger)
         # We have all the info for the corresponding attribute object
         attr = self._make_attribute()
-
         # Check of the expression is semantically correct
         if self._expression_node:
             if not self._expression_node.semantic_analysis(messenger):
