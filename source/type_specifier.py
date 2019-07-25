@@ -67,6 +67,7 @@ class TypeSpecifier:
             'char': 'i8',
             'int': 'i32',
             'float': 'float',
+            '*': '*'
         }
 
         return _LLVM_TYPE.get(self.value, '')

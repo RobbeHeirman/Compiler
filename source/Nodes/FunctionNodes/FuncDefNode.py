@@ -27,7 +27,6 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
     # ==================================================================================================================
     @property
     def label(self):
-        print(self._type_stack)
         return 'Func def\nIdentifier: {0}\nReturn type {1}'.format(self.id, [el.value for el in
                                                                              self._type_stack[:-1]])
 
@@ -85,17 +84,18 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         return True
 
     def get_return_type(self):
-
         return self._type_stack[:-1]
 
-    def generate_llvm(self, c_comment: bool):
+    def generate_llvm(self, c_comment: bool = True):
 
         # Code for a function Def in LLVM: Example: LLVM: Define i32 @main(int) {...} <=> C: int main(int){...}
         # Commenting...
         function_signature = self._param_list_node.generate_llvm_function_signature()
+
+        return_type = f'{"".join([child.llvm_type for child in self._type_stack[:-1]])} '
         ret = self.llvm_comment(f'{self.base_type.value} {self.id}({function_signature}){{...}}', c_comment)
 
-        ret += f'{self.code_indent_string()} define {self.base_type.llvm_type} @{self.id}'
+        ret += f'{self.code_indent_string()} define {return_type} @{self.id}'
         ret += f'({function_signature}){{\n'
         self.increase_code_indent()
 

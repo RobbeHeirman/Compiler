@@ -43,7 +43,6 @@ class ReturnNode(AbstractNode.AbstractNode):
         ret_type = self._parent_node.get_return_type()
         ret_type_str = ret_type[0].llvm_type
         ret_type_str += "".join([c_type.value for c_type in ret_type[1:]])
-
         if isinstance(self._children[0], ConstantExpressionNode.ConstantExpressionNode):
             child: ConstantExpressionNode.ConstantExpressionNode = self._children[0]
             return_string += self.code_indent_string() + "ret {0} {1}\n".format(ret_type_str, child.llvm_value)
@@ -51,7 +50,6 @@ class ReturnNode(AbstractNode.AbstractNode):
         elif isinstance(self._children[0], IdentifierExpressionNode.IdentifierExpressionNode):
             child: IdentifierExpressionNode.IdentifierExpressionNode = self._children[0]
             return_string += child.llvm_load()
-
             return_string += self.code_indent_string() + "ret {0} %{1}\n".format(ret_type_str, self.register_index)
 
         return return_string

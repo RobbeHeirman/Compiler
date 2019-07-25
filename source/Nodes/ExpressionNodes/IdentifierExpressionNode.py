@@ -79,12 +79,14 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         return ret
 
-    def llvm_load(self) -> str:
+    def llvm_load(self, reg_load_from=None) -> str:
         """
         Will load this variable into a register
         :return: a string that loaded the value of the var into the register
         """
 
+        load_from = reg_load_from if reg_load_from else self.id
+        ret_string = ''
         if self._is_function_call():
             param_node = self._get_param_node()
             ret_string = param_node.llvm_load_params()
@@ -98,35 +100,40 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
             ret_string += f' @{self.id}{call_string}\n'
             return ret_string
 
+        elif self.do_we_dereference():
+            self._type_stack = self.get_attribute(self.id).operator_stack
+
+            while self.do_we_dereference():
+                self.increment_register_index()
+
+                ret_string += LlvmCode.llvm_load_instruction(str(self.id), self._type_stack, str(self.register_index),
+                                                             self._type_stack, False, self.code_indent_string())
+
+                self._type_stack.pop()
+                self.remove_modifier_node()
+                load_from = self.register_index
+
+
         self.increment_register_index()
         self._temporal_reg_num = self.register_index
 
+        ret_string += LlvmCode.llvm_load_instruction(str(load_from), self.type_stack, str(self.register_index),
+                                                     self.type_stack,
+                                                     self.is_in_global_table(self.id), self.code_indent_string())
 
-
-        return LlvmCode.llvm_load_instruction(self.id, self.type_stack, str(self.register_index), self.type_stack,
-                                              self.is_in_global_table(self.id), self.code_indent_string())
+        return ret_string
 
     def generate_llvm_store(self, addr: str):
-
+        ret = ''
         if self.taking_address():
             ret = LlvmCode.llvm_store_instruction(str(self.id), self._type_stack, str(addr), self._type_stack,
                                                   self.code_indent_string())
             return ret
 
-        elif self.do_we_dereference():
-            self._type_stack = self.get_attribute(self.id).operator_stack
-            print(self._type_stack)
-            self.increment_register_index()
+            ret += self.llvm_load(self.register_index)
+        else:
+            ret += self.llvm_load()
 
-            ret = LlvmCode.llvm_load_instruction(str(self.id), self._type_stack, str(self.register_index),
-                                                 self._type_stack, False, self.code_indent_string())
-
-            self.remove_modifier_node()
-            print("should remove" + str(self._type_modifier_node))
-            ret += self.generate_llvm_store(addr)
-
-            return ret
-        ret = self.llvm_load()
         ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, addr, self._type_stack,
                                                self.code_indent_string())
         return ret
