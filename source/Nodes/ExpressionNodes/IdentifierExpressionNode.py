@@ -119,11 +119,11 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 ret_string += f' @{self.id}{call_string}\n'
 
             elif element == type_specifier.TypeSpecifier.POINTER:
-
+                call_global = True if self.is_in_global_table(str(self._place_of_value)) else False
                 self.increment_register_index()
                 ret_string += LlvmCode.llvm_load_instruction(self._place_of_value, self._type_stack,  # Load From
                                                              str(self.register_index), self._type_stack,  # To
-                                                             False, self.code_indent_string())  # Metadata for instr
+                                                             call_global, self.code_indent_string())  # Metadata
                 self._place_of_value = self.register_index
 
             elif element == type_specifier.TypeSpecifier.ADDRESS:
