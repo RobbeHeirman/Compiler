@@ -45,7 +45,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         Note: We do not support implicit conversions.
         :return:
         """
-        if not self._generate_type_modifier_stack(messenger):  # the modifiers applied in the expression
+        if not self._generate_secondary_types(messenger):  # the modifiers applied in the expression
             return False
         ret = True
 

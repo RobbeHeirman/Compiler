@@ -27,7 +27,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
     def semantic_analysis(self, messenger: messages.MessageGenerator):
 
-        if not self._generate_type_modifier_stack(messenger):
+        if not self._generate_secondary_types(messenger):
             return False
 
         defined = False

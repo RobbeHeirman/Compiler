@@ -92,7 +92,7 @@ class DeclarationNode(TypedNode.TypedNode):
         :return: Amount of errors encountered in node and children.
         """
         ret = True
-        self._generate_type_modifier_stack(messenger)
+        self._generate_secondary_types(messenger)
         # We have all the info for the corresponding attribute object
         attr = self._make_attribute()
         # Check of the expression is semantically correct

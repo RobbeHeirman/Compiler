@@ -49,7 +49,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
             return False
 
         self._type_stack = self.get_attribute(self.id).operator_stack
-        if not self._generate_type_modifier_stack(messenger):  # the modifiers applied in the expression
+        if not self._generate_secondary_types(messenger):  # the modifiers applied in the expression
 
             return False
 
@@ -130,7 +130,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                                                   self.code_indent_string())
             return ret
 
-            ret += self.llvm_load(self.register_index)
         else:
             ret += self.llvm_load()
 

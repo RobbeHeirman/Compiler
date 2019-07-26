@@ -66,7 +66,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
             return False
 
         # Applies all special types to the function definition
-        self._generate_type_modifier_stack(messenger)
+        self._generate_secondary_types(messenger)
         self._type_stack.append(type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.FUNCTION,
                                                              self._param_list_node.get_function_signature()))
 
