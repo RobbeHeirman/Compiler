@@ -70,7 +70,7 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
         :return Bool: Returns True if All operations were legal, otherwise returns False.
         """
         if self._type_modifier_node:
-            return self._type_modifier_node.generate_type_operator_stack(self, messenger)
+            return self._type_modifier_node.generate_secondary_type(self, messenger)
 
         return True
 

@@ -3,24 +3,24 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import abc
+
 from Nodes.AbstractNodes import AbstractNode
-
 import typing
-
-import Nodes.AbstractNodes.AbstractNode as AbstractNode
-
 import type_specifier
-
 from typing import TYPE_CHECKING
-
 from type_specifier import TypeSpecifier
 
 if TYPE_CHECKING:
+    import Nodes.AbstractNodes.TypedNode as TypedNode
     import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
     import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
+# Type aliasing
+TypeStack = typing.List[type_specifier.TypeSpecifier]
 
-class TypeModifierNode(AbstractNode.AbstractNode):
+
+class TypeModifierNode(AbstractNode.AbstractNode, abc.ABC):
     # TypeAnnotations
     _parent_node: typing.Union[
         "TypeModifierNode", "DeclarationNode.DeclarationNode", "ExpressionNode.ExpressionNode"]
@@ -80,13 +80,9 @@ class TypeModifierNode(AbstractNode.AbstractNode):
 
     def remove_child(self, child):
 
-        try:
-            super().remove_child(child)
-            if isinstance(child, TypeModifierNode):
-                self._type_modifier_node = None
-        except:
-            print("should be called")
-            pass
+        super().remove_child(child)
+        if isinstance(child, TypeModifierNode):
+            self._type_modifier_node = None
 
     def add_child(self, child, index=None):
 
@@ -117,20 +113,29 @@ class TypeModifierNode(AbstractNode.AbstractNode):
 
         return []
 
-    def generate_type_operator_stack(self, node, messenger):
+    @abc.abstractmethod
+    def generate_secondary_type(self, node: "TypedNode.TypedNode", messenger) -> bool:
         """
-        This function generates the operators stack.
-        :param node:
-        :param messenger:
+        This function applies the secondary type to a given node. After application the node will represent
+        a new type according to what this type modifier (node) introduced. The change of type is found in the
+        type stack attribute of the Given (TypedNode)
+        :param node: The node the type modification needs to be applied to.
+        :param messenger: An error messenger Object. For generating error codes.
         :return: the type_stack
         """
-        if self.modifier_type == type_specifier.TypeSpecifier.FUNCTION:
-            self.modifier_type.function_signature = self._param_list_node.get_function_signature()
-        node.type_stack_ref().append(self._modifier_type)
-        if self._type_modifier_node is not None:
-            self._type_modifier_node.generate_type_operator_stack(node, messenger)
 
-        return True
+    def generate_type_modifier_stack(self, type_modifier_stack: TypeStack = None) -> TypeStack:
+        """
+        Will generate a List of TypeSpecifiers elements in stack order. Add's own type to the list and recursively
+        calls it's child. Until a child is a leaf.
+        :return:
+        """
+
+        var_type_stack = type_modifier_stack if type_modifier_stack else []
+        var_type_stack.append(self.modifier_type)
+        if self._type_modifier_node:
+            return self._type_modifier_node.generate_type_modifier_stack(var_type_stack)
+        return var_type_stack
 
     # LLVM Code generations
     # ==================================================================================================================

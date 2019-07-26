@@ -37,7 +37,7 @@ class TypeModifierNode(TypeModifierNode.TypeModifierNode):
     # semantic analysis
     # ==================================================================================================================
 
-    def generate_type_operator_stack(self, node, messenger):
+    def generate_secondary_type(self, node, messenger):
         """
         This function generates the operators stack.
         :param node:
@@ -48,7 +48,7 @@ class TypeModifierNode(TypeModifierNode.TypeModifierNode):
             self.modifier_type.function_signature = self._param_list_node.get_function_signature()
         node.type_stack_ref().append(self._modifier_type)
         if self._type_modifier_node is not None:
-            self._type_modifier_node.generate_type_operator_stack(node, messenger)
+            self._type_modifier_node.generate_secondary_type(node, messenger)
 
         return True
 

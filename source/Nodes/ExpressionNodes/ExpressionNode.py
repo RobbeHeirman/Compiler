@@ -1,7 +1,9 @@
 import abc
+from typing import List
 
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.DeclarationTypeModifierNode as TypeModifierNode
+import type_specifier
 
 
 class ExpressionNode(TypedNode.TypedNode, abc.ABC):
@@ -69,9 +71,6 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         :return:
         """
         pass
-    # @property
-    # def type_string_llvm(self):
-    #     return self._type_stack[0].llvm_type + "*" * len(self._type_stack)
 
     def taking_address(self) -> bool:
         if self._type_modifier_node:
@@ -84,3 +83,16 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
             return self._type_modifier_node.do_we_dereference()
         else:
             return False
+
+    def _generate_type_operator_stack(self) -> List[type_specifier.TypeSpecifier]:
+        """
+        Will make a List of all applied operator's in stack order. (Bound closest = Last Element).
+        The list is represented with TypeSpecifier elements
+        :return List[TypeSpecifier]: A list of type specifier if this expression had typeModifiers. Else an
+                                     Empty list.
+        """
+
+        if self._type_modifier_node:
+            return self._type_modifier_node.generate_type_modifier_stack()
+
+        return []

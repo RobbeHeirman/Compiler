@@ -17,7 +17,7 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
     def __init__(self, parent_node, ctx, modifier=None):
         super().__init__(parent_node, ctx, modifier)
 
-    def generate_type_operator_stack(self, node: ExpressionNode.ExpressionNode, messenger: messages.MessageGenerator):
+    def generate_secondary_type(self, node: ExpressionNode.ExpressionNode, messenger: messages.MessageGenerator):
         """
         Function requires an expressionNode and adjust this node's type trough it's type stack.
         This node modifies the ExpressionNode state in type_stack and l_value(bool that tell's if l or r val)
@@ -29,7 +29,7 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
 
         # Check the type_modifier subtree. Children of this type modifier node get to modify the type stack first.
         if self._type_modifier_node:
-            if not self._type_modifier_node.generate_type_operator_stack(node, messenger):
+            if not self._type_modifier_node.generate_secondary_type(node, messenger):
                 return False
 
         # else this node should be applied first == base
