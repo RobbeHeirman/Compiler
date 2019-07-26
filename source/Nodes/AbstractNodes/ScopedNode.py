@@ -15,7 +15,7 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
     This node is an abstract node that presents all nodes with their own scope.
     This means this node has it's own SymbolTable
     """
-    _register_index: int
+    _llvm_register_index: int
 
     # Built-ins
     # ==================================================================================================================
@@ -25,7 +25,9 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         """
         super().__init__(parent_node, ctx)
         self._symbol_table = SymbolTable.SymbolTable()
-        self._register_index = 0
+        self._llvm_register_index = 0
+
+        self._mips_stack_pointer: int = 0
 
     # Semantic analysis
     # ==================================================================================================================
@@ -77,14 +79,14 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         the register index that is on top available.
         :return: int register index
         """
-        return self._register_index
+        return self._llvm_register_index
 
     def increment_register_index(self, amount: int = 1) -> None:
         """
         Increment the next available register index
         :param amount: int by amount we increase, 1 by default.
         """
-        self._register_index += amount
+        self._llvm_register_index += amount
 
     def is_global(self) -> bool:
         """

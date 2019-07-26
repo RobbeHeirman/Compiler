@@ -45,7 +45,7 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
     # Semantic-analysis
     # ==================================================================================================================
     @property
-    def type_stack(self):
+    def type_stack(self) -> type_specifier.TypeStack:
         """ No outer modification on the list"""
         return list(self._type_stack)
 

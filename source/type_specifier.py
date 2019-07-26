@@ -73,6 +73,21 @@ class TypeSpecifier:
 
         return _LLVM_TYPE.get(self.value, '')
 
+    @property
+    def mips_stack_size(self) -> int:
+        """
+        Size the value will take on the stack.
+        :return int: the size of the stack
+        """
+
+        _MIPS_SIZES = {
+            "char": 1,
+            "int": 4,
+            "float": 4,
+            "*": 4
+        }
+        return _MIPS_SIZES[self._type_spec]
+
 
 # Type aliasing
 TypeStack = typing.List[TypeSpecifier]

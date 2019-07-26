@@ -66,3 +66,18 @@ class RootNode(ScopedNode.ScopedNode):
     @property
     def code_indent_level(self):
         return self._indent_level
+
+    # Mips Code
+    # ==================================================================================================================
+
+    def generate_mips(self, c_comment: bool = True):
+        # We always start by calling main
+        ret = "jal main\n"
+
+        # Now we cleanly exit
+        # Load 10 in to v0 10 = exit (end of program)
+        ret += "li $v0, 10 # System call code for end of program\n"
+        ret += "syscall\n"
+
+        ret += super().generate_mips()
+        return ret

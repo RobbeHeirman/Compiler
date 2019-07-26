@@ -122,6 +122,10 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
         # Label the start of the function
         ret += f'{self.id}:\n'
+        # First we need to tell the symbol table where to find the arguments. It is possible there are some element's
+        # on the stack. So the method will increment the sp accordingly.
+        self._mips_stack_pointer += self._param_list_node.mips_assign_params_to_mem()
+
         # Some awesome code here
 
         # Return

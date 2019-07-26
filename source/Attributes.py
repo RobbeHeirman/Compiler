@@ -27,6 +27,10 @@ class Attributes:
         self._line = line
         self._column = column
 
+        # Mips info
+        self._mips_is_register: bool = False
+        self._mips_address: str = ""
+
     def __eq__(self, val: "Attributes") -> bool:
         if self._operator_stack == val._operator_stack:
             return True
@@ -68,34 +72,24 @@ class Attributes:
     def operator_stack(self):
         return list(self._operator_stack)
 
-    # def same_signature(self, attr: "Attributes") -> bool:
-    #     """
-    #     Compares the function signatures of two attributes.
-    #     :param attr: the attribute this attributes signature has to be compared against
-    #     :return:
-    #     """
-    #
-    #     if self.function_signature == attr.function_signature:
-    #         return True
-    #     return False
+    # Mips-Code
+    # ==================================================================================================================
 
-    # def rhs_same_signature(self, type_specs, error_attr, l_id):
-    #
-    #     own_list = [attr.decl_type for attr in self.function_signature]
-    #
-    #     if own_list == type_specs:
-    #         return True
-    #
-    #     elif len(type_specs) < len(own_list):
-    #         # self._messenger.error_func_to_few_arguments(l_id, error_attr)
-    #         print("TODO Respect msg attributes")
-    #     elif len(type_specs) > len(own_list):
-    #         # self._messenger.error_func_to_many_arguments(l_id, error_attr)
-    #         print("TODO Respect msg attributes")
-    #     else:
-    #         # self._messenger.error_signature_does_not_match(l_id, error_attr)
-    #         print("TODO Respect msg attributes")
-    #     return False
+    @property
+    def mips_is_register(self):
+        return self._mips_is_register
+
+    @mips_is_register.setter
+    def mips_is_register(self, val):
+        self._mips_is_register = val
+
+    @property
+    def mips_address(self):
+        return self._mips_address
+
+    @mips_address.setter
+    def mips_address(self, val):
+        self._mips_address = val
 
 
 class AttributesGlobal(Attributes):
