@@ -214,6 +214,23 @@ class AbstractNode(abc.ABC):
 
         return ret
 
+    # MIPS Code Generation
+    # ==================================================================================================================
+
+    def generate_mips(self, c_comment: bool = True) -> str:
+        """
+            Generates the corresponding node into mips instructions.
+            :param bool c_comment: Will generate The Compiled C code in comment's next to the instructions
+            :return str: generates the instructions as a string
+            """
+        ret = ""
+        for child in self._children:
+            ret += child.generate_mips(c_comment)
+
+        return ret
+
+    # Meta Code Generation
+    # ==================================================================================================================
     @property
     def code_indent_level(self):
         return self._parent_node.code_indent_level

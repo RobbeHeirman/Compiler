@@ -4,8 +4,7 @@ import subprocess
 import sys
 import os
 import shutil
-import traceback
-
+from inspect import stack
 import main
 
 
@@ -14,8 +13,13 @@ class TracePrints(object):
         self.stdout = sys.stdout
 
     def write(self, s):
-        self.stdout.write("Writing %r\n" % s)
-        traceback.print_stack(file=self.stdout)
+        if s != '\n':
+            frame_info = stack()[1]
+            type(frame_info)
+            self.stdout.write(f'{frame_info[1]}:{frame_info[2]}: {s}\n')
+
+    def flush(self):
+        self.stdout.flush()
 
 
 sys.stdout = TracePrints()
@@ -77,7 +81,10 @@ if __name__ == "__main__":
 
     if args.ref_test:
         name_reference = path + slug + "_ref.ll"
-        subprocess.call(["clang", args.input_file, "-S", "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion", "-ansi",
+        # subprocess.call(["clang", args.input_file, "-S", "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion", "-ansi",
+        #                  "-o", name_reference])  # Test compiler errors
+
+        subprocess.call(["clang", "-cc1", args.input_file, "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion",
                          "-o", name_reference])  # Test compiler errors
 
     if args.executable_test:

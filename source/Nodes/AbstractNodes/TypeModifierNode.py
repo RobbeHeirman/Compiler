@@ -9,15 +9,12 @@ from Nodes.AbstractNodes import AbstractNode
 import typing
 import type_specifier
 from typing import TYPE_CHECKING
-from type_specifier import TypeSpecifier
+from type_specifier import TypeSpecifier, TypeStack
 
 if TYPE_CHECKING:
     import Nodes.AbstractNodes.TypedNode as TypedNode
     import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
     import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
-
-# Type aliasing
-TypeStack = typing.List[type_specifier.TypeSpecifier]
 
 
 class TypeModifierNode(AbstractNode.AbstractNode, abc.ABC):

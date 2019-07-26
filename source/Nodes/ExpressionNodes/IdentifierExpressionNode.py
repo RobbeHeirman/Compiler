@@ -3,13 +3,14 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from typing import List
+from typing import List, Union
 
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 
 import LlvmCode
 import messages
+import type_specifier
 
 
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
@@ -23,11 +24,10 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         super().__init__(parent_node, ctx)
         self.id = ctx.getText()
         self._l_value = True  # As it's base form an identifier is an Lvalue
-
-        self._temporal_reg_num: int = None
+        self._place_of_value: Union[int, str] = self.id  # The register the current value of the identifier is placed
 
     def __str__(self):
-        return self.id
+        return f'{self.id}{[child for child in self._type_stack]}'
 
     # AST visuals
     # ==================================================================================================================
@@ -70,9 +70,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
             param_node = self._get_param_node()
             ret = param_node.llvm_call_param_nodes()
 
-            # This is the base register the functions will load from
-            remember_reg = self.register_index
-
         else:
             ret = self.code_indent_string() + ";... {0}\n".format(self.id)
             ret += self.llvm_load()
@@ -85,55 +82,69 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         :return: a string that loaded the value of the var into the register
         """
 
-        load_from = reg_load_from if reg_load_from else self.id
+        self._place_of_value = reg_load_from if reg_load_from else self._place_of_value
+
+        print(self.id + str(self._generate_type_operator_stack()))
+
+        # The first el of the operator stack is the implicit conversion from L to R value
+        stack: type_specifier.TypeStack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
+        stack += self._generate_type_operator_stack()
+
+        # Currently the different we can handle are * = Dereference, & = Take Address of, (params) = A function call
         ret_string = ''
-        if self._is_function_call():
-            param_node = self._get_param_node()
-            ret_string = param_node.llvm_load_params()
-            call_string = '('
-            self.increment_register_index()
-            self._temporal_reg_num = self.register_index
-            child_list: List[ExpressionNode] = param_node.get_children()
-            call_string += ', '.join([f'{child.type_stack[0].llvm_type} {child.llvm_value}' for child in child_list])
-            call_string += ')'
-            ret_string += f'{self.code_indent_string()}%{self._temporal_reg_num} = call {self._type_stack[0].llvm_type}'
-            ret_string += f' @{self.id}{call_string}\n'
+        while stack:
+
+            element: type_specifier.TypeSpecifier = stack.pop()
+
+            if element == type_specifier.TypeSpecifier.FUNCTION:
+
+                # Function calls are trickier we need to have the call argument's in place we do that in the next block
+                param_node = self._get_param_node()
+                ret_string += param_node.llvm_load_params()
+
+                # Next up we make a string for the parameter call
+                child_list: List[ExpressionNode] = param_node.get_children()
+
+                # the children know where there values are loaded into in child.llv_value
+                children_their_strings = []
+                for child in child_list:
+                    child_string = ''.join([type_child.llvm_value for type_child in child.type_stack])
+                    child_string += f' {child.llvm_value}'
+                    children_their_strings.append(child_string)
+                call_string = '(' + ', '.join(children_their_strings) + ')'
+
+                # Now for the actual call we will load the call value into a new temporal register
+                self.increment_register_index()
+                self._place_of_value = self.register_index
+                ret_string += f'{self.code_indent_string()}%{self._place_of_value} = call'
+                ret_string += f' {"".join([child.llvm_value for child in self._type_stack.llvm_value])}'
+                ret_string += f' @{self.id}{call_string}\n'
+
+            elif element == type_specifier.TypeSpecifier.POINTER:
+
+                self.increment_register_index()
+                ret_string += LlvmCode.llvm_load_instruction(self._place_of_value, self._type_stack,  # Load From
+                                                             str(self.register_index), self._type_stack,  # To
+                                                             False, self.code_indent_string())  # Metadata for instr
+                self._place_of_value = self.register_index
+
+            elif element == type_specifier.TypeSpecifier.ADDRESS:
+                item = stack.pop()
+                assert (item == type_specifier.TypeSpecifier.POINTER), f"We dereference something else then addr " \
+                    f"type This: {item} "
+
             return ret_string
 
-        elif self.do_we_dereference():
-            self._type_stack = self.get_attribute(self.id).operator_stack
-
-            while self.do_we_dereference():
-                self.increment_register_index()
-
-                ret_string += LlvmCode.llvm_load_instruction(str(self.id), self._type_stack, str(self.register_index),
-                                                             self._type_stack, False, self.code_indent_string())
-
-                self._type_stack.pop()
-                self.remove_modifier_node()
-                load_from = self.register_index
-
-
-        self.increment_register_index()
-        self._temporal_reg_num = self.register_index
-
-        ret_string += LlvmCode.llvm_load_instruction(str(load_from), self.type_stack, str(self.register_index),
-                                                     self.type_stack,
-                                                     self.is_in_global_table(self.id), self.code_indent_string())
-
-        return ret_string
-
-    def generate_llvm_store(self, addr: str):
-        ret = ''
-        if self.taking_address():
-            ret = LlvmCode.llvm_store_instruction(str(self.id), self._type_stack, str(addr), self._type_stack,
-                                                  self.code_indent_string())
-            return ret
-
-        else:
-            ret += self.llvm_load()
-
-        ret += LlvmCode.llvm_store_instruction(str(self.register_index), self._type_stack, addr, self._type_stack,
+    def generate_llvm_store(self, addr: str) -> str:
+        """
+        Tell the IDExpresionNode to store it's value to a certain address. This could be a temporal address
+        or a register constructed by a declaration. The trick is to deduce the corresponding loads, calls and stores
+        depending on the type Modifiers
+        :param addr:  the address to store to
+        :return: The generated store instruction string
+        """
+        ret = self.llvm_load()
+        ret += LlvmCode.llvm_store_instruction(self._place_of_value, self._type_stack, addr, self._type_stack,
                                                self.code_indent_string())
         return ret
 
@@ -147,4 +158,4 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
     @property
     def llvm_value(self):
-        return f'%{self._temporal_reg_num}'
+        return f'%{self._place_of_value}'

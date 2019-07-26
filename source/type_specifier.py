@@ -3,6 +3,7 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+import typing
 
 
 class TypeSpecifier:
@@ -71,3 +72,7 @@ class TypeSpecifier:
         }
 
         return _LLVM_TYPE.get(self.value, '')
+
+
+# Type aliasing
+TypeStack = typing.List[TypeSpecifier]
