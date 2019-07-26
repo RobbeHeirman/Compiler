@@ -84,8 +84,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         self._place_of_value = reg_load_from if reg_load_from else self._place_of_value
 
-        print(self.id + str(self._generate_type_operator_stack()))
-
         # The first el of the operator stack is the implicit conversion from L to R value
         stack: type_specifier.TypeStack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
         stack += self._generate_type_operator_stack()
@@ -108,7 +106,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 # the children know where there values are loaded into in child.llv_value
                 children_their_strings = []
                 for child in child_list:
-                    child_string = ''.join([type_child.llvm_value for type_child in child.type_stack])
+                    child_string = ''.join([type_child.llvm_type for type_child in child.type_stack])
                     child_string += f' {child.llvm_value}'
                     children_their_strings.append(child_string)
                 call_string = '(' + ', '.join(children_their_strings) + ')'
@@ -117,7 +115,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 self.increment_register_index()
                 self._place_of_value = self.register_index
                 ret_string += f'{self.code_indent_string()}%{self._place_of_value} = call'
-                ret_string += f' {"".join([child.llvm_value for child in self._type_stack.llvm_value])}'
+                ret_string += f' {"".join([child.llvm_type for child in self._type_stack])}'
                 ret_string += f' @{self.id}{call_string}\n'
 
             elif element == type_specifier.TypeSpecifier.POINTER:

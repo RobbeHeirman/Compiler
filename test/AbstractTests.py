@@ -6,8 +6,9 @@ Academic Year: 2018-2019
 import os
 import subprocess
 import unittest
-import traceback
 import sys
+from inspect import stack
+
 import main
 
 
@@ -16,11 +17,17 @@ class TracePrints(object):
         self.stdout = sys.stdout
 
     def write(self, s):
-        self.stdout.write("Writing %r\n" % s)
-        traceback.print_stack(file=self.stdout)
+        if s != '\n':
+            frame_info = stack()[1]
+            type(frame_info)
+            self.stdout.write(f'{frame_info[1]}:{frame_info[2]}: {s}\n')
+
+    def flush(self):
+        self.stdout.flush()
 
 
 sys.stdout = TracePrints()
+
 
 class SAbstractTest(unittest.TestCase):
 
@@ -105,7 +112,8 @@ class LLVMAbstractExecTest(LLVMAbstractTest):
         exec_name = self.result_path + slug + ".exe"
 
         if self._compile_llvm(filename):
-            subprocess.call(["clang", "-Wno-override-module", self.result_path + slug + ".ll", "-o", exec_name])
+            code = subprocess.call(["clang", "-Wno-override-module", self.result_path + slug + ".ll", "-o", exec_name])
+            self.assertEqual(code, 0, "Did not compile ll to exec")
         else:
             return
 
