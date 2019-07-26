@@ -86,15 +86,13 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
     def get_return_type(self):
         return self._type_stack[:-1]
 
+    # LLVM Code-Generation
+    # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
 
-        # Code for a function Def in LLVM: Example: LLVM: Define i32 @main(int) {...} <=> C: int main(int){...}
-        # Commenting...
         function_signature = self._param_list_node.generate_llvm_function_signature()
-
         return_type = f'{"".join([child.llvm_type for child in self._type_stack[:-1]])} '
-        ret = self.llvm_comment(f'{self.base_type.value} {self.id}({function_signature}){{...}}', c_comment)
-
+        ret = self.comment_code(c_comment, False)
         ret += f'{self.code_indent_string()} define {return_type} @{self.id}'
         ret += f'({function_signature}){{\n'
         self.increase_code_indent()
@@ -115,3 +113,34 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         ret += "}\n"
         self.decrease_code_indent()
         return ret
+
+    # MIPS Code-Generation
+    # ==================================================================================================================
+    def generate_mips(self, c_comment: bool = True):
+
+        ret = self.comment_code(c_comment)
+
+        # Label the start of the function
+        ret += f'{self.id}:\n'
+        # Some awesome code here
+
+        # Return
+        ret += 'jr $ra'
+        return ret
+
+    # Meta Code Generation
+    # ==================================================================================================================
+    def comment_code(self, c_comment: bool = True, mips=True):
+        """
+        Generates the comment code
+        :param mips:
+        :param c_comment:
+        :return: a string with comment code
+        """
+        # Code for a function Def in LLVM: Example: LLVM: Define i32 @main(int) {...} <=> C: int main(int){...}
+        # Commenting...
+        function_signature = self._param_list_node.generate_llvm_function_signature()
+        return_type = f'{"".join([child.llvm_type for child in self._type_stack[:-1]])} '
+
+        return self.mips_comment(f'{return_type} {self.id}({function_signature}){{...}}', c_comment) if mips else \
+            self.llvm_comment(f'{return_type} {self.id}({function_signature}){{...}}', c_comment)

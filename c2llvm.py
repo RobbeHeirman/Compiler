@@ -77,6 +77,7 @@ if __name__ == "__main__":
     main.generate_ast_visuals(ast, path + slug + "2")
     # generate the ll code
     if not args.no_code:
+        main.generate_mips(ast, path + slug)
         main.generate_llvm(ast, path + slug)
 
     if args.ref_test:
@@ -93,5 +94,7 @@ if __name__ == "__main__":
         runner = subprocess.run(["clang", "-Wno-override-module", ll_file, "-o", path + slug + ".exe"])
         if runner.returncode is 0:
             code = subprocess.call(["./" + path + slug + ".exe"])
+            print(code)
+            code = subprocess.call(["java", "-jar", "Mars.jar", path + slug + ".asm"])
             print(code)
     sys.exit(0)

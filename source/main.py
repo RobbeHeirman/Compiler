@@ -62,3 +62,10 @@ def generate_llvm(ast: AST, output_path_slug):
     file = open(file_name, 'w+')
     file.write(ast.generate_llvm())
     file.close()
+
+
+def generate_mips(ast: AST, output_path_slug):
+    file_name = output_path_slug + ".asm"
+    file = open(file_name, 'w+')
+    file.write(ast.generate_mips())
+    file.close()
