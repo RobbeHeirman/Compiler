@@ -121,3 +121,34 @@ class LLVMAbstractExecTest(LLVMAbstractTest):
         si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         ret_code = subprocess.call([exec_name], startupinfo=si)
         self.assertEqual(ret_code, exit_code_exec)
+
+
+class MipsAbstractTest(unittest.TestCase):
+    """
+    Base for the Mips tests
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.result_path = "test/test_results/MIPS/"
+        self.path = "C_files/semantic/"
+
+    def build_and_run_mips(self, filename, exit_code):
+
+        slug = filename[:-2]  # -c
+        file_name = self.path + filename
+        ast = main.create_ast(file_name)
+        if ast.semantic_analysis():
+            code = ast.generate_llvm()
+            result_file = self.result_path + filename[:-2] + ".ll"
+            with open(result_file, "w+") as file:
+                file.write(code)
+
+            main.generate_mips(ast, self.result_path + slug)
+            code = subprocess.call(['java', '-jar', "../Mars.jar", self.path + filename, "nc"])
+            self.assertEqual(code, exit_code, "Wrong exit code")
+
+        else:
+            self.assertTrue(False, 'Semantics are wrong in an excecution test')
+            return False
