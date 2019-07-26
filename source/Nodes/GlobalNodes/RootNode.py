@@ -74,9 +74,10 @@ class RootNode(ScopedNode.ScopedNode):
         # We always start by calling main
         ret = "jal main\n"
 
-        # Now we cleanly exit
-        # Load 10 in to v0 10 = exit (end of program)
-        ret += "li $v0, 10 # System call code for end of program\n"
+        # Now we cleanly exit We will return the return of main as exit code
+        # Load 17 in to v0 10 = exit (end of program)
+        ret += "move $v0 $a0 # We move the return value of main for syscall\n"
+        ret += "li $v0, 17 # System call code for end of program\n"
         ret += "syscall\n"
 
         ret += super().generate_mips()
