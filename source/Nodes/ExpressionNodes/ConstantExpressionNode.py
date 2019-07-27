@@ -53,6 +53,10 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
         return str(self.constant)
 
+    @property
+    def mips_value(self) -> str:
+        return self.llvm_value
+
     def generate_llvm_store(self, store_addr: str) -> str:
         """
         Stores the constant directly in to given addr

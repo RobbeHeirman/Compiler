@@ -95,6 +95,6 @@ if __name__ == "__main__":
         if runner.returncode is 0:
             code = subprocess.call(["./" + path + slug + ".exe"])
             print(code)
-            code = subprocess.call(["java", "-jar", "Mars.jar", path + slug + ".asm"])
+            code = subprocess.call(["java", "-jar", "Mars.jar", "nc", path + slug + ".asm"])
             print(code)
     sys.exit(0)

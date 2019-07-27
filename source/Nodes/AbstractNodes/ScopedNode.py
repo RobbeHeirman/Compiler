@@ -95,3 +95,23 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         :return: A bool False meaning this is not global.
         """
         return False
+
+    # Mips-Code
+    # ==================================================================================================================
+
+    @property
+    def mips_stack_pointer(self) -> int:
+        """
+
+        :return int: The relative address of the stack pointer. Front end book keeping
+        """
+        return self._mips_stack_pointer
+
+    def increase_stack_pointer(self, amount: int) -> int:
+        """
+        Increases the amount of the stack pointer.
+        :param int amount: the amount we increase the stack pointer with
+        :return int: the new (relative value of the stack pointer)
+        """
+        self._mips_stack_pointer += amount
+        return self._mips_stack_pointer

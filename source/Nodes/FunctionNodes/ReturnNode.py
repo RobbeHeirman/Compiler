@@ -5,7 +5,6 @@ Academic Year: 2018-2019
 """
 from typing import List
 
-import LlvmCode
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 import Nodes.GlobalNodes.StatementsNode as StatementsNode
@@ -16,12 +15,17 @@ import Nodes.ExpressionNodes.IdentifierExpressionNode as IdentifierExpressionNod
 class ReturnNode(AbstractNode.AbstractNode):
     label = "return"
 
+    # Type Annotations
     _parent_node: StatementsNode.StatementsNode
     _children: List[ExpressionNode.ExpressionNode]
 
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, parent_node: AbstractNode.AbstractNode, ctx):
         super().__init__(parent_node, ctx)
 
+    # Semantic analysis
+    # ==================================================================================================================
     def semantic_analysis(self, messenger):
 
         child = self._children[0]
@@ -35,6 +39,13 @@ class ReturnNode(AbstractNode.AbstractNode):
             return False
         return True
 
+    def has_return(self):
+        if self._children:
+            return True
+        return False
+
+    # LLVM Code
+    # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
 
         # Commenting
@@ -54,7 +65,27 @@ class ReturnNode(AbstractNode.AbstractNode):
 
         return return_string
 
-    def has_return(self):
-        if self._children:
-            return True
-        return False
+    # Mips Code
+    # ==================================================================================================================
+    def generate_mips(self, c_comment: bool = True) -> str:
+        """
+        Generates The return Code in Mips. Will need to load a value into the Load register. Either $v0 or $v1.
+        We will always use $v0 for consistency.
+        :param bool c_comment: Do Write comments
+        :return str: The return string with MIPS code and optional comment strings
+        """
+
+        # Start with commenting
+        return_string = self.mips_comment(f'return {self._children[0]}', c_comment)
+
+        # Load the value into $v0 so we can return
+        if isinstance(self._children[0], ConstantExpressionNode.ConstantExpressionNode):
+            child: ConstantExpressionNode.ConstantExpressionNode = self._children[0]
+            return_string += f'{self.code_indent_string()}li $v0 {child.mips_value}\n'
+
+        # We can free up stack memory again since we are going out of scope
+        if self._parent_node.mips_get_stack_pointer():
+            return_string += f'{self.code_indent_string()}sub $sp $sp {self._parent_node.mips_get_stack_pointer()}\n'
+        # Now we need to jump back to the scope of the caller
+        return_string += f"{self.code_indent_string()}jr $ra\n"
+        return return_string

@@ -105,7 +105,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         self.increment_register_index(self._param_list_node.child_count())
 
         for child in self._children[1:]:
-            ret += child.generate_llvm()
+            ret += child.generate_llvm(c_comment)
 
         # if self._return_node is None:
         #     ret += self.indent_string() + "  ret {0} 0\n".format(self.base_type.llvm_type)
@@ -126,10 +126,14 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # on the stack. So the method will increment the sp accordingly.
         self._mips_stack_pointer += self._param_list_node.mips_assign_params_to_mem()
 
+        # Fill in the function body
+        self.increase_code_indent()
+        # ret += self.code_indent_string()
+        ret += f"{self.code_indent_string()}".join([child.generate_mips(c_comment) for child in self._children[1:]])
         # Some awesome code here
 
         # Return
-        ret += 'jr $ra'
+        # ret += f'{self.code_indent_string()}jr $ra'
         return ret
 
     # Meta Code Generation

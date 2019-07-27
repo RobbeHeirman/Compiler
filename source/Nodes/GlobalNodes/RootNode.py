@@ -76,9 +76,9 @@ class RootNode(ScopedNode.ScopedNode):
 
         # Now we cleanly exit We will return the return of main as exit code
         # Load 17 in to v0 10 = exit (end of program)
-        ret += "move $v0 $a0 # We move the return value of main for syscall\n"
+        ret += "move $a0 $v0  # We move the return value of main for syscall\n"
         ret += "li $v0, 17 # System call code for end of program\n"
-        ret += "syscall\n"
+        ret += "syscall\n\n"
 
         ret += super().generate_mips()
         return ret
