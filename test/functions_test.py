@@ -5,7 +5,7 @@ Academic Year: 2018-2019
 """
 import os
 
-from test.AbstractTests import SAbstractTest, LLVMAbstractExecTest
+from test.AbstractTests import SAbstractTest, LLVMAbstractExecTest, MipsAbstractTest
 
 
 class SFunctionTest(SAbstractTest):
@@ -69,3 +69,16 @@ class LLVMFunctionTest(LLVMAbstractExecTest):
 
     def test_main_happy_day_regres_llvm(self):
         return self._build_and_run_llvm("happy_day_regres.c", 44)
+
+
+class MipsFunctionTest(MipsAbstractTest):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.path += "Function/"
+        self.result_path += "function/"
+
+    def test_main_happy_day(self):
+        return self._build_and_run_mips("main_happy_day.c", 0)
+
+    def test_return_constant(self):
+        return self._build_and_run_mips("return_constant.c", 42)

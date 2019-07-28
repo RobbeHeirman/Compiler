@@ -134,19 +134,21 @@ class MipsAbstractTest(unittest.TestCase):
         self.result_path = "test/test_results/MIPS/"
         self.path = "C_files/semantic/"
 
-    def build_and_run_mips(self, filename, exit_code):
+    def _build_and_run_mips(self, filename, exit_code):
+        if not os.path.exists(self.result_path):
+            os.makedirs(self.result_path)
 
         slug = filename[:-2]  # -c
         file_name = self.path + filename
         ast = main.create_ast(file_name)
         if ast.semantic_analysis():
             code = ast.generate_llvm()
-            result_file = self.result_path + filename[:-2] + ".ll"
+            result_file = self.result_path + filename[:-2] + ".asm"
             with open(result_file, "w+") as file:
                 file.write(code)
 
             main.generate_mips(ast, self.result_path + slug)
-            code = subprocess.call(['java', '-jar', "../Mars.jar", self.path + filename, "nc"])
+            code = subprocess.call(['java', '-jar', "Mars.jar", self.result_path + slug + ".asm", "nc"])
             self.assertEqual(code, exit_code, "Wrong exit code")
 
         else:
