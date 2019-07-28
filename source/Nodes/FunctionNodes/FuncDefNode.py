@@ -14,14 +14,20 @@ import Nodes.GlobalNodes.StatementsNode
 
 
 class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
+    # The Mips Register ref's. Used for comparing with mips register stack's
+    _LAZY_MIPS_REGISTERS = tuple(f't{i}' for i in reversed(range(10)))
+    _PRESERVE_MIPS_REGISTERS = tuple(f's{i}' for i in reversed(range(8)))
 
     # Built-ins
     # ==================================================================================================================
     def __init__(self, parent_node: AbstractNode.AbstractNode, ctx):
         super().__init__(parent_node, ctx)
-
         self._param_list_node: ParamListNode.ParamListNode = None
         self._function_signature = []
+
+        # We need a mechanism to keep track of the Mips Register's available
+        self._lazy_mips_registers_available = list(self.__class__._LAZY_MIPS_REGISTERS)
+        self._preserve_mips_registers_available = list(self.__class__._PRESERVE_MIPS_REGISTERS)
 
     # AST-Visuals
     # ==================================================================================================================
@@ -135,6 +141,24 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # Return
         # ret += f'{self.code_indent_string()}jr $ra'
         return ret
+
+    def register_available(self) -> bool:
+        """
+        Return's True if their is a register available, False if not (Variables should be stored on stack then)
+        :return bool:  A bool = True if register(s) are available Else = False
+        """
+        return True if (self._PRESERVE_MIPS_REGISTERS or self._LAZY_MIPS_REGISTERS) else False
+
+    def get_available_register(self) -> str:
+        """
+        Return's a available register. Start's with the register the function doesn't need to preserve
+        :return string: A register string
+        """
+
+        return self._lazy_mips_registers_available.pop() if self._lazy_mips_registers_available else \
+            self._preserve_mips_registers_available.pop()
+
+
 
     # Meta Code Generation
     # ==================================================================================================================
