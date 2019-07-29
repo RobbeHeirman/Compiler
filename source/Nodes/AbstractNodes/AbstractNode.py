@@ -249,6 +249,32 @@ class AbstractNode(abc.ABC):
 
         return f'{self.code_indent_string()}# {comment_string}\n' if do_comment else ""
 
+    def mips_register_available(self) -> bool:
+        """
+        Just forwards the request to check of there are register mips available in this scope.
+        :return: True if there are register's available else False
+        """
+
+        return self._parent_node.mips_register_available()
+
+    def mips_get_available_register(self) -> bool:
+        """
+        Forward's request for an available register
+        :return: A Available Register
+        """
+
+        return self._parent_node.mips_get_available_register()
+
+    @property
+    def mips_stack_pointer(self) -> int:
+        return self._parent_node.mips_stack_pointer
+
+    def mips_increase_stack_pointer(self, amount: int) -> int:
+        return self._parent_node.mips_increase_stack_pointer(amount)
+
+    def mips_stack_space_needed(self) -> int:
+        return 0
+
     # Meta Code Generation
     # ==================================================================================================================
     @property

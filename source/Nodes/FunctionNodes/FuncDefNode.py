@@ -122,34 +122,59 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
     # MIPS Code-Generation
     # ==================================================================================================================
-    def generate_mips(self, c_comment: bool = True):
+    def generate_mips(self, c_comment: bool = True) -> str:
+        """
+        A Mips (sub) routine definition. Mips routines: Argument's in a0-a3, rest passed on the stack.
+        Return value's in v0 and v1. Steps for a routine definition follows
+        1) Label the routine
+        2) Make room on the stack for local variables (Callee's stack frame)
+        3) Notify the front end where the argument's can be found (in registers or on stack)
+        4) Routine Body
+        5) Make a return label. ReturnNodes will use those to jump to to return to the caller (at ra)
 
+        :param bool c_comment: If False we don't write comments in code.
+        :return string: A string of MipsCode. Generated of this function definition.
+        """
+        # 0 Starting comment's. = A pseudo code (a bit like C) that shows witch statement we are generating
         ret = self.comment_code(c_comment)
 
-        # Label the start of the function
+        # 1 Label the start of the function
         ret += f'{self.id}:\n'
-        # First we need to tell the symbol table where to find the arguments. It is possible there are some element's
-        # on the stack. So the method will increment the sp accordingly.
-        self._mips_stack_pointer += self._param_list_node.mips_assign_params_to_mem()
-
-        # Fill in the function body
         self.increase_code_indent()
-        # ret += self.code_indent_string()
+
+        # 2 Make room on the stack for local variable's
+        frame_size = self._expression_node.mips_stack_space_needed()
+
+        # 3) Now we need to notify the front end where we can find (and where to store in case of subroutine call)
+        #    Argument's. We let the parameter node handle that. It has more complete information about param's.
+        #    We Allocate some memory of the argument's on the stack.
+        extra_frame_size = self._param_list_node.mips_assign_params_to_mem(frame_size)
+        frame_size += extra_frame_size
+
+        # Now we know the frame size so we can make room on the stack
+        # (subiu = subtract immediate unsigned = supported by Mars MIPS)
+        ret += f'{self.code_indent_string()}subiu $s1, $s1, {frame_size}\n'
+
+        # 4 Fill in the function body
         ret += f"{self.code_indent_string()}".join([child.generate_mips(c_comment) for child in self._children[1:]])
         # Some awesome code here
 
-        # Return
-        # ret += f'{self.code_indent_string()}jr $ra'
+        # 5 Make a Return label, free up the stack and jump back to caller
+        ret += f'\n{self.code_indent_string()}return:\n'
+        self.increase_code_indent()
+        ret += f'{self.code_indent_string()}addiu $sp, $sp, {frame_size}\n'
+        ret += f"{self.code_indent_string()}jr $ra\n"
+        self.decrease_code_indent()
         return ret
 
-    def register_available(self) -> bool:
+    def mips_register_available(self) -> bool:
         """
         Return's True if their is a register available, False if not (Variables should be stored on stack then)
         :return bool:  A bool = True if register(s) are available Else = False
         """
-        return True if (self._PRESERVE_MIPS_REGISTERS or self._LAZY_MIPS_REGISTERS) else False
+        return True if (self._preserve_mips_registers_available or self._lazy_mips_registers_available) else False
 
-    def get_available_register(self) -> str:
+    def mips_get_available_register(self) -> str:
         """
         Return's a available register. Start's with the register the function doesn't need to preserve
         :return string: A register string
@@ -157,8 +182,6 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
         return self._lazy_mips_registers_available.pop() if self._lazy_mips_registers_available else \
             self._preserve_mips_registers_available.pop()
-
-
 
     # Meta Code Generation
     # ==================================================================================================================

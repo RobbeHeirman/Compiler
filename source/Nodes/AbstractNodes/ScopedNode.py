@@ -107,7 +107,7 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         """
         return self._mips_stack_pointer
 
-    def increase_stack_pointer(self, amount: int) -> int:
+    def mips_increase_stack_pointer(self, amount: int) -> int:
         """
         Increases the amount of the stack pointer.
         :param int amount: the amount we increase the stack pointer with

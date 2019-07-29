@@ -148,3 +148,44 @@ class DeclarationNode(TypedNode.TypedNode):
         if self._expression_node:
             ret += self._expression_node.generate_llvm_store(self.id)
         return ret
+
+    # MIPS Generation
+    # ==================================================================================================================
+    def generate_mips(self, c_comment: bool = True) -> str:
+        """
+        Generates MIPS Code. Steps:
+        1) Declaration itself: Assign a register to variable. Record in Front-End (no code)
+                               OR assign address space on the stack. Code needs to be written for this
+        2) Generate code for assignment node (if there is an assignment)
+        3) Load value of assignment into register (Or on stack.)
+        :param bool c_comment: Do we write Comments in MIPS Code. Comments consist of psuedo (C) code of what we try to
+                               achieve with the mips instruction
+        :return string: The written code as a string
+        """
+
+        # PreProcessing
+        # Get the attribute from the symbol table. We will use the symbol table to keep track of where we find
+        # variables
+        attribute = self._parent_node.get_attribute(self.id)
+        # The return string
+        return_string = ""
+
+        # Step 1:
+        # Check if we can use a register
+        if self._parent_node.mips_register_available():
+            attribute.mips_is_register = True
+            attribute.mips_is_register = self._parent_node.mips_get_available_register()
+        # If not make room on the stack
+        else:
+            # Make room on the stack (both front end and in MIPS)
+            current_addr = self._parent_node
+            # TODO More declaration Code
+        return return_string
+
+    def mips_stack_space_needed(self) -> int:
+        """
+        Return's the value of how much stack space this variable needs.
+        :return: The stack space size.
+        """
+
+        return self._type_stack[-1].mips_stack_size

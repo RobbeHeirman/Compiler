@@ -16,7 +16,7 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
         super().__init__(parent_node, ctx)
 
         self._type_modifier_node = None  # Start of the type modifier subtree this can be *, [], ()
-        self._type_stack = []
+        self._type_stack: type_specifier.TypeStack = []
 
     # AST-generation
     # ==================================================================================================================

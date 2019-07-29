@@ -78,14 +78,9 @@ class ReturnNode(AbstractNode.AbstractNode):
         # Start with commenting
         return_string = self.mips_comment(f'return {self._children[0]}', c_comment)
 
-        # Load the value into $v0 so we can return
+        # Load the value into $v0 and jump to the return label
         if isinstance(self._children[0], ConstantExpressionNode.ConstantExpressionNode):
             child: ConstantExpressionNode.ConstantExpressionNode = self._children[0]
             return_string += f'{self.code_indent_string()}li $v0 {child.mips_value}\n'
-
-        # We can free up stack memory again since we are going out of scope
-        if self._parent_node.mips_get_stack_pointer():
-            return_string += f'{self.code_indent_string()}sub $sp $sp {self._parent_node.mips_get_stack_pointer()}\n'
-        # Now we need to jump back to the scope of the caller
-        return_string += f"{self.code_indent_string()}jr $ra\n"
+            return_string += f'{self.code_indent_string()}j return\n'
         return return_string

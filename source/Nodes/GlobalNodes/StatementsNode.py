@@ -24,5 +24,13 @@ class StatementsNode(AbstractNode.AbstractNode):
         return self._parent_node.get_return_type()
 
     # Mips-Code
+    # ==================================================================================================================
     def mips_get_stack_pointer(self):
         return self._parent_node.mips_stack_pointer
+
+    def mips_stack_space_needed(self):
+        """
+        Return's The total mips stack size needed
+        :return: Stack space needed by all children
+        """
+        return sum(child.mips_stack_space_needed() for child in self._children)

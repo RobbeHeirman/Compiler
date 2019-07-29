@@ -81,7 +81,7 @@ class TypeSpecifier:
         """
 
         _MIPS_SIZES = {
-            "char": 1,
+            "char": 4,  # Actually this is 1 but addressing in 4 contigious bytes
             "int": 4,
             "float": 4,
             "*": 4
