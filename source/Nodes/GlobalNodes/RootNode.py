@@ -71,14 +71,19 @@ class RootNode(ScopedNode.ScopedNode):
     # ==================================================================================================================
 
     def generate_mips(self, c_comment: bool = True):
+        ret = ".text\n"
+        ret += "#" * 72
+        ret += "\n"
         # We always start by calling main
-        ret = "jal main\n"
+        ret += "jal main # .enter is not supported by mars, using this to emulate behaviour\n"
 
         # Now we cleanly exit We will return the return of main as exit code
         # Load 17 in to v0 10 = exit (end of program)
+        ret += "\n# .exit is also not supported so use next part to emulate behaviour\n"
         ret += "move $a0 $v0  # We move the return value of main for syscall\n"
         ret += "li $v0, 17 # System call code for end of program\n"
         ret += "syscall\n\n"
 
         ret += super().generate_mips()
+        ret += "#" * 72
         return ret
