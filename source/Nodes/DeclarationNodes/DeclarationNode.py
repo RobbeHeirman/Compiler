@@ -170,16 +170,22 @@ class DeclarationNode(TypedNode.TypedNode):
         # The return string
         return_string = ""
 
+        # Step 0: We record the address where it can save it's value anyway
+        attribute.mips_register = self._parent_node.mips_get_available_register()
+        attribute.mips_stack_address = self.mips_stack_pointer
+        self.mips_increase_stack_pointer(self._type_stack[-1].mips_stack_size)
+
         # Step 1:
         # Check if we can use a register
         if self._parent_node.mips_register_available():
             attribute.mips_is_register = True
-            attribute.mips_is_register = self._parent_node.mips_get_available_register()
+
         # If not make room on the stack
         else:
             # Make room on the stack (both front end and in MIPS)
-            current_addr = self._parent_node
-            # TODO More declaration Code
+            attribute.mips_is_register = False
+            return_string += f'addiu $sp, $sp, {self._type_stack[-1].mips_stack_size}'
+
         return return_string
 
     def mips_stack_space_needed(self) -> int:
