@@ -34,3 +34,9 @@ class StatementsNode(AbstractNode.AbstractNode):
         :return: Stack space needed by all children
         """
         return sum(child.mips_stack_space_needed() for child in self._children)
+
+    def mips_assign_register(self):
+        [child.mips_assign_register() for child in self._children]
+
+    def mips_assign_address(self):
+        [child.mips_assign_address() for child in self._children]

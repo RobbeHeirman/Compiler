@@ -12,10 +12,12 @@ import type_specifier
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 import Nodes.GlobalNodes.StatementsNode
 
+from constants import MIPS_REGISTER_SIZE
+
 
 class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
     # The Mips Register ref's. Used for comparing with mips register stack's
-    _LAZY_MIPS_REGISTERS = tuple(f't{i}' for i in reversed(range(10)))
+    _LAZY_MIPS_REGISTERS = tuple(f't{i}' for i in reversed(range(2, 10)))  # Using $t0, $t1 as
     _PRESERVE_MIPS_REGISTERS = tuple(f's{i}' for i in reversed(range(8)))
 
     # Built-ins
@@ -147,21 +149,29 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
         # 3) Now we need to notify the front end where we can find (and where to store in case of subroutine call)
         #    Argument's. We let the parameter node handle that. It has more complete information about param's.
-        #    We Allocate some memory of the argument's on the stack.
+        #    We Allocate some memory for reg argument's on the stack.
         extra_frame_size = self._param_list_node.mips_assign_params_to_mem(frame_size)
         frame_size += extra_frame_size
 
         # Now we know the frame size so we can make room on the stack
         # (subiu = subtract immediate unsigned = supported by Mars MIPS)
-        ret += f'{self.code_indent_string()}subiu $s1, $s1, {frame_size}\n'
+        ret += f'{self.code_indent_string()}subiu $sp, $sp, {frame_size}\n'
+
+        # Assign addresses to the declared variable's if available.
+        self._expression_node.mips_assign_register()
+
+        # Store the register's $s0 - $s7 to memory
+        load_preserved_regs_from = self.mips_stack_pointer
+        ret += self.mips_store_preserved_registers()
 
         # 4 Fill in the function body
         ret += f"{self.code_indent_string()}".join([child.generate_mips(c_comment) for child in self._children[1:]])
         # Some awesome code here
 
-        # 5 Make a Return label, free up the stack and jump back to caller
+        # 5 Make a Return label, free up the stack, set s register's back in place and jump back to caller
         ret += f'\n{self.code_indent_string()}return:\n'
         self.increase_code_indent()
+        ret += self.mips_load_preserved_registers(load_preserved_regs_from)
         ret += f'{self.code_indent_string()}addiu $sp, $sp, {frame_size}\n'
         ret += f"{self.code_indent_string()}jr $ra\n"
         self.decrease_code_indent()
@@ -179,9 +189,39 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         Return's a available register. Start's with the register the function doesn't need to preserve
         :return string: A register string
         """
+        return self._preserve_mips_registers_available.pop() if self._preserve_mips_registers_available else \
+            self._lazy_mips_registers_available.pop()
 
-        return self._lazy_mips_registers_available.pop() if self._lazy_mips_registers_available else \
-            self._preserve_mips_registers_available.pop()
+    def mips_store_preserved_registers(self) -> str:
+        """
+        Returns a string of store operations for the preservation registers
+        :return string: mips string with store to RAM operations.
+        """
+        # Get the list of register's we need to save on the stack
+        store = list(set(self.__class__._PRESERVE_MIPS_REGISTERS) - set(self._preserve_mips_registers_available))
+        store.sort()
+        ret = self.code_indent_string() + f'\n{self.code_indent_string()}' \
+            .join([f'sw ${reg},'f' {index * MIPS_REGISTER_SIZE + self.mips_stack_pointer}($sp)'
+                   for index, reg in enumerate(store)])
+
+        ret += '\n'
+        self.mips_increase_stack_pointer(MIPS_REGISTER_SIZE * len(store))
+        return ret
+
+    def mips_load_preserved_registers(self, load_from) -> str:
+        """
+        Returns a string of load operation's to load the s register's back into their register place
+        :return:
+        """
+
+        load = list(set(self.__class__._PRESERVE_MIPS_REGISTERS) - set(self._preserve_mips_registers_available))
+        load.sort()
+        ret = self.code_indent_string() + f'\n{self.code_indent_string()}' \
+            .join([f'lw ${reg}, {index * MIPS_REGISTER_SIZE + load_from}($sp)'
+                   for index, reg in enumerate(load)])
+
+        ret += "\n"
+        return ret
 
     # Meta Code Generation
     # ==================================================================================================================

@@ -275,6 +275,12 @@ class AbstractNode(abc.ABC):
     def mips_stack_space_needed(self) -> int:
         return 0
 
+    def mips_assign_register(self):
+        pass
+
+    def mips_assign_address(self):
+        pass
+
     # Meta Code Generation
     # ==================================================================================================================
     @property

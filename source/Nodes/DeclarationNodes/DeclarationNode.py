@@ -158,11 +158,18 @@ class DeclarationNode(TypedNode.TypedNode):
                                OR assign address space on the stack. Code needs to be written for this
         2) Generate code for assignment node (if there is an assignment)
         3) Load value of assignment into register (Or on stack.)
-        :param bool c_comment: Do we write Comments in MIPS Code. Comments consist of psuedo (C) code of what we try to
+        :param bool c_comment: Do we write Comments in MIPS Code. Comments consist of pseudo (C) code of what we try to
                                achieve with the mips instruction
         :return string: The written code as a string
         """
 
+        return ""
+
+    def mips_assign_register(self):
+        """
+        Tells the front end where to store the different variable's.
+
+        """
         # PreProcessing
         # Get the attribute from the symbol table. We will use the symbol table to keep track of where we find
         # variables
@@ -170,28 +177,24 @@ class DeclarationNode(TypedNode.TypedNode):
         # The return string
         return_string = ""
 
-        # Step 0: We record the address where it can save it's value anyway
-        attribute.mips_register = self._parent_node.mips_get_available_register()
-        attribute.mips_stack_address = self.mips_stack_pointer
-        self.mips_increase_stack_pointer(self._type_stack[-1].mips_stack_size)
-
         # Step 1:
         # Check if we can use a register
         if self._parent_node.mips_register_available():
             attribute.mips_is_register = True
+            attribute.mips_register = self._parent_node.mips_get_available_register()
 
-        # If not make room on the stack
         else:
-            # Make room on the stack (both front end and in MIPS)
             attribute.mips_is_register = False
-            return_string += f'addiu $sp, $sp, {self._type_stack[-1].mips_stack_size}'
 
-        return return_string
+    def mips_assign_address(self):
+
+        attribute = self._parent_node.get_attribute(self.id)
+        attribute.mips_stack_address = self.mips_stack_pointer
+        self.mips_increase_stack_pointer(self._type_stack[-1].mips_stack_size)
 
     def mips_stack_space_needed(self) -> int:
         """
         Return's the value of how much stack space this variable needs.
         :return: The stack space size.
         """
-
         return self._type_stack[-1].mips_stack_size
