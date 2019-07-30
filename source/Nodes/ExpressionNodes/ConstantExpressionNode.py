@@ -53,6 +53,8 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
         return str(self.constant)
 
+    # Mips Code-generation
+    # ==================================================================================================================
     @property
     def mips_value(self) -> str:
         return self.llvm_value
@@ -66,3 +68,7 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
         return LlvmCode.llvm_store_instruction_c(self.llvm_value, self._type_stack, str(store_addr),
                                                  self._type_stack, self.code_indent_string())
+
+    def mips_store_in_register(self, addr: str) -> str:
+
+        return f'{self.code_indent_string()}li ${addr}, {self.mips_value}\n'

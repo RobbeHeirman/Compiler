@@ -157,3 +157,18 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     @property
     def llvm_value(self):
         return f'%{self._place_of_value}'
+
+    # Mips code
+    # ==================================================================================================================
+    def mips_store_in_register(self, reg: str):
+
+        attribute = self._parent_node.get_attribute(self.id)
+        ret_str = self.code_indent_string()
+        if attribute.mips_is_register:
+            ret_str += f"move ${reg}, ${attribute.mips_register}"
+
+        else:
+            ret_str += f'lw ${reg}, {attribute.mips_stack_address}($sp)'
+
+        ret_str += '\n'
+        return ret_str

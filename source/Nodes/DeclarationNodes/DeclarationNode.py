@@ -26,7 +26,6 @@ class DeclarationNode(TypedNode.TypedNode):
     # Type annotations members
 
     _lexeme: str
-
     _BASE_LABEL = "Declaration"
 
     # Built-ins
@@ -35,7 +34,7 @@ class DeclarationNode(TypedNode.TypedNode):
         super().__init__(parent_node, ctx)
 
         self.id = None
-        self._expression_node = None
+        self._expression_node: ExpressionNode.ExpressionNode = None
         # Error message info
 
     # AST Visuals
@@ -152,17 +151,29 @@ class DeclarationNode(TypedNode.TypedNode):
     # MIPS Generation
     # ==================================================================================================================
     def generate_mips(self, c_comment: bool = True) -> str:
+
         """
         Generates MIPS Code. Steps:
-        1) Declaration itself: Assign a register to variable. Record in Front-End (no code)
-                               OR assign address space on the stack. Code needs to be written for this
-        2) Generate code for assignment node (if there is an assignment)
+        1) Generate code for assignment node (if there is an assignment)
         3) Load value of assignment into register (Or on stack.)
         :param bool c_comment: Do we write Comments in MIPS Code. Comments consist of pseudo (C) code of what we try to
                                achieve with the mips instruction
         :return string: The written code as a string
         """
 
+        attribute = self._parent_node.get_attribute(self.id)
+
+        if self._expression_node:
+            # Variable has assigned register.
+            if attribute.mips_is_register:
+                return self._expression_node.mips_store_in_register(attribute.mips_register)
+
+            else:
+                # We use t0
+                ret = self._expression_node.mips_store_in_register('t0')
+                # Store value on address in stack after
+                ret += self.code_indent_string() + f'sw $t0, {attribute.mips_stack_address}($sp)\n'
+                return ret
         return ""
 
     def mips_assign_register(self):

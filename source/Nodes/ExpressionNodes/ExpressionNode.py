@@ -96,3 +96,20 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
             return self._type_modifier_node.generate_type_modifier_stack()
 
         return []
+
+    def generate_llvm_store(self, store_addr: int) -> str:
+        """
+        Store llvm value into store address
+        :param int store_addr: The address to store to
+        :return str : String to store to.
+        """
+
+    # Mips Code
+    # ==================================================================================================================
+
+    def mips_store_in_register(self, reg: str) -> str:
+        """
+        Store's the value of the expression into given register.
+        :param reg: The register to store to
+        :return: a mips code string resolving the store of the expression.
+        """
