@@ -17,7 +17,7 @@ from constants import MIPS_REGISTER_SIZE
 
 class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.ScopedNode):
     # The Mips Register ref's. Used for comparing with mips register stack's
-    _LAZY_MIPS_REGISTERS = tuple(f't{i}' for i in reversed(range(2, 10)))  # Using $t0, $t1 as
+    _LAZY_MIPS_REGISTERS = tuple(f't{i}' for i in reversed(range(2, 10)))  # Using $t0, $t1 as temporal work addrs
     _PRESERVE_MIPS_REGISTERS = tuple(f's{i}' for i in reversed(range(8)))
 
     # Built-ins
