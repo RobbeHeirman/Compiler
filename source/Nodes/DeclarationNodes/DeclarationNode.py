@@ -162,7 +162,9 @@ class DeclarationNode(TypedNode.TypedNode):
         """
 
         attribute = self._parent_node.get_attribute(self.id)
-        ret = ""
+        ret = "\n"
+        expression_c = f' = {self._expression_node}' if self._expression_node else ''
+        ret += self.mips_comment(f'{self._type_stack} {self.id}{expression_c}', c_comment)
         mips_addr = "$t0"
         if self._expression_node:
             # Variable has assigned register.

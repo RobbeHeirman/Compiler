@@ -281,6 +281,10 @@ class AbstractNode(abc.ABC):
     def mips_assign_address(self):
         pass
 
+    @property
+    def mips_function_base_label(self) -> str:
+        return self._parent_node.mips_function_base_label
+
     # Meta Code Generation
     # ==================================================================================================================
     @property

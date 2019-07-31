@@ -138,10 +138,10 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         :return string: A string of MipsCode. Generated of this function definition.
         """
         # 0 Starting comment's. = A pseudo code (a bit like C) that shows witch statement we are generating
-        ret = self.comment_code(c_comment)
+        ret = '\n\n' + self.comment_code(c_comment)
 
-        # 1 Label the start of the function
-        ret += f'{self.id}:\n'
+        # 1 Label the start of the function. We add a . to prevent name clashes with compiler defined labels.
+        ret += f'.{self.id}:\n'
         self.increase_code_indent()
 
         # 2 Make room on the stack for local variable's
@@ -150,20 +150,20 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # 3) Now we need to notify the front end where we can find (and where to store in case of subroutine call)
         #    Argument's. We let the parameter node handle that. It has more complete information about param's.
         #    We Allocate some memory for reg argument's on the stack.
-        extra_frame_size = self._param_list_node.mips_assign_params_to_mem(frame_size)
-        frame_size += extra_frame_size
-
-        # Now we know the frame size so we can make room on the stack
-        # (subiu = subtract immediate unsigned = supported by Mars MIPS)
-        ret += f'{self.code_indent_string()}subiu $sp, $sp, {frame_size}\n'
+        self._param_list_node.mips_assign_params_to_mem(frame_size)
 
         # Assign addresses to the declared variable's if available.
         self._expression_node.mips_assign_register()
 
         # Store the register's $s0 - $s7 to memory
         load_preserved_regs_from = self.mips_stack_pointer
-        ret += self.mips_store_preserved_registers()
-
+        temp_ret = self.mips_store_preserved_registers()
+        # Now we know the frame size so we can make room on the stack
+        # (subiu = subtract immediate unsigned = supported by Mars MIPS)
+        increase_stack_with = frame_size + self.mips_stack_pointer
+        ret += f'{self.code_indent_string()}subiu $sp, $sp, {increase_stack_with}\n'
+        ret += self._param_list_node.mips_store_arguments()
+        ret += temp_ret
         # Give them some addresses aswell
         self._expression_node.mips_assign_address()
         # 4 Fill in the function body
@@ -171,11 +171,12 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # Some awesome code here
 
         # 5 Make a Return label, free up the stack, set s register's back in place and jump back to caller
-        ret += f'\n{self.code_indent_string()}return:\n'
+        ret += f'\n{self.code_indent_string()}{self.mips_function_base_label}_return:'
         self.increase_code_indent()
         ret += self.mips_load_preserved_registers(load_preserved_regs_from)
-        ret += f'{self.code_indent_string()}addiu $sp, $sp, {frame_size}\n'
+        ret += f'{self.code_indent_string()}addiu $sp, $sp, {increase_stack_with}\n'
         ret += f"{self.code_indent_string()}jr $ra\n"
+        self.decrease_code_indent()
         self.decrease_code_indent()
         return ret
 
@@ -225,6 +226,9 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         ret += "\n"
         return ret
 
+    @property
+    def mips_function_base_label(self) -> str:
+        return self.id
     # Meta Code Generation
     # ==================================================================================================================
     def comment_code(self, c_comment: bool = True, mips=True):
@@ -237,7 +241,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # Code for a function Def in LLVM: Example: LLVM: Define i32 @main(int) {...} <=> C: int main(int){...}
         # Commenting...
         function_signature = self._param_list_node.generate_llvm_function_signature()
-        return_type = f'{"".join([child.llvm_type for child in self._type_stack[:-1]])} '
+        return_type = f'{"".join([str(child) for child in self._type_stack[:-1]])} '
 
         return self.mips_comment(f'{return_type} {self.id}({function_signature}){{...}}', c_comment) if mips else \
             self.llvm_comment(f'{return_type} {self.id}({function_signature}){{...}}', c_comment)

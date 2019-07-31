@@ -81,5 +81,5 @@ class ReturnNode(AbstractNode.AbstractNode):
         # Load the value into $v0 and jump to the return label
         child: ExpressionNode.ExpressionNode = self._children[0]
         return_string += child.mips_store_in_register('v0')
-        return_string += f'{self.code_indent_string()}j return\n'
+        return_string += f'{self.code_indent_string()}j {self._parent_node.mips_function_base_label}_return\n'
         return return_string

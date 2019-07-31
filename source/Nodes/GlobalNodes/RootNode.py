@@ -75,7 +75,7 @@ class RootNode(ScopedNode.ScopedNode):
         ret += "#" * 72
         ret += "\n"
         # We always start by calling main
-        ret += "jal main # .enter is not supported by mars, using this to emulate behaviour\n"
+        ret += "jal .main # .enter is not supported by mars, using this to emulate behaviour\n"
 
         # Now we cleanly exit We will return the return of main as exit code
         # Load 17 in to v0 10 = exit (end of program)

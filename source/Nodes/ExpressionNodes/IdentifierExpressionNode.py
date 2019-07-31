@@ -27,7 +27,8 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         self._place_of_value: Union[int, str] = self.id  # The register the current value of the identifier is placed
 
     def __str__(self):
-        return f'{self.id}{[child for child in self._type_stack]}'
+        return f'{self.id}{[child for child in self._type_stack]} Modified: {[child for child in
+                                                                              self._generate_type_operator_stack()]}'
 
     # AST visuals
     # ==================================================================================================================
@@ -164,15 +165,42 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
     # Mips code
     # ==================================================================================================================
-    def mips_store_in_register(self, reg: str):
+    def mips_store_in_register(self, reg: str) -> str:
+        """
+        Store the value of the identifier Expression in target register.
+        We also need to take in account some operators are applied
 
+        :param str reg: the target register
+        :return str: A Mips Code string
+        """
+
+        # We need to find where the value of this variable is located
         attribute = self._parent_node.get_attribute(self.id)
+        ret = self.code_indent_string()
         ret_str = self.code_indent_string()
         if attribute.mips_is_register:
-            ret_str += f"move ${reg}, ${attribute.mips_register}"
-
+            ret_str += f"move ${reg}, ${attribute.mips_register}\n"
         else:
-            ret_str += f'lw ${reg}, {attribute.mips_stack_address}($sp)'
+            ret_str += f'lw ${reg}, {attribute.mips_stack_address}($sp)\n'
 
-        ret_str += '\n'
+        stack = self._generate_type_operator_stack()
+        while stack:
+            element = stack.pop()
+
+            # Need to find the value at address.
+            if element == type_specifier.TypeSpecifier.POINTER:
+                ret_str += f'{self.code_indent_string()}lw ${reg}, (${reg})\n'
+
+            # Need to load in the address of where to find the val
+            elif element == type_specifier.TypeSpecifier.ADDRESS:
+                ret_str += f'{self.code_indent_string()}addiu ${reg}, $sp, {attribute.mips_stack_address}\n'
+
+            elif element == type_specifier.TypeSpecifier.FUNCTION:
+
+                # For now the compiler always store's it's value's into registers.
+                param_node = self._get_param_node()
+                ret_str += param_node.mips_load_arguments()
+                ret_str += f'{self.code_indent_string()}jal .{self.id}\n'
+
+
         return ret_str
