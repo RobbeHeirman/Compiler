@@ -164,6 +164,8 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         load_preserved_regs_from = self.mips_stack_pointer
         ret += self.mips_store_preserved_registers()
 
+        # Give them some addresses aswell
+        self._expression_node.mips_assign_address()
         # 4 Fill in the function body
         ret += f"{self.code_indent_string()}".join([child.generate_mips(c_comment) for child in self._children[1:]])
         # Some awesome code here

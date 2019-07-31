@@ -82,3 +82,9 @@ class MipsFunctionTest(MipsAbstractTest):
 
     def test_return_constant(self):
         return self._build_and_run_mips("return_constant.c", 42)
+
+    def test_return_variable(self):
+        return self._build_and_run_mips("return_variable.c", 44)
+
+    def test_return_stored_variable(self):
+        return self._build_and_run_mips("return_stored_var.c", 48)

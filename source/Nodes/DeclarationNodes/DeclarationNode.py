@@ -162,19 +162,21 @@ class DeclarationNode(TypedNode.TypedNode):
         """
 
         attribute = self._parent_node.get_attribute(self.id)
-
+        ret = ""
+        mips_addr = "$t0"
         if self._expression_node:
             # Variable has assigned register.
             if attribute.mips_is_register:
-                return self._expression_node.mips_store_in_register(attribute.mips_register)
-
+                ret += self._expression_node.mips_store_in_register(attribute.mips_register)
+                mips_addr = attribute.mips_register
             else:
                 # We use t0
                 ret = self._expression_node.mips_store_in_register('t0')
-                # Store value on address in stack after
-                ret += self.code_indent_string() + f'sw $t0, {attribute.mips_stack_address}($sp)\n'
-                return ret
-        return ""
+
+            # Store value on address in stack after
+            ret += self.code_indent_string() + f'sw ${mips_addr}, {attribute.mips_stack_address}($sp)\n'
+
+        return ret
 
     def mips_assign_register(self):
         """
@@ -198,10 +200,9 @@ class DeclarationNode(TypedNode.TypedNode):
             attribute.mips_is_register = False
 
     def mips_assign_address(self):
-
         attribute = self._parent_node.get_attribute(self.id)
         attribute.mips_stack_address = self.mips_stack_pointer
-        self.mips_increase_stack_pointer(self._type_stack[-1].mips_stack_size)
+        self._parent_node.mips_increase_stack_pointer(self._type_stack[-1].mips_stack_size)
 
     def mips_stack_space_needed(self) -> int:
         """

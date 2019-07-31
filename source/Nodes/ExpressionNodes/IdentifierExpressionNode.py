@@ -85,15 +85,15 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         self._place_of_value = reg_load_from if reg_load_from else self._place_of_value
 
         # The first el of the operator stack is the implicit conversion from L to R value
+
         stack: type_specifier.TypeStack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
         stack += self._generate_type_operator_stack()
-
-        # Currently the different we can handle are * = Dereference, & = Take Address of, (params) = A function call
+        type_stack = list(self._parent_node.get_attribute(self.id).operator_stack)
+        type_stack.insert(1, type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER))
         ret_string = ''
+
         while stack:
-
             element: type_specifier.TypeSpecifier = stack.pop()
-
             if element == type_specifier.TypeSpecifier.FUNCTION:
 
                 # Function calls are trickier we need to have the call argument's in place we do that in the next block
@@ -111,6 +111,8 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                     children_their_strings.append(child_string)
                 call_string = '(' + ', '.join(children_their_strings) + ')'
 
+                stack.pop()
+
                 # Now for the actual call we will load the call value into a new temporal register
                 self.increment_register_index()
                 self._place_of_value = self.register_index
@@ -119,11 +121,13 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 ret_string += f' @{self.id}{call_string}\n'
 
             elif element == type_specifier.TypeSpecifier.POINTER:
-                call_global = True if self.is_in_global_table(str(self._place_of_value)) else False
+                type_stack.pop()
+                stack_string = "".join([child.llvm_type for child in type_stack])
+                call_global = '@' if self.is_in_global_table(str(self._place_of_value)) else '%'
                 self.increment_register_index()
-                ret_string += LlvmCode.llvm_load_instruction(self._place_of_value, self._type_stack,  # Load From
-                                                             str(self.register_index), self._type_stack,  # To
-                                                             call_global, self.code_indent_string())  # Metadata
+                ret_string += f'{self.code_indent_string()} %{self.register_index} = load '
+                ret_string += f'{stack_string}, '
+                ret_string += f'{stack_string}* {call_global}{self._place_of_value}\n'
                 self._place_of_value = self.register_index
 
             elif element == type_specifier.TypeSpecifier.ADDRESS:
@@ -131,7 +135,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 assert (item == type_specifier.TypeSpecifier.POINTER), f"We dereference something else then addr " \
                     f"type This: {item} "
 
-            return ret_string
+        return ret_string
 
     def generate_llvm_store(self, addr: str) -> str:
         """

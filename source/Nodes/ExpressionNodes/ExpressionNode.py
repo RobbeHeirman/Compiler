@@ -91,7 +91,6 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         :return List[TypeSpecifier]: A list of type specifier if this expression had typeModifiers. Else an
                                      Empty list.
         """
-
         if self._type_modifier_node:
             return self._type_modifier_node.generate_type_modifier_stack()
 
