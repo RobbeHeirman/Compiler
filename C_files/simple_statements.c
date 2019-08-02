@@ -1,10 +1,7 @@
 int main(){
-
-    int a = 12;
-    int b = 44;
-    int c = 88;
-
-    c = a =  b;
-
-    return a;
+   int b = 1000;
+   int * a = &b;
+   *a = 1000;
+   a = int c;
+   return 12;
 }
