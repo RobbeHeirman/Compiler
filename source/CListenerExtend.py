@@ -12,7 +12,6 @@ import Nodes.ConditionalNodes.ConditionNode as ConditionNode
 import Nodes.ConditionalNodes.IfElseNode as IfElseNode
 import Nodes.DeclarationNodes.IncludeStatementNode as IncludeStatementNode
 import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
-import Nodes.ExpressionNodes.AssignmentNode as AssignmentNode
 import Nodes.ExpressionNodes.ConstantExpressionNode as ConstantExpressionNode
 import Nodes.DeclarationNodes.DeclListNode as DeclListNode
 import Nodes.DeclarationNodes.DeclarationTypeModifierNode as TypeModifierNode
@@ -43,6 +42,8 @@ class CListenerExtend(CListener):
     _ast: AST.AST
     _parent_node: AbstractNode.AbstractNode
 
+    # Build-ins
+    # ==================================================================================================================
     def __init__(self, filename: str, string_stream=None):
         # Some info about the traversing will be recorded
 
@@ -55,14 +56,20 @@ class CListenerExtend(CListener):
         self._func_def_node = None
         self._prev_node = None
 
+    # Properties
+    # ==================================================================================================================
     @property
     def ast(self):
         return self._ast
 
+    # Global Scope
+    # ==================================================================================================================
     def enterRoot(self, ctx: CParser.RootContext):
         self._ast.root = RootNode.RootNode(ctx)
         self._parent_node = self._ast.root
 
+    # Local Scope
+    # ==================================================================================================================
     def enterStatements(self, ctx: CParser.StatementContext):
         """
         This is the root of our C program. It will make a root node
@@ -79,6 +86,8 @@ class CListenerExtend(CListener):
         self._scope_counter -= 1
         self._parent_node = self._parent_node.parent_node
 
+    # Functions
+    # ==================================================================================================================
     def enterFunc_def(self, ctx: CParser.Func_defContext):
         func_node = FuncDefNode.FuncDefNode(self._parent_node, ctx)
         self._parent_node.add_child(func_node)
@@ -126,7 +135,7 @@ class CListenerExtend(CListener):
         self._parent_node = self._parent_node.parent_node
 
     # Simple Declarations
-    # ======================================================================================================================
+    # ==================================================================================================================
     def enterDecl_list(self, ctx: CParser.Decl_listContext):
         """
         Entering decl list example : int, a, b = 10, c..;
@@ -139,7 +148,7 @@ class CListenerExtend(CListener):
 
     def exitDecl_list(self, ctx: CParser.Decl_listContext):
 
-        self._parent_node._cleanup()
+        self._parent_node.cleanup()
         self._parent_node = self._parent_node.parent_node
 
     def enterSimple_declaration(self, ctx: CParser.Simple_declarationContext):
@@ -230,25 +239,6 @@ class CListenerExtend(CListener):
         self._parent_node = node
 
     def exitArray_init(self, ctx: CParser.Array_initContext):
-        self._parent_node = self._parent_node.parent_node
-
-    def enterAssignment(self, ctx: CParser.AssignmentContext):
-        """
-        Handle's assignment statement's. We enter the assignment statement so we just make the node.
-        :param ctx: ParserContextNode
-        :return:
-        """
-        assignment_node = AssignmentNode.AssignmentNode(self._parent_node, self._filename, ctx)
-        self._parent_node.add_child(assignment_node)
-        self._parent_node = assignment_node
-
-    def exitAssignment(self, ctx: CParser.AssignmentContext):
-        """
-        Finishes the assignment. Expressions RHS & LHS have been evaluated. Now we just need to
-        assign the value.
-        :param ctx:
-        :return:
-        """
         self._parent_node = self._parent_node.parent_node
 
     def enterLhs(self, ctx: CParser.LhsContext):

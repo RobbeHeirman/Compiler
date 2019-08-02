@@ -57,7 +57,13 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
     # ==================================================================================================================
     @property
     def mips_value(self) -> str:
-        return self.llvm_value
+        if self._type_stack[0] == type_specifier.TypeSpecifier.CHAR:
+            return str(ord(str(self.constant)[1]))
+
+        elif self._type_stack[0] == type_specifier.TypeSpecifier.FLOAT:
+            return hex(struct.unpack('<I', struct.pack('<f', float(self.constant)))[0])
+
+        return str(self.constant)
 
     def generate_llvm_store(self, store_addr: str) -> str:
         """

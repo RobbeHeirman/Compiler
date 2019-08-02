@@ -6,6 +6,8 @@ Academic Year: 2018-2019
 
 import Nodes.AbstractNodes.ScopedNode as ScopedNode
 import SymbolTable
+from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
+from Nodes.GlobalNodes.GlobalDeclarationNode import GlobalDeclarationNode
 
 
 class RootNode(ScopedNode.ScopedNode):
@@ -71,8 +73,22 @@ class RootNode(ScopedNode.ScopedNode):
     # ==================================================================================================================
 
     def generate_mips(self, c_comment: bool = True):
-        ret = ".text\n"
-        ret += "#" * 72
+        ret = "#" * 72 + "\n"
+        ret += ".data\n"
+
+        data_ret = ""
+        text_ret = ""
+        for child in self._children:
+            if isinstance(child, FuncDefNode):
+                text_ret += child.generate_mips(c_comment)
+
+            else:
+
+                data_ret += child.generate_mips(c_comment)
+
+        ret += data_ret
+        ret += "#" * 72 + "\n"
+        ret += ".text\n"
         ret += "\n"
         # We always start by calling main
         ret += "jal .main # .enter is not supported by mars, using this to emulate behaviour\n"
@@ -84,6 +100,6 @@ class RootNode(ScopedNode.ScopedNode):
         ret += "li $v0, 17 # System call code for end of program\n"
         ret += "syscall\n\n"
 
-        ret += super().generate_mips()
+        ret += text_ret
         ret += "#" * 72
         return ret

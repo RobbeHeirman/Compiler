@@ -12,6 +12,8 @@ import LlvmCode
 import messages
 import type_specifier
 
+from constants import MIPS_REGISTER_SIZE
+
 
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     # TypeAnnotations
@@ -27,8 +29,8 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         self._place_of_value: Union[int, str] = self.id  # The register the current value of the identifier is placed
 
     def __str__(self):
-        return f'{self.id}{[child for child in self._type_stack]} Modified: {[child for child in
-                                                                              self._generate_type_operator_stack()]}'
+        return f'{self.id}{[child for child in self._type_stack]} Modified: ' \
+            f'{[child for child in self._generate_type_operator_stack()]}'
 
     # AST visuals
     # ==================================================================================================================
@@ -103,7 +105,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
                 # Next up we make a string for the parameter call
                 child_list: List[ExpressionNode] = param_node.get_children()
-
                 # the children know where there values are loaded into in child.llv_value
                 children_their_strings = []
                 for child in child_list:
@@ -176,14 +177,16 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         # We need to find where the value of this variable is located
         attribute = self._parent_node.get_attribute(self.id)
-        ret = self.code_indent_string()
-        ret_str = self.code_indent_string()
-        if attribute.mips_is_register:
-            ret_str += f"move ${reg}, ${attribute.mips_register}\n"
-        else:
-            ret_str += f'lw ${reg}, {attribute.mips_stack_address}($sp)\n'
-
+        ret_str = ""
         stack = self._generate_type_operator_stack()
+        if not stack or stack[-1] != type_specifier.TypeSpecifier.FUNCTION:
+
+            ret_str += self.code_indent_string()
+            if attribute.mips_is_register:
+                ret_str += f"move ${reg}, ${attribute.mips_register}\n"
+            else:
+                ret_str += f'lw ${reg}, {attribute.mips_stack_address}($sp)\n'
+
         while stack:
             element = stack.pop()
 
@@ -196,11 +199,19 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 ret_str += f'{self.code_indent_string()}addiu ${reg}, $sp, {attribute.mips_stack_address}\n'
 
             elif element == type_specifier.TypeSpecifier.FUNCTION:
-
-                # For now the compiler always store's it's value's into registers.
+                # We need to save $ra
+                ret_str += f'{self.code_indent_string()}subiu $sp, $sp, {MIPS_REGISTER_SIZE} # Making room for link \n'
+                ret_str += f'{self.code_indent_string()}sw $ra, ($sp) # Storing link\n'
+                # Set up the argument's in both register and on stack
                 param_node = self._get_param_node()
                 ret_str += param_node.mips_load_arguments()
                 ret_str += f'{self.code_indent_string()}jal .{self.id}\n'
 
-
+                # Free up stack that we used for arguments
+                ret_str += param_node.mips_free_stack_of_arguments()
+                # Restore link
+                ret_str += f'{self.code_indent_string()}lw $ra, ($sp) # Restoring link\n'
+                ret_str += f'{self.code_indent_string()}addiu $sp, $sp, {MIPS_REGISTER_SIZE}\n'
+                # move the return value in to assigned register
+                ret_str += f'{self.code_indent_string()}move ${reg}, $v0\n'
         return ret_str

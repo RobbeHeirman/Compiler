@@ -16,8 +16,8 @@ grammar C;
     ;
 
 statement
-    : assignment
-    | decl_list
+
+    : decl_list
     | func_def
     | ret_statement SEMICOLON
     | selection_statements
@@ -81,9 +81,6 @@ parameter_list
 param
     : base_type declarator
     ;
-assignment // a = 4;, int b = a;
-    : lhs EQ expression SEMICOLON
-    ;
 
 lhs // L value nodes
     : lhs expression_postfix
@@ -91,17 +88,28 @@ lhs // L value nodes
     | id_expression
     ;
 
+
 expression // Possible R values
+    // Constants and identifier's have highes precedence
     : constant # ignore_expression
-    | expression expression_postfix # fix_expression
-    | expression_prefix expression  # fix_expression
     | id_expression # ignore_expression
     | SUB expression # ignore_expression
+
+    // Followed by their modifier's
+    | expression expression_postfix # fix_expression
+    | expression_prefix expression  # fix_expression
+
+    // Followed by ( expr )
     | LPARANT expression RPARANT # ignore_expression
-    | <assoc=right> expression POWER expression # ignore_expression
-    | expression (INCEREMENT | DECREMENT) # ignore_expression
-    | expression (ASTERIX | DIVIDE) expression # ignore_expression
-    | expression (ADD | SUB) expression # ignore_expression
+
+    // Binary operator's in precdence order
+    | <assoc=right> expression POWER expression # binary_operator
+    | expression (INCEREMENT | DECREMENT) # binary_operator
+    | expression (ASTERIX | DIVIDE) expression # binary_operator
+    | expression (ADD | SUB) expression # binary_operator
+
+    // Assignment operator
+    | expression  EQ expression #ignore_expression
     ;
 
 id_expression

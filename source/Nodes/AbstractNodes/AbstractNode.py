@@ -140,7 +140,7 @@ class AbstractNode(abc.ABC):
         """
         return self._parent_node.get_attribute(lexeme)
 
-    def _cleanup(self):
+    def cleanup(self):
         """
         Some nodes need to clean stuff up
         :return:

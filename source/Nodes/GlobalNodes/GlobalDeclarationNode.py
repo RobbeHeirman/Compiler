@@ -22,9 +22,13 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
         type_specifier.TypeSpecifier.FUNCTION: "null"
     }
 
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
 
+    # Semantic-analysis
+    # ==================================================================================================================
     def semantic_analysis(self, messenger: messages.MessageGenerator):
 
         if not self._generate_secondary_types(messenger):
@@ -94,6 +98,8 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
 
         return True
 
+    # Generate llvm
+    # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True) -> str:
 
         val = self._expression_node.llvm_value if self._expression_node else \
@@ -102,4 +108,16 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
         ret = self.llvm_comment(f'{[child.value for child in self._type_stack]} {self.id} = {self._expression_node}',
                                 c_comment)
         ret += LlvmCode.llvm_allocate_instruction_global(self.id, self._type_stack, str(val), self.code_indent_string())
+        return ret
+
+    # Mips Code
+    # ==================================================================================================================
+    def generate_mips(self, c_comment: bool = True):
+
+        val = self._expression_node.mips_value if self._expression_node else 0
+
+        ret = self.mips_comment(f'{[child.value for child in self._type_stack]} {self.id} = {self._expression_node}',
+                                c_comment)
+
+        ret += f' .{self.id}: .word {val}\n'
         return ret

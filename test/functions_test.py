@@ -88,3 +88,15 @@ class MipsFunctionTest(MipsAbstractTest):
 
     def test_return_stored_variable(self):
         return self._build_and_run_mips("return_stored_var.c", 48)
+
+    def test_call_with_constant(self):
+        return self._build_and_run_mips("call_with_constants.c", 454)
+
+    def test_call_with_variables(self):
+        return self._build_and_run_mips("call_with_variables.c", 1000)
+
+    def test_mixed_calls(self):
+        return self._build_and_run_mips("call_mixed.c", 88)
+
+    def test_main_happy_day_regres(self):
+        return self._build_and_run_mips("happy_day_regres.c", 44)

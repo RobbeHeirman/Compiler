@@ -166,12 +166,13 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         ret += temp_ret
         # Give them some addresses aswell
         self._expression_node.mips_assign_address()
+
         # 4 Fill in the function body
         ret += f"{self.code_indent_string()}".join([child.generate_mips(c_comment) for child in self._children[1:]])
         # Some awesome code here
 
         # 5 Make a Return label, free up the stack, set s register's back in place and jump back to caller
-        ret += f'\n{self.code_indent_string()}{self.mips_function_base_label}_return:'
+        ret += f'\n{self.code_indent_string()}{self.mips_function_base_label}_return:\n'
         self.increase_code_indent()
         ret += self.mips_load_preserved_registers(load_preserved_regs_from)
         ret += f'{self.code_indent_string()}addiu $sp, $sp, {increase_stack_with}\n'
