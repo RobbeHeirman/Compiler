@@ -42,3 +42,27 @@ class BinaryExpressionNode(ExpressionNode.ExpressionNode, ABC):
                 raise IndexError("Adding a 3d expression to a binary expression")
 
         super().add_child(child, index)
+
+    # Semantic-analysis
+    # ==================================================================================================================
+
+    def semantic_analysis(self, messenger) -> bool:
+        """
+        Checking the types of bother expression's mainly
+        :param messenger:
+        :return:
+        """
+
+        super().semantic_analysis(messenger)
+
+        if self._left_expression.type_stack != self._right_expression.type_stack:
+            # print(f'{self._left_expression.type_stack} :}')
+            messenger.error_no_conversion_base_types(self._left_expression.type_stack[0],
+                                                     self._right_expression.type_stack[0],
+                                                     self.line,
+                                                     self.column
+                                                     )
+            return False
+
+        self._type_stack = self._left_expression.type_stack  # Expression adapt's type
+        return True

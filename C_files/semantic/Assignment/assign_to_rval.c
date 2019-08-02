@@ -12,6 +12,6 @@ int main(){
     int a;
     &a = 100; // = RValue
 
-    a() = 142 // = Rvalue
+    a() = 142; // = Rvalue
 
 }

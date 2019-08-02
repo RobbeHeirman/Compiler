@@ -16,3 +16,9 @@ class SAssignmentTest(AbstractTest.SAbstractTest):
 
     def test_happy_day(self):
         return self._run_analysis("happy_day.c", 0, 0)
+
+    def test_assign_to_rval(self):
+        return self._run_analysis("assign_to_rval.c", 3)
+
+    def test_conversion(self):
+        return self._run_analysis("conversions.c", 3)

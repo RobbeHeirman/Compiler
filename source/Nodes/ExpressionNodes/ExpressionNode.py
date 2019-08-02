@@ -4,6 +4,7 @@ from typing import List
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.DeclarationTypeModifierNode as TypeModifierNode
 import type_specifier
+from Nodes.FunctionNodes import ParamListNode
 
 
 class ExpressionNode(TypedNode.TypedNode, abc.ABC):
@@ -17,6 +18,8 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         self.type = None
 
         self.l_value = True
+
+        self._place_of_value = 0  # The register the current value of the identifier is placed
 
     # AST-Visuals
     # ==================================================================================================================
@@ -33,7 +36,6 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     def add_child(self, child, index=None):
 
         if isinstance(child, TypeModifierNode.TypeModifierNode):
-            temp = self._type_modifier_node
             self._type_modifier_node = child
 
         super().add_child(child)
@@ -62,6 +64,68 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
     # LLVM-code
     # ==================================================================================================================
+
+    def llvm_load(self, reg_load_from=None, is_l_val: bool = False) -> str:
+        """
+        Will load this variable into a register
+        :return: a string that loaded the value of the var into the register
+        """
+
+        self._place_of_value = reg_load_from if reg_load_from else self._place_of_value
+
+        # The first el of the operator stack is the implicit conversion from L to R value
+
+        stack: type_specifier.TypeStack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
+        stack += self._generate_type_operator_stack()
+        type_stack = list(self._parent_node.get_attribute(self._place_of_value).operator_stack)
+
+        if not is_l_val:
+            type_stack.insert(1, type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER))
+        ret_string = ''
+
+        while stack:
+            element: type_specifier.TypeSpecifier = stack.pop()
+            if element == type_specifier.TypeSpecifier.FUNCTION:
+
+                # Function calls are trickier we need to have the call argument's in place we do that in the next block
+                param_node = self._get_param_node()
+                ret_string += param_node.llvm_load_params()
+
+                # Next up we make a string for the parameter call
+                child_list: List[ExpressionNode] = param_node.get_children()
+                # the children know where there values are loaded into in child.llv_value
+                children_their_strings = []
+                for child in child_list:
+                    child_string = ''.join([type_child.llvm_type for type_child in child.type_stack])
+                    child_string += f' {child.llvm_value}'
+                    children_their_strings.append(child_string)
+                call_string = '(' + ', '.join(children_their_strings) + ')'
+
+                stack.pop()
+
+                # Now for the actual call we will load the call value into a new temporal register
+                self.increment_register_index()
+
+                ret_string += f'{self.code_indent_string()}%{self.register_index} = call'
+                ret_string += f' {"".join([child.llvm_type for child in self._type_stack])}'
+                ret_string += f' @{self._place_of_value}{call_string}\n'
+                self._place_of_value = self.register_index
+            elif element == type_specifier.TypeSpecifier.POINTER:
+                type_stack.pop()
+                stack_string = "".join([child.llvm_type for child in type_stack])
+                call_global = '@' if self.is_in_global_table(str(self._place_of_value)) else '%'
+                self.increment_register_index()
+                ret_string += f'{self.code_indent_string()} %{self.register_index} = load '
+                ret_string += f'{stack_string}, '
+                ret_string += f'{stack_string}* {call_global}{self._place_of_value}\n'
+                self._place_of_value = self.register_index
+
+            elif element == type_specifier.TypeSpecifier.ADDRESS:
+                item = stack.pop()
+                assert (item == type_specifier.TypeSpecifier.POINTER), f"We dereference something else then addr " \
+                    f"type This: {item} "
+
+        return ret_string
 
     @property
     @abc.abstractmethod
@@ -102,6 +166,9 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         :param int store_addr: The address to store to
         :return str : String to store to.
         """
+
+    def _get_param_node(self) -> ParamListNode.ParamListNode:
+        return self._type_modifier_node.get_param_node()
 
     # Mips Code
     # ==================================================================================================================

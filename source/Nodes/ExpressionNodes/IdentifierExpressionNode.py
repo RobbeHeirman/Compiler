@@ -25,6 +25,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
         self.id = ctx.getText()
+
         self._l_value = True  # As it's base form an identifier is an Lvalue
         self._place_of_value: Union[int, str] = self.id  # The register the current value of the identifier is placed
 
@@ -79,66 +80,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         return ret
 
-    def llvm_load(self, reg_load_from=None) -> str:
-        """
-        Will load this variable into a register
-        :return: a string that loaded the value of the var into the register
-        """
-
-        self._place_of_value = reg_load_from if reg_load_from else self._place_of_value
-
-        # The first el of the operator stack is the implicit conversion from L to R value
-
-        stack: type_specifier.TypeStack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
-        stack += self._generate_type_operator_stack()
-        type_stack = list(self._parent_node.get_attribute(self.id).operator_stack)
-        type_stack.insert(1, type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER))
-        ret_string = ''
-
-        while stack:
-            element: type_specifier.TypeSpecifier = stack.pop()
-            if element == type_specifier.TypeSpecifier.FUNCTION:
-
-                # Function calls are trickier we need to have the call argument's in place we do that in the next block
-                param_node = self._get_param_node()
-                ret_string += param_node.llvm_load_params()
-
-                # Next up we make a string for the parameter call
-                child_list: List[ExpressionNode] = param_node.get_children()
-                # the children know where there values are loaded into in child.llv_value
-                children_their_strings = []
-                for child in child_list:
-                    child_string = ''.join([type_child.llvm_type for type_child in child.type_stack])
-                    child_string += f' {child.llvm_value}'
-                    children_their_strings.append(child_string)
-                call_string = '(' + ', '.join(children_their_strings) + ')'
-
-                stack.pop()
-
-                # Now for the actual call we will load the call value into a new temporal register
-                self.increment_register_index()
-                self._place_of_value = self.register_index
-                ret_string += f'{self.code_indent_string()}%{self._place_of_value} = call'
-                ret_string += f' {"".join([child.llvm_type for child in self._type_stack])}'
-                ret_string += f' @{self.id}{call_string}\n'
-
-            elif element == type_specifier.TypeSpecifier.POINTER:
-                type_stack.pop()
-                stack_string = "".join([child.llvm_type for child in type_stack])
-                call_global = '@' if self.is_in_global_table(str(self._place_of_value)) else '%'
-                self.increment_register_index()
-                ret_string += f'{self.code_indent_string()} %{self.register_index} = load '
-                ret_string += f'{stack_string}, '
-                ret_string += f'{stack_string}* {call_global}{self._place_of_value}\n'
-                self._place_of_value = self.register_index
-
-            elif element == type_specifier.TypeSpecifier.ADDRESS:
-                item = stack.pop()
-                assert (item == type_specifier.TypeSpecifier.POINTER), f"We dereference something else then addr " \
-                    f"type This: {item} "
-
-        return ret_string
-
     def generate_llvm_store(self, addr: str) -> str:
         """
         Tell the IDExpresionNode to store it's value to a certain address. This could be a temporal address
@@ -156,9 +97,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         if self._type_modifier_node:
             return self._type_modifier_node.is_function_call()
         return False
-
-    def _get_param_node(self) -> ParamListNode.ParamListNode:
-        return self._type_modifier_node.get_param_node()
 
     @property
     def llvm_value(self):
