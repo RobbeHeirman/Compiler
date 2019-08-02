@@ -1,7 +1,6 @@
 int main(){
+  int a , b = 12;
+  a = 88;
 
-    int a = 44;
-    int *b = &a;
-
-    *b = a;
+  return a;
 }

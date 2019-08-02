@@ -75,14 +75,14 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
         # The first el of the operator stack is the implicit conversion from L to R value
 
-        stack: type_specifier.TypeStack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
-        stack += self._generate_type_operator_stack()
+        stack: type_specifier.TypeStack = []
         type_stack = list(self._parent_node.get_attribute(self._place_of_value).operator_stack)
-
         if not is_l_val:
+            stack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
             type_stack.insert(1, type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER))
-        ret_string = ''
+        stack += self._generate_type_operator_stack()
 
+        ret_string = ''
         while stack:
             element: type_specifier.TypeSpecifier = stack.pop()
             if element == type_specifier.TypeSpecifier.FUNCTION:
@@ -135,6 +135,10 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         :return:
         """
         pass
+
+    @property
+    def llvm_place_of_value(self):
+        return self._place_of_value
 
     def taking_address(self) -> bool:
         if self._type_modifier_node:

@@ -81,3 +81,8 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
                 return self._type_modifier_node.remove_bottom_node()
             else:
                 self.remove_child(self._type_modifier_node)
+
+    # LLVM Code
+    # ==================================================================================================================
+    def llvm_type_string(self):
+        return ''.join([child.llvm_type for child in self._type_stack])

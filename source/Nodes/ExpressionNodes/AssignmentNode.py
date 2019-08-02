@@ -6,6 +6,7 @@ Academic Year: 2018-2019
 
 from antlr4 import ParserRuleContext
 import Nodes.ExpressionNodes.BinaryExpressionNode as BinaryExpressionNode
+from Nodes.ExpressionNodes import ConstantExpressionNode
 
 
 class AssignmentNode(BinaryExpressionNode.BinaryExpressionNode):
@@ -45,8 +46,13 @@ class AssignmentNode(BinaryExpressionNode.BinaryExpressionNode):
     # ==================================================================================================================
     def generate_llvm(self, c_comment=True) -> str:
 
-        ret = self._left_expression
+        ret = self._left_expression.llvm_load(None, True)
 
+        if isinstance(self._right_expression, ConstantExpressionNode.ConstantExpressionNode):
+            ret += self.code_indent_string() + f'store {self.llvm_type_string()} {self._right_expression.llvm_value},'
+            ret += f' {self.llvm_type_string()}* %{self._left_expression.llvm_place_of_value}\n'
+
+        return ret
 
     @property
     def llvm_value(self) -> str:
