@@ -126,6 +126,10 @@ class MessageGenerator:
     def error_conflicting_types(self, line, column, node_id):
         self._writer(self._error(line, column) + "conflicting types for '" + str(node_id) + "'")
 
+    # Error's in assignment's
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def error_expected_l_value(self, line, column):
+        self._writer(self._error(line, column) + 'lvalue required as left operand of assignment')
     # Function declaration, definition and call error's
     # ==================================================================================================================
     def error_func_initialized_like_var(self, lexeme, line, column):
