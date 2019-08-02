@@ -3,47 +3,38 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-import Nodes.AbstractNodes.AbstractNode as AbstractNode
-import Nodes.ExpressionNodes.LHSNode as LhsNode
+
 from antlr4 import ParserRuleContext
+import Nodes.ExpressionNodes.BinaryExpressionNode as BinaryExpressionNode
 
 
-class AssignmentNode(AbstractNode.AbstractNode):
+class AssignmentNode(BinaryExpressionNode.BinaryExpressionNode):
 
     _BASE_LABEL = "="
 
-    def __init__(self, parent_node, filename: str, ctx: ParserRuleContext):
-        super().__init__(parent_node)
+    # Build ins
+    # ==================================================================================================================
+    def __init__(self, parent_node, ctx: ParserRuleContext):
+        super().__init__(parent_node, ctx)
 
-        self._id = None
-        self._lhs_node = None
-
-        attr = self._parent_node.get_attribute(self._id)
-        if attr:
-            self._base_type = attr.type_spec
-
+    # AST-Visuals
+    # ==================================================================================================================
     @property
     def label(self):
-        ret = self._BASE_LABEL
+        return self._BASE_LABEL
 
-        if self._id is not None:
-            ret += "\n Identifier: {0}".format(self._id)
+    # def _find_id(self):
+    #     self._id = self._lhs_node.find_id()
+    #
+    # def generate_llvm(self, c_comment: bool) -> str:
+    #
+    #     ret = self._children[0].generate_llvm(bool)
+    #     ret += 'store {0} %{1}, {2}* %{3}\n'.format(self._base_type.llvm_type,
+    #                                                 self.register_index,
+    #                                                 self._base_type.llvm_type,
+    #                                                 self._id)
+    #     return ret
 
-        return ret
-
-    def add_child(self, child: AbstractNode.AbstractNode, index=None):
-        if isinstance(child, LhsNode.LHSNode):
-            self._lhs_node = child
-        super().add_child(child)
-
-    def _find_id(self):
-        self._id = self._lhs_node.find_id()
-
-    def generate_llvm(self, c_comment: bool) -> str:
-
-        ret = self._children[0].generate_llvm(bool)
-        ret += 'store {0} %{1}, {2}* %{3}\n'.format(self._base_type.llvm_type,
-                                                    self.register_index,
-                                                    self._base_type.llvm_type,
-                                                    self._id)
-        return ret
+    @property
+    def llvm_value(self) -> str:
+        return ""

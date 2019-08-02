@@ -109,7 +109,7 @@ expression // Possible R values
     | expression (ADD | SUB) expression # binary_operator
 
     // Assignment operator
-    | expression  EQ expression #ignore_expression
+    | expression  EQ expression #assignment_expression
     ;
 
 id_expression

@@ -28,6 +28,7 @@ import Specifiers
 import type_specifier
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.ExpressionNodes.ExpressionTypeModifierNode as ExpressionTypeModifierNode
+from Nodes.ExpressionNodes import AssignmentNode
 
 from gen.CListener import CListener
 from gen.CParser import CParser
@@ -331,6 +332,24 @@ class CListenerExtend(CListener):
     def exitExpression_param_list(self, ctx: CParser.Expression_param_listContext):
         self._parent_node = self._parent_node.parent_node
 
+    # Binary Operator's
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Assignment operator
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    def enterAssignment_expression(self, ctx: CParser.Assignment_expressionContext):
+        """
+        Handle's assignment expression's => expr = expr
+        :param ctx: The Parser Node we retrieve info from
+        """
+
+        assignment_node = AssignmentNode.AssignmentNode(self._parent_node, ctx)
+        self._parent_node.add_child(assignment_node)
+        self._parent_node = assignment_node
+
+    def exitAssignment_expression(self, ctx: CParser.Assignment_expressionContext):
+        self._parent_node = self._parent_node.parent_node
+
+    # ==================================================================================================================
     def enterInclude_statement(self, ctx: CParser.Include_statementContext):
 
         node = IncludeStatementNode.IncludeStatementNode(self._parent_node, self._filename, ctx)
