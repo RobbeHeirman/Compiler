@@ -3,10 +3,10 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from typing import List, Union
+from typing import Union
 
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
-import Nodes.FunctionNodes.ParamListNode as ParamListNode
+
 
 import LlvmCode
 import messages
@@ -28,6 +28,8 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         self._l_value = True  # As it's base form an identifier is an Lvalue
         self._place_of_value: Union[int, str] = self.id  # The register the current value of the identifier is placed
+
+        self._is_global = False
 
     def __str__(self):
         return f'{self.id}{[child for child in self._type_stack]} Modified: ' \
@@ -52,6 +54,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
             messenger.error_undeclared_var(self.id, self._line, self._column)
             return False
 
+        self._is_global = True if self.is_in_global_table(self.id) else False
         self._type_stack = self.get_attribute(self.id).operator_stack
         if not self._generate_secondary_types(messenger):  # the modifiers applied in the expression
 
@@ -100,7 +103,9 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
     @property
     def llvm_value(self):
-        return f'%{self._place_of_value}'
+        if not self._is_global:
+            return f'%{self._place_of_value}'
+        return f'@{self._place_of_value}'
 
     # Mips code
     # ==================================================================================================================

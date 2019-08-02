@@ -53,6 +53,15 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
 
         return str(self.constant)
 
+    def llvm_load(self, reg_load_from=None, is_l_val: bool = False):
+        """
+        No Value ahs to be loaded with a constant.
+        :param reg_load_from:
+        :param is_l_val:
+        :return:
+        """
+        return ""
+
     # Mips Code-generation
     # ==================================================================================================================
     @property

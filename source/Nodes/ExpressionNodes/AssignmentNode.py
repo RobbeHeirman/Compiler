@@ -46,14 +46,14 @@ class AssignmentNode(BinaryExpressionNode.BinaryExpressionNode):
     # ==================================================================================================================
     def generate_llvm(self, c_comment=True) -> str:
 
-        ret = self._left_expression.llvm_load(None, True)
-
-        if isinstance(self._right_expression, ConstantExpressionNode.ConstantExpressionNode):
-            ret += self.code_indent_string() + f'store {self.llvm_type_string()} {self._right_expression.llvm_value},'
-            ret += f' {self.llvm_type_string()}* %{self._left_expression.llvm_place_of_value}\n'
+        ret = self.llvm_comment(f'{self._left_expression} = {self._right_expression} ', c_comment)
+        ret += self._left_expression.llvm_load(None, True)
+        ret += self._right_expression.llvm_load(None, False)
+        ret += self.code_indent_string() + f'store {self.llvm_type_string()} {self._right_expression.llvm_value},'
+        ret += f' {self.llvm_type_string()}* {self._left_expression.llvm_value}\n'
 
         return ret
 
     @property
     def llvm_value(self) -> str:
-        return ""
+        return self._left_expression.llvm_value

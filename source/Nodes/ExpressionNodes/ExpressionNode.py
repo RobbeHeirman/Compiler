@@ -20,6 +20,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         self.l_value = True
 
         self._place_of_value = 0  # The register the current value of the identifier is placed
+        self._is_global = False
 
     # AST-Visuals
     # ==================================================================================================================
@@ -102,7 +103,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 call_string = '(' + ', '.join(children_their_strings) + ')'
 
                 stack.pop()
-
+                self._is_global = False
                 # Now for the actual call we will load the call value into a new temporal register
                 self.increment_register_index()
 
@@ -115,11 +116,11 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 stack_string = "".join([child.llvm_type for child in type_stack])
                 call_global = '@' if self.is_in_global_table(str(self._place_of_value)) else '%'
                 self.increment_register_index()
-                ret_string += f'{self.code_indent_string()} %{self.register_index} = load '
+                ret_string += f'{self.code_indent_string()}%{self.register_index} = load '
                 ret_string += f'{stack_string}, '
                 ret_string += f'{stack_string}* {call_global}{self._place_of_value}\n'
                 self._place_of_value = self.register_index
-
+                self._is_global = False
             elif element == type_specifier.TypeSpecifier.ADDRESS:
                 item = stack.pop()
                 assert (item == type_specifier.TypeSpecifier.POINTER), f"We dereference something else then addr " \
@@ -134,11 +135,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         Returns te LLVM value as a string can either be the constant directly or be a register
         :return:
         """
-        pass
-
-    @property
-    def llvm_place_of_value(self):
-        return self._place_of_value
+        return f'%{self._place_of_value}'
 
     def taking_address(self) -> bool:
         if self._type_modifier_node:
