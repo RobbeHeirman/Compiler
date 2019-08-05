@@ -124,6 +124,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 self._place_of_value = self.register_index
                 self._is_global = False
                 type_stack.pop()
+
             elif element == type_specifier.TypeSpecifier.ADDRESS:
                 item = stack.pop()
                 assert (item == type_specifier.TypeSpecifier.POINTER), f"We dereference something else then addr " \
@@ -132,7 +133,6 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         return ret_string
 
     @property
-    @abc.abstractmethod
     def llvm_value(self) -> str:
         """
         Returns te LLVM value as a string can either be the constant directly or be a register
@@ -170,6 +170,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         :param int store_addr: The address to store to
         :return str : String to store to.
         """
+        return ""
 
     def _get_param_node(self) -> ParamListNode.ParamListNode:
         return self._type_modifier_node.get_param_node()
@@ -183,6 +184,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         :param reg: The register to store to
         :return: a mips code string resolving the store of the expression.
         """
+        return ""
 
     def mips_store_address_in_reg(self, target_reg):
         """
@@ -190,3 +192,4 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         :param target_reg:
         :return:
         """
+        return ""

@@ -145,7 +145,9 @@ class DeclarationNode(TypedNode.TypedNode):
 
         # handle expression node and store it in address of declaration id
         if self._expression_node:
-            ret += self._expression_node.generate_llvm_store(self.id)
+            ret += self._expression_node.llvm_load()
+            ret += f'{self.code_indent_string()}store {self.llvm_type_string()} {self._expression_node.llvm_value},'
+            ret += f' {self.llvm_type_string()}* %{self.id}\n'
         return ret
 
     # MIPS Generation

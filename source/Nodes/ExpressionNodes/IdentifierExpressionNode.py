@@ -92,8 +92,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         :return: The generated store instruction string
         """
         ret = self.llvm_load()
-        ret += LlvmCode.llvm_store_instruction(self._place_of_value, self._type_stack, addr, self._type_stack,
-                                               self.code_indent_string())
+
         return ret
 
     def _is_function_call(self) -> bool:

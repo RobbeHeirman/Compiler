@@ -58,7 +58,7 @@ class ReturnNode(AbstractNode.AbstractNode):
             child: ConstantExpressionNode.ConstantExpressionNode = self._children[0]
             return_string += self.code_indent_string() + "ret {0} {1}\n".format(ret_type_str, child.llvm_value)
 
-        elif isinstance(self._children[0], IdentifierExpressionNode.IdentifierExpressionNode):
+        else:
             child: IdentifierExpressionNode.IdentifierExpressionNode = self._children[0]
             return_string += child.llvm_load()
             return_string += self.code_indent_string() + "ret {0} %{1}\n".format(ret_type_str, self.register_index)
