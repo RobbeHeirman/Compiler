@@ -17,7 +17,6 @@ import Nodes.DeclarationNodes.DeclListNode as DeclListNode
 import Nodes.DeclarationNodes.DeclarationTypeModifierNode as TypeModifierNode
 import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
 import Nodes.ExpressionNodes.IdentifierExpressionNode as IdentifierExpressionNode
-import Nodes.ExpressionNodes.LHSNode as LhsNode
 import Nodes.FunctionNodes.FuncDefNode as FuncDefNode
 import Nodes.FunctionNodes.ParamListNode as ParamListNode
 import Nodes.FunctionNodes.ReturnNode as ReturnNode
@@ -28,7 +27,7 @@ import Specifiers
 import type_specifier
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.ExpressionNodes.ExpressionTypeModifierNode as ExpressionTypeModifierNode
-from Nodes.ExpressionNodes import AssignmentNode
+from Nodes.ExpressionNodes import AssignmentNode, BinaryArethmicOperatorNode
 
 from gen.CListener import CListener
 from gen.CParser import CParser
@@ -242,15 +241,6 @@ class CListenerExtend(CListener):
     def exitArray_init(self, ctx: CParser.Array_initContext):
         self._parent_node = self._parent_node.parent_node
 
-    def enterLhs(self, ctx: CParser.LhsContext):
-
-        node = LhsNode.LHSNode(self._parent_node)
-        self._parent_node.add_child(node)
-        self._parent_node = node
-
-    def exitLhs(self, ctx: CParser.LhsContext):
-        self._parent_node = self._parent_node.parent_node
-
     # Expressions
     # ======================================================================================================================
 
@@ -347,6 +337,16 @@ class CListenerExtend(CListener):
         self._parent_node = assignment_node
 
     def exitAssignment_expression(self, ctx: CParser.Assignment_expressionContext):
+        self._parent_node = self._parent_node.parent_node
+
+    # Arithmetic operator
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    def enterBinary_operator(self, ctx: CParser.Binary_operatorContext):
+        bin_node = BinaryArethmicOperatorNode.BinaryArethmicOperatorNode(self._parent_node, ctx)
+        self._parent_node.add_child(bin_node)
+        self._parent_node = bin_node
+
+    def exitBinary_operator(self, ctx: CParser.Binary_operatorContext):
         self._parent_node = self._parent_node.parent_node
 
     # ==================================================================================================================
