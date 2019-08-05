@@ -57,3 +57,19 @@ class AssignmentNode(BinaryExpressionNode.BinaryExpressionNode):
     @property
     def llvm_value(self) -> str:
         return self._left_expression.llvm_value
+
+    # Mips Code
+    # ==================================================================================================================
+    def generate_mips(self, c_comment: bool = True):
+        """
+        Generates the mips code
+        :param c_comment:
+        :return:
+        """
+
+        ret = '\n' + self.mips_comment(f'{self._left_expression} = {self._right_expression} ', c_comment)
+        ret += self._left_expression.mips_store_address_in_reg("t0")
+        ret += f'{self.code_indent_string()}addu $t0, $t0, $sp\n'
+        ret += self._right_expression.mips_store_in_register("t1")
+        ret += f'{self.code_indent_string()}sw, $t1, ($t0)\n'
+        return ret

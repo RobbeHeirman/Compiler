@@ -22,3 +22,14 @@ class SAssignmentTest(AbstractTest.SAbstractTest):
 
     def test_conversion(self):
         return self._run_analysis("conversions.c", 3)
+
+
+class LLVMAssignmentTest(AbstractTest.LLVMAbstractExecTest):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.path += "Assignment/"
+        self.result_path += "assignment/"
+
+    def test_happy_day(self):
+        return self._build_and_run_llvm("happy_day.c", 1)

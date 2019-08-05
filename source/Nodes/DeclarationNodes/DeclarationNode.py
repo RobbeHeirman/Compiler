@@ -165,41 +165,32 @@ class DeclarationNode(TypedNode.TypedNode):
         ret = "\n"
         expression_c = f' = {self._expression_node}' if self._expression_node else ''
         ret += self.mips_comment(f'{self._type_stack} {self.id}{expression_c}', c_comment)
-        mips_addr = "$t0"
-        if self._expression_node:
-            # Variable has assigned register.
-            if attribute.mips_is_register:
-                ret += self._expression_node.mips_store_in_register(attribute.mips_register)
-                mips_addr = attribute.mips_register
-            else:
-                # We use t0
-                ret = self._expression_node.mips_store_in_register('t0')
 
-            # Store value on address in stack after
-            ret += self.code_indent_string() + f'sw ${mips_addr}, {attribute.mips_stack_address}($sp)\n'
+        ret += self._expression_node.mips_store_in_register('t0')
+        ret += self.code_indent_string() + f'sw $t0, {attribute.mips_stack_address}($sp)\n'
 
         return ret
 
-    def mips_assign_register(self):
-        """
-        Tells the front end where to store the different variable's.
-
-        """
-        # PreProcessing
-        # Get the attribute from the symbol table. We will use the symbol table to keep track of where we find
-        # variables
-        attribute = self._parent_node.get_attribute(self.id)
-        # The return string
-        return_string = ""
-
-        # Step 1:
-        # Check if we can use a register
-        if self._parent_node.mips_register_available():
-            attribute.mips_is_register = True
-            attribute.mips_register = self._parent_node.mips_get_available_register()
-
-        else:
-            attribute.mips_is_register = False
+    # def mips_assign_register(self):
+    #     """
+    #     Tells the front end where to store the different variable's.
+    #
+    #     """
+    #     # PreProcessing
+    #     # Get the attribute from the symbol table. We will use the symbol table to keep track of where we find
+    #     # variables
+    #     attribute = self._parent_node.get_attribute(self.id)
+    #     # The return string
+    #     return_string = ""
+    #
+    #     # Step 1:
+    #     # Check if we can use a register
+    #     if self._parent_node.mips_register_available():
+    #         attribute.mips_is_register = True
+    #         attribute.mips_register = self._parent_node.mips_get_available_register()
+    #
+    #     else:
+    #         attribute.mips_is_register = False
 
     def mips_assign_address(self):
         attribute = self._parent_node.get_attribute(self.id)

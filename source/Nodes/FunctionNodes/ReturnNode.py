@@ -76,7 +76,7 @@ class ReturnNode(AbstractNode.AbstractNode):
         """
 
         # Start with commenting
-        return_string = self.mips_comment(f'return {self._children[0]}', c_comment)
+        return_string = '\n' + self.mips_comment(f'return {self._children[0]}', c_comment)
 
         # Load the value into $v0 and jump to the return label
         child = self._children[0]

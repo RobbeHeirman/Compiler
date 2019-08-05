@@ -85,5 +85,4 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
                                                  self._type_stack, self.code_indent_string())
 
     def mips_store_in_register(self, addr: str) -> str:
-
         return f'{self.code_indent_string()}li ${addr}, {self.mips_value}\n'

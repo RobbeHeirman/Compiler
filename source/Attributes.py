@@ -28,8 +28,6 @@ class Attributes:
         self._column = column
 
         # Mips info
-        self._mips_is_register: bool = False
-        self._mips_register: str = ""
         self._mips_stack_address: int = 0
 
     def __eq__(self, val: "Attributes") -> bool:
@@ -77,29 +75,12 @@ class Attributes:
     # ==================================================================================================================
 
     @property
-    def mips_is_register(self) -> bool:
-        return self._mips_is_register
-
-    @mips_is_register.setter
-    def mips_is_register(self, val: bool):
-        self._mips_is_register = val
-
-    @property
     def mips_stack_address(self) -> int:
         return self._mips_stack_address
 
     @mips_stack_address.setter
     def mips_stack_address(self, val: int):
         self._mips_stack_address = val
-
-    @property
-    def mips_register(self) -> str:
-        return self._mips_register
-
-    @mips_register.setter
-    def mips_register(self, val: str):
-        self._mips_is_register = True
-        self._mips_register = val
 
 
 class AttributesGlobal(Attributes):

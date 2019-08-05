@@ -122,13 +122,9 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         attribute = self._parent_node.get_attribute(self.id)
         ret_str = ""
         stack = self._generate_type_operator_stack()
-        if not stack or stack[-1] != type_specifier.TypeSpecifier.FUNCTION:
 
-            ret_str += self.code_indent_string()
-            if attribute.mips_is_register:
-                ret_str += f"move ${reg}, ${attribute.mips_register}\n"
-            else:
-                ret_str += f'lw ${reg}, {attribute.mips_stack_address}($sp)\n'
+        if not stack or stack[-1] != type_specifier.TypeSpecifier.FUNCTION:
+            ret_str += f'{self.code_indent_string()}lw ${reg}, {attribute.mips_stack_address}($sp)\n'
 
         while stack:
             element = stack.pop()
@@ -142,12 +138,15 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 ret_str += f'{self.code_indent_string()}addiu ${reg}, $sp, {attribute.mips_stack_address}\n'
 
             elif element == type_specifier.TypeSpecifier.FUNCTION:
-                # We need to save $ra
-                ret_str += f'{self.code_indent_string()}subiu $sp, $sp, {MIPS_REGISTER_SIZE} # Making room for link \n'
-                ret_str += f'{self.code_indent_string()}sw $ra, ($sp) # Storing link\n'
+
                 # Set up the argument's in both register and on stack
                 param_node = self._get_param_node()
                 ret_str += param_node.mips_load_arguments()
+
+                # We need to save $ra
+                ret_str += f'{self.code_indent_string()}subiu $sp, $sp, {MIPS_REGISTER_SIZE} # Making room for link \n'
+                ret_str += f'{self.code_indent_string()}sw $ra, ($sp) # Storing link\n'
+
                 ret_str += f'{self.code_indent_string()}jal .{self.id}\n'
 
                 # Free up stack that we used for arguments
@@ -158,3 +157,17 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 # move the return value in to assigned register
                 ret_str += f'{self.code_indent_string()}move ${reg}, $v0\n'
         return ret_str
+
+    def mips_store_address_in_reg(self, target_reg):
+
+        number_on_stack = self._parent_node.get_attribute(self.id).mips_stack_address
+        stack = self._generate_type_operator_stack()
+        ret = f'{self.code_indent_string()}li ${target_reg}, {number_on_stack}\n'
+        while stack:
+
+            element = stack.pop()
+
+            if element == type_specifier.TypeSpecifier.POINTER:
+                ret += f'{self.code_indent_string()}lw ${target_reg}, ${target_reg}($sp)\n'
+
+        return ret

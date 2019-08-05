@@ -38,8 +38,10 @@ class SAbstractTest(unittest.TestCase):
         self.path = "C_files/semantic/"
 
     def _run_analysis(self, filename, errors=0, warnings=0):
+
         if not os.path.exists(self.result_path):
             os.makedirs(self.result_path)
+
         f = open(self.result_path + filename[:-2] + "_error.log", "w+")
         file_name = self.path + filename
         ast = main.create_ast(file_name, f)
@@ -92,6 +94,10 @@ class LLVMAbstractTest(unittest.TestCase):
 class LLVMAbstractExecTest(LLVMAbstractTest):
 
     def _compile_llvm(self, filename):
+
+        if not os.path.exists(self.result_path):
+            os.makedirs(self.result_path)
+
         slug = filename[: -2]  # - .c
         file_name = self.path + filename
         ast = main.create_ast(file_name)

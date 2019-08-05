@@ -78,9 +78,11 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
         stack: type_specifier.TypeStack = []
         type_stack = list(self._parent_node.get_attribute(self._place_of_value).operator_stack)
+
         if not is_l_val:
             stack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
-            type_stack.insert(1, type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER))
+            # type_stack.insert(1, type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER))
+
         stack += self._generate_type_operator_stack()
 
         ret_string = ''
@@ -111,8 +113,8 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 ret_string += f' {"".join([child.llvm_type for child in self._type_stack])}'
                 ret_string += f' @{self._place_of_value}{call_string}\n'
                 self._place_of_value = self.register_index
+
             elif element == type_specifier.TypeSpecifier.POINTER:
-                type_stack.pop()
                 stack_string = "".join([child.llvm_type for child in type_stack])
                 call_global = '@' if self.is_in_global_table(str(self._place_of_value)) else '%'
                 self.increment_register_index()
@@ -121,6 +123,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 ret_string += f'{stack_string}* {call_global}{self._place_of_value}\n'
                 self._place_of_value = self.register_index
                 self._is_global = False
+                type_stack.pop()
             elif element == type_specifier.TypeSpecifier.ADDRESS:
                 item = stack.pop()
                 assert (item == type_specifier.TypeSpecifier.POINTER), f"We dereference something else then addr " \
@@ -179,4 +182,11 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         Store's the value of the expression into given register.
         :param reg: The register to store to
         :return: a mips code string resolving the store of the expression.
+        """
+
+    def mips_store_address_in_reg(self, target_reg):
+        """
+        Return's the address of where the variable is stored.
+        :param target_reg:
+        :return:
         """
