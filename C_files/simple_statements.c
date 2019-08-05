@@ -1,12 +1,23 @@
-int a(int b, int c, int d){
-    return b;
-}
-
-
 int main(){
 
-    int b = 1000, c = 55, d = 112;
-    d = a(b, c, d);
-    return d;
+    int a = 1;
+    int b;
+    b = a;
+
+    char c = '1';
+    char d;
+    d = c;
+
+    float e = 4.44;
+    float f;
+    f = e;
+
+    int * g = &a;
+    int *h;
+    h = g;
+
+    *g = b;
+
+    return a;
 
 }

@@ -162,12 +162,12 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
         number_on_stack = self._parent_node.get_attribute(self.id).mips_stack_address
         stack = self._generate_type_operator_stack()
-        ret = f'{self.code_indent_string()}li ${target_reg}, {number_on_stack}\n'
+        ret = f'{self.code_indent_string()}addu  ${target_reg}, $sp, {number_on_stack}\n'
         while stack:
 
             element = stack.pop()
 
             if element == type_specifier.TypeSpecifier.POINTER:
-                ret += f'{self.code_indent_string()}lw ${target_reg}, ${target_reg}($sp)\n'
+                ret += f'{self.code_indent_string()}lw ${target_reg}, (${target_reg})\n'
 
         return ret

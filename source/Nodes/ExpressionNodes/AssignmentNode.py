@@ -69,7 +69,7 @@ class AssignmentNode(BinaryExpressionNode.BinaryExpressionNode):
 
         ret = '\n' + self.mips_comment(f'{self._left_expression} = {self._right_expression} ', c_comment)
         ret += self._left_expression.mips_store_address_in_reg("t0")
-        ret += f'{self.code_indent_string()}addu $t0, $t0, $sp\n'
+
         ret += self._right_expression.mips_store_in_register("t1")
         ret += f'{self.code_indent_string()}sw, $t1, ($t0)\n'
         return ret
