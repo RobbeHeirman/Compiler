@@ -21,8 +21,6 @@ statement
     : decl_list
     | func_def
     | ret_statement SEMICOLON
-    | selection_statements
-    | while_statement
     | expression SEMICOLON
     ;
 
@@ -108,6 +106,9 @@ expression // Possible R values
     | expression (ASTERIX | DIVIDE) expression # binary_operator
     | expression (ADD | SUB) expression # binary_operator
 
+    //
+    | expression cond_operator expression # condition
+
     // Assignment operator
     | expression  EQ expression #assignment_expression
     ;
@@ -174,33 +175,6 @@ w_p_id:
 
 ret_statement
     : RETURN (expression)?
-    ;
-
-selection_statements
-    : if_statement (else_if_statement)* (else_statement)?
-    ;
-
-
-if_statement
-    : IF cond_statement
-    ;
-
-else_if_statement
-    : ELSE IF cond_statement
-    ;
-
-else_statement
-    : ELSE LBRACES statements RBRACES
-    ;
-while_statement
-    : WHILE cond_statement
-    ;
-
-cond_statement
-    :LPARANT condition RPARANT LBRACES statements RBRACES
-    ;
-condition
-    : expression cond_operator expression
     ;
 
 cond_operator

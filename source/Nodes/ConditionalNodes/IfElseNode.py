@@ -10,8 +10,8 @@ from Specifiers import ConditionType
 
 class IfElseNode(ScopedNode.ScopedNode):
 
-    def __init__(self, parent_node, c_type: ConditionType):
-        super().__init__(parent_node)
+    def __init__(self, parent_node, ctx, c_type: ConditionType):
+        super().__init__(parent_node, ctx)
 
         self._cond_type = c_type
 

@@ -8,7 +8,7 @@ from typing import Union
 
 import AST
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
-import Nodes.ConditionalNodes.ConditionNode as ConditionNode
+import Nodes.ExpressionNodes.ConditionNode as ConditionNode
 import Nodes.ConditionalNodes.IfElseNode as IfElseNode
 import Nodes.DeclarationNodes.IncludeStatementNode as IncludeStatementNode
 import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
@@ -359,51 +359,51 @@ class CListenerExtend(CListener):
     def exitInclude_statement(self, ctx: CParser.Include_statementContext):
         self._parent_node = self._parent_node.parent_node
 
-    def enterIf_statement(self, ctx: CParser.If_statementContext):
-
-        c_type = Specifiers.ConditionType.IF
-        node = IfElseNode.IfElseNode(self._parent_node, c_type)
-
-        self._parent_node.add_child(node)
-        self._parent_node = node
-
-    def exitIf_statement(self, ctx: CParser.If_statementContext):
-        self._parent_node = self._parent_node.parent_node
-
-    def enterElse_if_statement(self, ctx: CParser.Else_if_statementContext):
-        c_type = Specifiers.ConditionType.ELSE_IF
-        node = IfElseNode.IfElseNode(self._parent_node, c_type)
-
-        self._parent_node.add_child(node)
-        self._parent_node = node
-
-    def exitElse_if_statement(self, ctx: CParser.Else_if_statementContext):
-        self._parent_node = self._parent_node.parent_node
-
-    def enterElse_statement(self, ctx: CParser.Else_statementContext):
-        c_type = Specifiers.ConditionType.ELSE
-        node = IfElseNode.IfElseNode(self._parent_node, c_type)
-
-        self._parent_node.add_child(node)
-        self._parent_node = node
-
-    def exitElse_statement(self, ctx: CParser.Else_statementContext):
-        self._parent_node = self._parent_node.parent_node
-
-    def enterWhile_statement(self, ctx: CParser.While_statementContext):
-
-        c_type = Specifiers.ConditionType.WHILE
-        node = IfElseNode.IfElseNode(self._parent_node, c_type)
-        self._parent_node.add_child(node)
-        self._parent_node = node
-
-    def exitWhile_statement(self, ctx: CParser.While_statementContext):
-        self._parent_node = self._parent_node.parent_node
+    # def enterIf_statement(self, ctx: CParser.If_statementContext):
+    #
+    #     c_type = Specifiers.ConditionType.IF
+    #     node = IfElseNode.IfElseNode(self._parent_node, ctx, c_type)
+    #
+    #     self._parent_node.add_child(node)
+    #     self._parent_node = node
+    #
+    # def exitIf_statement(self, ctx: CParser.If_statementContext):
+    #     self._parent_node = self._parent_node.parent_node
+    #
+    # def enterElse_if_statement(self, ctx: CParser.Else_if_statementContext):
+    #     c_type = Specifiers.ConditionType.ELSE_IF
+    #     node = IfElseNode.IfElseNode(self._parent_node, c_type)
+    #
+    #     self._parent_node.add_child(node)
+    #     self._parent_node = node
+    #
+    # def exitElse_if_statement(self, ctx: CParser.Else_if_statementContext):
+    #     self._parent_node = self._parent_node.parent_node
+    #
+    # def enterElse_statement(self, ctx: CParser.Else_statementContext):
+    #     c_type = Specifiers.ConditionType.ELSE
+    #     node = IfElseNode.IfElseNode(self._parent_node, c_type)
+    #
+    #     self._parent_node.add_child(node)
+    #     self._parent_node = node
+    #
+    # def exitElse_statement(self, ctx: CParser.Else_statementContext):
+    #     self._parent_node = self._parent_node.parent_node
+    #
+    # def enterWhile_statement(self, ctx: CParser.While_statementContext):
+    #
+    #     c_type = Specifiers.ConditionType.WHILE
+    #     node = IfElseNode.IfElseNode(self._parent_node, c_type)
+    #     self._parent_node.add_child(node)
+    #     self._parent_node = node
+    #
+    # def exitWhile_statement(self, ctx: CParser.While_statementContext):
+    #     self._parent_node = self._parent_node.parent_node
 
     def enterCondition(self, ctx: CParser.ConditionContext):
 
         op_val = ctx.getChild(1).getText()
-        node = ConditionNode.ConditionNode(self._parent_node, op_val)
+        node = ConditionNode.ConditionNode(self._parent_node, ctx, op_val)
         self._parent_node.add_child(node)
         self._parent_node = node
 

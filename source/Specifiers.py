@@ -30,12 +30,6 @@ class Operator(Enum):
         return _BINARY_LLVM_MAPPING[self]
 
 
-class ConditionalOperator(Enum):
-    BIGGER = '>'
-    SMALLER = '<'
-    EQUALS = '=='
-
-
 class ConditionType(Enum):
     IF = 'if'
     ELSE_IF = 'else if'
