@@ -25,7 +25,7 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
         """
 
         # printf
-        id = "printf"
+        var_id = "printf"
         ret_type = type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.INT)
         signature = [
             [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.CHAR),
@@ -41,7 +41,23 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
 
         printf_attr = Attributes.Attributes(type_stack, 0, 0)
 
-        self._parent_node.add_to_scope_symbol_table(id, printf_attr)
+        self._parent_node.add_to_scope_symbol_table(var_id, printf_attr)
+
+        # scanf
+        var_id = "scanf"
+        ret_type = type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.INT)
+        signature = [
+            [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.CHAR),
+             type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)],
+
+            [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.ANY)]
+        ]
+        func_type = type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.FUNCTION)
+        func_type.function_signature = signature
+        type_stack = [ret_type, func_type]
+        scanf_attr = Attributes.Attributes(type_stack, 0, 0)
+        self._parent_node.add_to_scope_symbol_table(var_id, scanf_attr)
+
         return True
 
     # LLVM Code
@@ -61,8 +77,16 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
         # Start with a label
         ret = '.printf:\n'
         self.increase_code_indent()
+        ret += f'{self.code_indent_string()}lw $a0, ($a0)\n'
         ret += f'{self.code_indent_string()}li $v0, 11 # Code for printing chars\n'
         ret += f'{self.code_indent_string()}syscall\n'
         ret += f'{self.code_indent_string()}jr $ra\n'
+
+        # scanf
+        ret += '\n'
+        ret += '.scanf:\n'
+        ret += f'{self.code_indent_string()}li $v0, 12\n'
+        ret += f'{self.code_indent_string()}syscall\n'
+        ret += f'{self.code_indent_string()}sw $v0 ($a0)\n'
 
         return ret
