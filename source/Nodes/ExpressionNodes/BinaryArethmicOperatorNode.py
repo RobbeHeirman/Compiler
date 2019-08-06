@@ -22,8 +22,17 @@ class Operator(Enum):
             self.MULTIPLY: "mul",
             self.DIVIDE: "sdiv"
         }
-
         return _llvm_op_code.get(self)
+
+    @property
+    def mips_op_code(self):
+        _mips_op_code = {
+            self.PLUS: "add",
+            self.MINUS: "sub",
+            self.MULTIPLY: "mult",
+            self.DIVIDE: "div"
+        }
+        return _mips_op_code.get(self)
 
 
 class BinaryArethmicOperatorNode(BinaryExpressionNode):
@@ -56,4 +65,12 @@ class BinaryArethmicOperatorNode(BinaryExpressionNode):
         ret += f'{self.code_indent_string()}{self.llvm_value} = {self._operator.llvm_op_code} {self.llvm_type_string()}'
         ret += f' {self._left_expression.llvm_value}, {self._right_expression.llvm_value}\n'
 
+        return ret
+
+    # MIPS Code
+    # ==================================================================================================================
+    def mips_store_in_register(self, reg: str):
+        ret = self._left_expression.mips_store_in_register('t0')
+        ret += self._right_expression.mips_store_in_register('t1')
+        ret += f'{self.code_indent_string()}{self._operator.mips_op_code} ${reg}, $t0, $t1\n'
         return ret

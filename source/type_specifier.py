@@ -19,6 +19,7 @@ class TypeSpecifier:
     ADDRESS = '&'
     FUNCTION = '()'
     ARRAY = '[]'
+    ANY = 0  # Needed for printf and scanf
 
     def __init__(self, type_val: str, func_signature=None):
         """
@@ -38,7 +39,7 @@ class TypeSpecifier:
             if self._type_spec == o.value:
                 return True
 
-        elif isinstance(o, str):
+        else:
             if self._type_spec == o:
                 return True
         return False

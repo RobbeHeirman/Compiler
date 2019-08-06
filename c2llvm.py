@@ -82,11 +82,11 @@ if __name__ == "__main__":
 
     if args.ref_test:
         name_reference = path + slug + "_ref.ll"
-        # subprocess.call(["clang", args.input_file, "-S", "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion", "-ansi",
-        #                  "-o", name_reference])  # Test compiler errors
-
-        subprocess.call(["clang", "-cc1", args.input_file, "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion",
+        subprocess.call(["clang", args.input_file, "-S", "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion", "-ansi",
                          "-o", name_reference])  # Test compiler errors
+
+        # subprocess.call(["clang", "-cc1", args.input_file, "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion",
+        #                  "-o", name_reference])  # Test compiler errors
 
     if args.executable_test:
         ll_file = path + slug + ".ll"

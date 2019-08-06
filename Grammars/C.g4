@@ -9,6 +9,7 @@ grammar C;
     global_statement
     : decl_list
     | func_def
+    | include_statement
     ;
 
     statements
@@ -22,7 +23,6 @@ statement
     | ret_statement SEMICOLON
     | selection_statements
     | while_statement
-    | include_statement
     | expression SEMICOLON
     ;
 

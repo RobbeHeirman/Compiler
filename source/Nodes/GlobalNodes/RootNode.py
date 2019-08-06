@@ -6,9 +6,8 @@ Academic Year: 2018-2019
 
 import Nodes.AbstractNodes.ScopedNode as ScopedNode
 import SymbolTable
+from Nodes.DeclarationNodes.IncludeStatementNode import IncludeStatementNode
 from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
-from Nodes.GlobalNodes.GlobalDeclarationNode import GlobalDeclarationNode
-
 
 class RootNode(ScopedNode.ScopedNode):
     """
@@ -79,7 +78,7 @@ class RootNode(ScopedNode.ScopedNode):
         data_ret = ""
         text_ret = ""
         for child in self._children:
-            if isinstance(child, FuncDefNode):
+            if isinstance(child, FuncDefNode) or isinstance(child, IncludeStatementNode):
                 text_ret += child.generate_mips(c_comment)
 
             else:

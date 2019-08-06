@@ -111,6 +111,12 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
                 ret_string += f'{self.code_indent_string()}%{self.register_index} = call'
                 ret_string += f' {"".join([child.llvm_type for child in self._type_stack])}'
+
+                if self._parent_node.is_in_table(self._place_of_value):
+                    if self._parent_node.get_attribute(self._place_of_value).operator_stack[-1].function_signature[-1] \
+                            == [type_specifier.TypeSpecifier.ANY]:
+                        ret_string += '( i8*, ...) '
+
                 ret_string += f' @{self._place_of_value}{call_string}\n'
                 self._place_of_value = self.register_index
 
@@ -177,6 +183,9 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
     # Mips Code
     # ==================================================================================================================
+
+    def generate_mips(self, c_comment: bool = True):
+        return self.mips_store_in_register("t0")
 
     def mips_store_in_register(self, reg: str) -> str:
         """

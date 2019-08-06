@@ -37,3 +37,9 @@ class LLVMArithmeticTest(AbstractTest.LLVMAbstractExecTest):
 
     def test_happy_day2(self):
         return self._build_and_run_llvm("happy_day2.c", 3)
+
+
+class MipsArithmeticTest(AbstractTest.MipsAbstractTest):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

@@ -66,20 +66,8 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
 
-        self.increment_register_index()
-
-        if self._is_function_call():
-            print("llvm for a function call")
-
-            # We pop off the function type since it's a call
-            self._type_stack.pop()
-            # This node will load all the value's in place
-            param_node = self._get_param_node()
-            ret = param_node.llvm_call_param_nodes()
-
-        else:
-            ret = self.code_indent_string() + ";... {0}\n".format(self.id)
-            ret += self.llvm_load()
+        ret = self.code_indent_string() + ";{0}\n".format(self)
+        ret += self.llvm_load()
 
         return ret
 

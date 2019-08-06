@@ -3,6 +3,8 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
+from typing import List
+
 import Nodes.AbstractNodes.TypeModifierNode as TypeModifierNode
 import messages
 import type_specifier
@@ -14,6 +16,7 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
     Handles TypeModifiers like & () * .... In an expressionNode.
     Augment's the type of an expression.
     """
+
     def __init__(self, parent_node, ctx, modifier=None):
         super().__init__(parent_node, ctx, modifier)
 
@@ -67,14 +70,30 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
                 self._param_list_node.semantic_analysis(messenger)
                 # for simplicity we == is overloaded. We can go in more detail about the function signatures as
                 # extension
+
                 if self.get_function_signature() == node.type_stack_ref()[-1].function_signature:
                     node.type_stack_ref().pop()
 
                 else:
-                    messenger.error_signature_does_not_match(self._line, self._column)
-                    return False
+                    if not self._check_any_consistent(node.type_stack_ref()[-1].function_signature):
+                        messenger.error_signature_does_not_match(self._line, self._column)
+                        return False
 
             else:
                 messenger.error_object_not_function(self._line, self._column)
                 return False
         return True
+
+    def _check_any_consistent(self, signature: List):
+        func_sign = self.get_function_signature()
+        signature = list(signature)
+
+        if signature and signature[-1] == [type_specifier.TypeSpecifier.ANY]:
+
+            signature.pop()
+            for i in range(len(signature)):
+                if signature[i] != func_sign[i]:
+                    return False
+            return True
+
+        return False
