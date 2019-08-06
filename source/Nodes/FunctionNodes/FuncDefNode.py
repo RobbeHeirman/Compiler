@@ -118,6 +118,8 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # if self._return_node is None:
         #     ret += self.indent_string() + "  ret {0} 0\n".format(self.base_type.llvm_type)
 
+        # ret_type_str = "".join([c_type.llvm_type for c_type in self.get_return_type()])
+        # ret += self.code_indent_string() + "ret {0} %{1}\n".format(ret_type_str, '0')
         ret += "}\n"
         self.decrease_code_indent()
         return ret

@@ -19,7 +19,7 @@ class Operator(Enum):
         _llvm_op_code = {
             self.PLUS: "add",
             self.MINUS: "sub",
-            self.MULTIPLY: "mult",
+            self.MULTIPLY: "mul",
             self.DIVIDE: "sdiv"
         }
 
