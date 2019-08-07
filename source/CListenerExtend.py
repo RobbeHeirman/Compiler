@@ -22,11 +22,12 @@ import Nodes.FunctionNodes.ReturnNode as ReturnNode
 import Nodes.GlobalNodes.RootNode as RootNode
 import Nodes.GlobalNodes.GlobalDeclarationNode as GlobalDeclarationNode
 import Nodes.GlobalNodes.StatementsNode as StatementNode
-import Specifiers
+
 import type_specifier
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.ExpressionNodes.ExpressionTypeModifierNode as ExpressionTypeModifierNode
 from Nodes.ConditionalNodes import BranchNode, IfNode, ElseNode
+from Nodes.ConditionalNodes.ElifNode import ElseIfNode
 from Nodes.ExpressionNodes import AssignmentNode, BinaryArethmicOperatorNode
 
 from gen.CListener import CListener
@@ -392,7 +393,7 @@ class CListenerExtend(CListener):
         self._parent_node = self._parent_node.parent_node
 
     def enterC_elif(self, ctx: CParser.C_elifContext):
-        node = IfNode.IfNode(self._parent_node, ctx)
+        node = ElseIfNode(self._parent_node, ctx)
         self._parent_node.add_child(node)
         self._parent_node = node
 

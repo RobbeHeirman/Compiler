@@ -1,9 +1,22 @@
 
-#include <stdio.h>
-
 int main(){
 
-    int a = 4 < 0;
+    int a = 12, b = 13 , c = 14 , d = 44;
 
-    return a;
+    if( a < b){
+
+        b = 22;
+    }
+
+    else if(a == b){
+
+        c = 100;
+    }
+
+    else {
+
+        d =  88;
+    }
+
+    return 12;
 }

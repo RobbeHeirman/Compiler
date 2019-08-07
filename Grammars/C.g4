@@ -195,8 +195,8 @@ include_statement
 branch: c_if (c_elif)* (c_else)?;
 
 c_if : IF LPARANT expression RPARANT LBRACES statements RBRACES;
-c_elif: ELSE c_if;
-c_else: ELSE LPARANT expression RPARANT LBRACES statements RBRACES;
+c_elif: ELSE IF LPARANT expression RPARANT LBRACES statements RBRACES;
+c_else: ELSE LBRACES statements RBRACES;
 
 // =====================================================================================================================
 /** Tokens */

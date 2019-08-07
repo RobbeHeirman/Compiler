@@ -174,7 +174,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # Some awesome code here
 
         # 5 Make a Return label, free up the stack, set s register's back in place and jump back to caller
-        ret += f'\n{self.code_indent_string()}{self.mips_function_base_label}_return:'
+        ret += f'\n{self.code_indent_string()}{self.code_function_base_label}_return:'
         self.increase_code_indent()
         ret += self.mips_load_preserved_registers(load_preserved_regs_from)
         ret += f'{self.code_indent_string()}addiu $sp, $sp, {increase_stack_with}\n'
@@ -230,7 +230,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         return ret
 
     @property
-    def mips_function_base_label(self) -> str:
+    def code_function_base_label(self) -> str:
         return self.id
     # Meta Code Generation
     # ==================================================================================================================

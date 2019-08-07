@@ -5,11 +5,13 @@ Academic Year: 2018-2019
 """
 
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.ConditionalNodes import ElseNode
+from Nodes.ConditionalNodes import ElseNode, BranchNode
 from Nodes.ExpressionNodes import ConditionNode
+
 
 class IfNode(ElseNode.ElseNode):
     label = "if"
+    _parent_node: BranchNode.BranchNode
 
     # Built-ins
     # ==================================================================================================================
@@ -25,3 +27,9 @@ class IfNode(ElseNode.ElseNode):
             self._condition_node = child
 
         super().add_child(child, index)
+
+    # LLVM Generation
+    # ==================================================================================================================
+    def generate_llvm(self, c_comment: bool = True):
+        ret = f'.{self._parent_node.code_function_base_label}_br{self._parent_node.assign_branch_index()}:'
+        return ""
