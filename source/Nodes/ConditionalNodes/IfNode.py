@@ -7,15 +7,13 @@ Academic Year: 2018-2019
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ConditionalNodes import ElseNode
 from Nodes.ExpressionNodes import ConditionNode
-from Specifiers import ConditionType
-
 
 class IfNode(ElseNode.ElseNode):
     label = "if"
 
     # Built-ins
     # ==================================================================================================================
-    def __init__(self, parent_node, ctx: ConditionType):
+    def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
 
         self._condition_node: ConditionNode.ConditionNode = None

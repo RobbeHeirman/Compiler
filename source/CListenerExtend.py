@@ -9,7 +9,6 @@ from typing import Union
 import AST
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.ExpressionNodes.ConditionNode as ConditionNode
-import Nodes.ConditionalNodes.IfNode as IfElseNode
 import Nodes.DeclarationNodes.IncludeStatementNode as IncludeStatementNode
 import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
 import Nodes.ExpressionNodes.ConstantExpressionNode as ConstantExpressionNode
@@ -27,6 +26,7 @@ import Specifiers
 import type_specifier
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.ExpressionNodes.ExpressionTypeModifierNode as ExpressionTypeModifierNode
+from Nodes.ConditionalNodes import BranchNode, IfNode, ElseNode
 from Nodes.ExpressionNodes import AssignmentNode, BinaryArethmicOperatorNode
 
 from gen.CListener import CListener
@@ -349,6 +349,19 @@ class CListenerExtend(CListener):
     def exitBinary_operator(self, ctx: CParser.Binary_operatorContext):
         self._parent_node = self._parent_node.parent_node
 
+    # Conditional operator
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    def enterCondition(self, ctx: CParser.ConditionContext):
+
+        op_val = ctx.getChild(1).getText()
+        node = ConditionNode.ConditionNode(self._parent_node, ctx, op_val)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitCondition(self, ctx: CParser.ConditionContext):
+        self._parent_node = self._parent_node.parent_node
+
+    # Includes
     # ==================================================================================================================
     def enterInclude_statement(self, ctx: CParser.Include_statementContext):
 
@@ -359,53 +372,37 @@ class CListenerExtend(CListener):
     def exitInclude_statement(self, ctx: CParser.Include_statementContext):
         self._parent_node = self._parent_node.parent_node
 
-    # def enterIf_statement(self, ctx: CParser.If_statementContext):
-    #
-    #     c_type = Specifiers.ConditionType.IF
-    #     node = IfElseNode.IfElseNode(self._parent_node, ctx, c_type)
-    #
-    #     self._parent_node.add_child(node)
-    #     self._parent_node = node
-    #
-    # def exitIf_statement(self, ctx: CParser.If_statementContext):
-    #     self._parent_node = self._parent_node.parent_node
-    #
-    # def enterElse_if_statement(self, ctx: CParser.Else_if_statementContext):
-    #     c_type = Specifiers.ConditionType.ELSE_IF
-    #     node = IfElseNode.IfElseNode(self._parent_node, c_type)
-    #
-    #     self._parent_node.add_child(node)
-    #     self._parent_node = node
-    #
-    # def exitElse_if_statement(self, ctx: CParser.Else_if_statementContext):
-    #     self._parent_node = self._parent_node.parent_node
-    #
-    # def enterElse_statement(self, ctx: CParser.Else_statementContext):
-    #     c_type = Specifiers.ConditionType.ELSE
-    #     node = IfElseNode.IfElseNode(self._parent_node, c_type)
-    #
-    #     self._parent_node.add_child(node)
-    #     self._parent_node = node
-    #
-    # def exitElse_statement(self, ctx: CParser.Else_statementContext):
-    #     self._parent_node = self._parent_node.parent_node
-    #
-    # def enterWhile_statement(self, ctx: CParser.While_statementContext):
-    #
-    #     c_type = Specifiers.ConditionType.WHILE
-    #     node = IfElseNode.IfElseNode(self._parent_node, c_type)
-    #     self._parent_node.add_child(node)
-    #     self._parent_node = node
-    #
-    # def exitWhile_statement(self, ctx: CParser.While_statementContext):
-    #     self._parent_node = self._parent_node.parent_node
+    # Branching
+    # ==================================================================================================================
+    def enterBranch(self, ctx: CParser.BranchContext):
 
-    def enterCondition(self, ctx: CParser.ConditionContext):
-
-        op_val = ctx.getChild(1).getText()
-        node = ConditionNode.ConditionNode(self._parent_node, ctx, op_val)
+        node = BranchNode.BranchNode(self._parent_node, ctx)
         self._parent_node.add_child(node)
         self._parent_node = node
 
-    def exitCondition(self, ctx: CParser.ConditionContext):
+    def exitBranch(self, ctx: CParser.BranchContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterC_if(self, ctx: CParser.C_ifContext):
+        node = IfNode.IfNode(self._parent_node, ctx)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitC_if(self, ctx: CParser.C_ifContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterC_elif(self, ctx: CParser.C_elifContext):
+        node = IfNode.IfNode(self._parent_node, ctx)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitC_elif(self, ctx: CParser.C_elifContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterC_else(self, ctx: CParser.C_elseContext):
+        node = ElseNode.ElseNode(self._parent_node, ctx)
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitC_else(self, ctx: CParser.C_elseContext):
         self._parent_node = self._parent_node.parent_node
