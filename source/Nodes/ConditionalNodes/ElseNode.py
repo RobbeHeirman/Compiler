@@ -3,27 +3,26 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-
+from Nodes.AbstractNodes import ScopedNode
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.ConditionalNodes import ElseNode
-from Nodes.ExpressionNodes import ConditionNode
-from Specifiers import ConditionType
+from Nodes.GlobalNodes import StatementsNode
 
 
-class IfNode(ElseNode.ElseNode):
-    label = "if"
+class ElseNode(ScopedNode.ScopedNode):
+    label = "Else"
 
-    # Built-ins
+    # Built ins
     # ==================================================================================================================
-    def __init__(self, parent_node, ctx: ConditionType):
+
+    def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
 
-        self._condition_node: ConditionNode.ConditionNode = None
+        self._statements_node: StatementsNode.StatementsNode = None
 
     # AST Generation
     # ==================================================================================================================
     def add_child(self, child: "AbstractNode", index: int = None):
-        if isinstance(child, ConditionNode.ConditionNode):
-            self._condition_node = child
+        if isinstance(child, StatementsNode.StatementsNode):
+            self._statements_node = child
 
         super().add_child(child, index)
