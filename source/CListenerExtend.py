@@ -9,7 +9,7 @@ from typing import Union
 import AST
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.ExpressionNodes.ConditionNode as ConditionNode
-import Nodes.ConditionalNodes.IfElseNode as IfElseNode
+import Nodes.ConditionalNodes.IfNode as IfElseNode
 import Nodes.DeclarationNodes.IncludeStatementNode as IncludeStatementNode
 import Nodes.DeclarationNodes.ArrayInitNode as ArrayInitNode
 import Nodes.ExpressionNodes.ConstantExpressionNode as ConstantExpressionNode
