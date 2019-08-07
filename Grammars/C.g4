@@ -22,6 +22,7 @@ statement
     | func_def
     | ret_statement SEMICOLON
     | expression SEMICOLON
+    | branch
     ;
 
 decl_list
@@ -157,6 +158,13 @@ floating_constant
     : FLOAT_C
     ;
 
+cond_operator
+    : EQ EQ
+    | SMALLER
+    | BIGGER;
+
+ // Functions
+ // ====================================================================================================================
 func_def
     : base_type func_declarator LBRACES statements RBRACES
     ;
@@ -177,16 +185,19 @@ ret_statement
     : RETURN (expression)?
     ;
 
-cond_operator
-    : EQ EQ
-    | SMALLER
-    | BIGGER;
-
 include_statement
     :'#include'SMALLER 'stdio.h' BIGGER
     ;
 
+/** Branching*/
 // =====================================================================================================================
+
+branch: c_if (c_elif)* (c_else)?;
+
+c_if : IF LPARANT expression RPARANT LBRACES statements RBRACES;
+c_elif: ELSE c_if;
+c_else: ELSE LPARANT expression RPARANT LBRACES statements RBRACES;
+
 // =====================================================================================================================
 /** Tokens */
 // =====================================================================================================================
@@ -222,6 +233,7 @@ LEFT_BRACKET: '[';
 RIGHT_BRACKET: ']';
 
 //======================================================================================================================
+
 
 // types
 // =====================================================================================================================

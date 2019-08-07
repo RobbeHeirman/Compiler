@@ -14,11 +14,13 @@ class TypeSpecifier:
     INT = 'int'
     CHAR = 'char'
     FLOAT = 'float'
+    BOOL = 'bool'
 
     POINTER = '*'
     ADDRESS = '&'
     FUNCTION = '()'
     ARRAY = '[]'
+
     ANY = 0  # Needed for printf and scanf
 
     def __init__(self, type_val: str, func_signature=None):
