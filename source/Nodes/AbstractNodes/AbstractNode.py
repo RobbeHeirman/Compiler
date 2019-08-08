@@ -224,6 +224,7 @@ class AbstractNode(abc.ABC):
 
         return f'{self.code_indent_string()}; {comment_string}\n' if do_comment else ""
 
+
     # MIPS Code Generation
     # ==================================================================================================================
 
@@ -324,4 +325,6 @@ class AbstractNode(abc.ABC):
         """
         self._parent_node.increment_register_index()
 
+    def get_return_type(self):
 
+        return self._parent_node.get_return_type()

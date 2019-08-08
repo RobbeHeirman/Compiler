@@ -27,6 +27,8 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         self._param_list_node: ParamListNode.ParamListNode = None
         self._function_signature = []
 
+        self._llvm_register_index = 0
+
         # We need a mechanism to keep track of the Mips Register's available
         self._lazy_mips_registers_available = list(self.__class__._LAZY_MIPS_REGISTERS)
         self._preserve_mips_registers_available = list(self.__class__._PRESERVE_MIPS_REGISTERS)
@@ -123,6 +125,22 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         ret += "}\n"
         self.decrease_code_indent()
         return ret
+
+    @property
+    def register_index(self) -> int:
+        """
+        the register index that is on top available.
+        :return: int register index
+        """
+        return self._llvm_register_index
+
+    def increment_register_index(self, amount: int = 1) -> None:
+        """
+        Increment the next available register index
+        :param amount: int by amount we increase, 1 by default.
+        """
+        self._llvm_register_index += amount
+
 
     # MIPS Code-Generation
     # ==================================================================================================================

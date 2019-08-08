@@ -1,22 +1,24 @@
 
+
+
+
+int fibbonaci(int n){
+
+    if (n == 0){
+
+        return 1;
+    }
+
+    else if (n == 1){
+
+        return 1;
+    }
+
+    return fibbonaci(n -1) - fibbonaci(n - 2);
+}
+
+
 int main(){
 
-    int a = 12, b = 13 , c = 14 , d = 44;
-
-    if( a < b){
-
-        b = 22;
-    }
-
-    else if(a == b){
-
-        c = 100;
-    }
-
-    else {
-
-        d =  88;
-    }
-
-    return 12;
+    return fibbonaci(5);
 }

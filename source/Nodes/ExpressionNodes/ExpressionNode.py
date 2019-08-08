@@ -74,16 +74,17 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
         self._place_of_value = reg_load_from if reg_load_from else self._place_of_value
 
-        # The first el of the operator stack is the implicit conversion from L to R value
-
+        # Modification
         stack: type_specifier.TypeStack = []
-        type_stack = list(self._parent_node.get_attribute(self._place_of_value).operator_stack)
 
+        # If marked as an natural l val (like identifier's) we need to dereference once in LLVM
         if not is_l_val:
             stack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
-            # type_stack.insert(1, type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER))
 
         stack += self._generate_type_operator_stack()
+
+        # Type of node
+        type_stack = list(self._parent_node.get_attribute(self._place_of_value).operator_stack)
 
         ret_string = ''
         while stack:
@@ -121,6 +122,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 self._place_of_value = self.register_index
 
             elif element == type_specifier.TypeSpecifier.POINTER:
+
                 stack_string = "".join([child.llvm_type for child in type_stack])
                 call_global = '@' if self.is_in_global_table(str(self._place_of_value)) else '%'
                 self.increment_register_index()
@@ -129,7 +131,8 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 ret_string += f'{stack_string}* {call_global}{self._place_of_value}\n'
                 self._place_of_value = self.register_index
                 self._is_global = False
-                type_stack.pop()
+                if type_stack:
+                    type_stack.pop()
 
             elif element == type_specifier.TypeSpecifier.ADDRESS:
                 item = stack.pop()

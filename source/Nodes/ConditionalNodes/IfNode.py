@@ -5,13 +5,12 @@ Academic Year: 2018-2019
 """
 
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
-from Nodes.ConditionalNodes import ElseNode, BranchNode
+from Nodes.ConditionalNodes import ElseNode
 from Nodes.ExpressionNodes import ConditionNode
 
 
 class IfNode(ElseNode.ElseNode):
     label = "if"
-    _parent_node: BranchNode.BranchNode
 
     # Built-ins
     # ==================================================================================================================
@@ -31,5 +30,24 @@ class IfNode(ElseNode.ElseNode):
     # LLVM Generation
     # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
-        ret = f'.{self._parent_node.code_function_base_label}_br{self._parent_node.assign_branch_index()}:'
-        return ""
+        # Labels to jump to
+        branch_to_true = self._parent_node.assign_label()
+        branch_to_false = self._parent_node.next_label()
+        branch_to_end = self._parent_node.end_label()
+
+        # Check condition
+        ret = self.llvm_comment(f'if {self._condition_node}', c_comment)
+        ret += self._condition_node.llvm_load(None, False)
+        ret += f'{self.code_indent_string()}br i1 {self._condition_node.llvm_value}, label %{branch_to_true}'
+        ret += f', label %{branch_to_false}\n\n'
+
+        # Code when expression is True
+        ret += f'{self.code_indent_string()}{branch_to_true}:\n'
+        self.increase_code_indent()
+        ret += self._statements_node.generate_llvm(c_comment)
+
+        # Jump to end of branch block
+        ret += f'{self.code_indent_string()}br label %{branch_to_end}\n\n'
+        self.decrease_code_indent()
+
+        return ret

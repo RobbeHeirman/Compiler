@@ -25,7 +25,7 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         """
         super().__init__(parent_node, ctx)
         self._symbol_table = SymbolTable.SymbolTable()
-        self._llvm_register_index = 0
+
 
         self._mips_stack_pointer: int = 0
 
@@ -67,26 +67,12 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         :param lexeme: lexeme to check
         :return: bool True if in global table False if not
         """
+
         if self._symbol_table.is_in_symbol_table(lexeme):
             return False
 
-        else:
-            return self._parent_node.is_in_table(lexeme)
+        return self._parent_node.is_in_global_table(lexeme)
 
-    @property
-    def register_index(self) -> int:
-        """
-        the register index that is on top available.
-        :return: int register index
-        """
-        return self._llvm_register_index
-
-    def increment_register_index(self, amount: int = 1) -> None:
-        """
-        Increment the next available register index
-        :param amount: int by amount we increase, 1 by default.
-        """
-        self._llvm_register_index += amount
 
     def is_global(self) -> bool:
         """
