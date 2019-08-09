@@ -19,7 +19,7 @@ class ElseNode(ScopedNode.ScopedNode):
         super().__init__(parent_node, ctx)
 
         self._statements_node: StatementsNode.StatementsNode = None
-        self.labels_needed = 1
+        self.labels_needed = 2
 
     # AST Generation
     # ==================================================================================================================
@@ -29,6 +29,8 @@ class ElseNode(ScopedNode.ScopedNode):
 
         super().add_child(child, index)
 
+    # LLVM Code generation
+    # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
         nw_br_label = self._parent_node.assign_label()
         end_branch = self._parent_node.end_label()
@@ -41,4 +43,12 @@ class ElseNode(ScopedNode.ScopedNode):
             return ret
 
         ret += f'{self.code_indent_string()}br label %{end_branch}\n\n'
+        return ret
+
+    def generate_mips(self, c_comment: bool = True):
+
+        nw_br_label = self._parent_node.assign_label()
+        ret = self.code_indent_string() + nw_br_label + ":\n"
+        ret += self._statements_node.generate_mips(c_comment)
+
         return ret

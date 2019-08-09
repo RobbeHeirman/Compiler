@@ -67,7 +67,7 @@ class AssignmentNode(BinaryExpressionNode.BinaryExpressionNode):
         :return:
         """
 
-        ret = '\n' + self.mips_comment(f'{self._left_expression} = {self._right_expression} ', c_comment)
+        ret = self.mips_comment(f'{self._left_expression} = {self._right_expression} ', c_comment)
         ret += self._left_expression.mips_store_address_in_reg("t0")
 
         ret += self._right_expression.mips_store_in_register("t1")

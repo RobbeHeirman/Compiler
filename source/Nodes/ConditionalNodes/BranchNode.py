@@ -24,8 +24,10 @@ class BranchNode(AbstractNode):
     # LLVM Code
     # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
+
         ret = super().generate_llvm(c_comment)
         ret += f'{self.code_indent_string()}{self.end_label()}:\n'
+        self._br_index = 0
         return ret
 
     def llvm_end_branch_index(self) -> int:
@@ -37,10 +39,11 @@ class BranchNode(AbstractNode):
     def generate_mips(self, c_comment: bool = True):
         ret = super().generate_mips(c_comment)
         ret += f'{self.code_indent_string()}{self.mips_end_label()}:\n'
+        self._br_index = 0
         return ret
 
     def mips_end_branch_index(self) -> int:
-        return self.llvm_end_branch_index() - 1
+        return len(self._children) - 1
 
     def mips_end_label(self) -> str:
         return f'{self.branch_base_label}{self.mips_end_branch_index()}'

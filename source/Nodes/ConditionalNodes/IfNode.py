@@ -18,6 +18,7 @@ class IfNode(ElseNode.ElseNode):
         super().__init__(parent_node, ctx)
 
         self._condition_node: ConditionNode.ConditionNode = None
+        self.labels_needed = 1
 
     # AST Generation
     # ==================================================================================================================

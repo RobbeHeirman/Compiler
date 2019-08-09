@@ -15,10 +15,19 @@ class ElseIfNode(IfNode.IfNode):
         self.labels_needed = 2
 
     # LLVM Code Generation
-    # ======================================================================================================================
+    # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
+        ret = self.llvm_comment("ELIF", c_comment)
         nw_br_label = self._parent_node.assign_label()
+        ret += self.code_indent_string() + nw_br_label + ":\n"
 
+        ret += IfNode.IfNode.generate_llvm(self, c_comment)
+        return ret
+
+    # Mips Code Generation
+    # ==================================================================================================================
+    def generate_mips(self, c_comment: bool = True):
+        nw_br_label = self._parent_node.assign_label()
         ret = self.code_indent_string() + nw_br_label + ":\n"
-        ret += super().generate_llvm(c_comment)
+        ret += super().generate_mips(c_comment)
         return ret
