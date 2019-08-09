@@ -100,6 +100,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 # the children know where there values are loaded into in child.llv_value
                 children_their_strings = []
                 for child in child_list:
+                    ret_string += child.llvm_load(None, False)
                     child_string = ''.join([type_child.llvm_type for type_child in child.type_stack])
                     child_string += f' {child.llvm_value}'
                     children_their_strings.append(child_string)

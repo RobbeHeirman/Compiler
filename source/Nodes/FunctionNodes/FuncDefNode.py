@@ -111,6 +111,8 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         ret += self._param_list_node.llvm_load_params()
         ret += self._param_list_node.llvm_store_params()
 
+        # get a return reg up
+        ret += f'{self.code_indent_string()}%.ret = alloca {return_type}\n'
         # We need to increment our register for each param
         self.increment_register_index(self._param_list_node.child_count())
 
@@ -122,6 +124,14 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
         # ret_type_str = "".join([c_type.llvm_type for c_type in self.get_return_type()])
         # ret += self.code_indent_string() + "ret {0} %{1}\n".format(ret_type_str, '0')
+
+        # Return
+        ret += f'{self.code_indent_string()}{self.return_label()}:\n'
+        self.increase_code_indent()
+        self.increment_register_index()
+        ret += f'{self.code_indent_string()}%{self.register_index} = load {return_type}, {return_type}* %.ret\n'
+        ret += f'{self.code_indent_string()} ret {return_type} %{self.register_index}\n'
+        self.decrease_code_indent()
         ret += "}\n"
         self.decrease_code_indent()
         return ret
@@ -141,6 +151,8 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         """
         self._llvm_register_index += amount
 
+    def return_label(self) -> str:
+        return f'{self.id}_return'
 
     # MIPS Code-Generation
     # ==================================================================================================================
@@ -250,6 +262,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
     @property
     def code_function_base_label(self) -> str:
         return self.id
+
     # Meta Code Generation
     # ==================================================================================================================
     def comment_code(self, c_comment: bool = True, mips=True):

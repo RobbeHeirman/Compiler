@@ -6,6 +6,7 @@ Academic Year: 2018-2019
 
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.FunctionNodes.FuncDefNode as FuncDefNode
+from Nodes.FunctionNodes.ReturnNode import ReturnNode
 
 
 class StatementsNode(AbstractNode.AbstractNode):
@@ -22,6 +23,14 @@ class StatementsNode(AbstractNode.AbstractNode):
     # ==================================================================================================================
     def get_return_type(self):
         return self._parent_node.get_return_type()
+
+    def has_return_node(self):
+
+        for child in self.get_children():
+            if isinstance(child, ReturnNode):
+                return True
+
+        return False
 
     # Mips-Code
     # ==================================================================================================================

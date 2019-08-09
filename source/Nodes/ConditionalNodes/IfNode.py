@@ -46,6 +46,11 @@ class IfNode(ElseNode.ElseNode):
         self.increase_code_indent()
         ret += self._statements_node.generate_llvm(c_comment)
 
+        if self._statements_node.has_return_node():
+            self.decrease_code_indent()
+            ret += "\n"
+            return ret
+
         # Jump to end of branch block
         ret += f'{self.code_indent_string()}br label %{branch_to_end}\n\n'
         self.decrease_code_indent()

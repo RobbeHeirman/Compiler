@@ -21,8 +21,20 @@ class ConditionalOperator(Enum):
             self.SMALLER: 'slt',
             self.EQUALS: 'eq'
         }
-
         return _LLVM_VAL_MAP[self]
+
+    @property
+    def mips_value(self):
+        _MIPS_VAL_MAP = {
+
+            self.BIGGER: 'sgt',
+            self.SMALLER: 'slt',
+            self.EQUALS: 'seq'
+        }
+
+        return _MIPS_VAL_MAP[self]
+
+
 
 
 class ConditionNode(BinaryExpressionNode):
@@ -66,5 +78,13 @@ class ConditionNode(BinaryExpressionNode):
         ret += f'{self.code_indent_string()}%{self.register_index} = icmp {self._type.llvm_value}'
         ret += f' {self._left_expression.llvm_type_string()} {self._left_expression.llvm_value},' \
             f' {self._right_expression.llvm_value}\n'
+
+        return ret
+
+    # Mips store
+    def mips_store_in_register(self, reg: str):
+        ret = self._left_expression.mips_store_in_register("t0")
+        ret += self._right_expression.mips_store_in_register("t1")
+        ret += f'{self.code_indent_string()}{self._type.mips_value} ${reg}, $t0, $t1\n\n'
 
         return ret

@@ -4,7 +4,12 @@
 
 int fibbonaci(int n){
 
-    if (n == 0){
+    if (n < 0){
+
+        return 0;
+    }
+
+    else if ( n == 0){
 
         return 1;
     }
@@ -14,7 +19,7 @@ int fibbonaci(int n){
         return 1;
     }
 
-    return fibbonaci(n -1) - fibbonaci(n - 2);
+    return fibbonaci(n -1) + fibbonaci(n - 2);
 }
 
 

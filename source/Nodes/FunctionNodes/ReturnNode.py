@@ -3,20 +3,22 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from typing import List
+from typing import List, TYPE_CHECKING
 
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
-import Nodes.GlobalNodes.StatementsNode as StatementsNode
-import Nodes.ExpressionNodes.ConstantExpressionNode as ConstantExpressionNode
+
 import Nodes.ExpressionNodes.IdentifierExpressionNode as IdentifierExpressionNode
+
+if TYPE_CHECKING:
+    import Nodes.GlobalNodes.StatementsNode as StatementsNode
 
 
 class ReturnNode(AbstractNode.AbstractNode):
     label = "return"
 
     # Type Annotations
-    _parent_node: StatementsNode.StatementsNode
+    _parent_node: "StatementsNode.StatementsNode"
     _children: List[ExpressionNode.ExpressionNode]
 
     # Built-ins
@@ -54,15 +56,11 @@ class ReturnNode(AbstractNode.AbstractNode):
         ret_type = self._parent_node.get_return_type()
         ret_type_str = ret_type[0].llvm_type
         ret_type_str += "".join([c_type.value for c_type in ret_type[1:]])
-        if isinstance(self._children[0], ConstantExpressionNode.ConstantExpressionNode):
-            child: ConstantExpressionNode.ConstantExpressionNode = self._children[0]
-            return_string += self.code_indent_string() + "ret {0} {1}\n".format(ret_type_str, child.llvm_value)
-
-        else:
-            child: IdentifierExpressionNode.IdentifierExpressionNode = self._children[0]
-            return_string += child.llvm_load()
-            return_string += self.code_indent_string() + "ret {0} %{1}\n".format(ret_type_str, self.register_index)
-
+        child: IdentifierExpressionNode.IdentifierExpressionNode = self._children[0]
+        return_string += child.llvm_load()
+        return_string += f'{self.code_indent_string()}store {ret_type_str}' \
+            f' {child.llvm_value}, {ret_type_str}* %.ret\n'
+        return_string += f'{self.code_indent_string()}br label %{self._parent_node.return_label()}\n'
         return return_string
 
     # Mips Code

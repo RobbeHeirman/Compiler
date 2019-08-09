@@ -34,5 +34,11 @@ class ElseNode(ScopedNode.ScopedNode):
         end_branch = self._parent_node.end_label()
         ret = self.code_indent_string() + nw_br_label + ":\n"
         ret += self._statements_node.generate_llvm(c_comment)
+
+        if self._statements_node.has_return_node():
+            self.decrease_code_indent()
+            ret += "\n"
+            return ret
+
         ret += f'{self.code_indent_string()}br label %{end_branch}\n\n'
         return ret
