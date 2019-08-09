@@ -81,10 +81,16 @@ class ConditionNode(BinaryExpressionNode):
 
         return ret
 
+    # Mips-Code
+    # ==================================================================================================================
+    def generate_mips(self, c_comment: bool = True):
+        return self.mips_store_in_register('t0') + '\n'
+
     # Mips store
     def mips_store_in_register(self, reg: str):
+
         ret = self._left_expression.mips_store_in_register("t0")
         ret += self._right_expression.mips_store_in_register("t1")
-        ret += f'{self.code_indent_string()}{self._type.mips_value} ${reg}, $t0, $t1\n\n'
+        ret += f'{self.code_indent_string()}{self._type.mips_value} ${reg}, $t0, $t1\n'
 
         return ret

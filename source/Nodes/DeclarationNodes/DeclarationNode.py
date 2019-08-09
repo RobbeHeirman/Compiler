@@ -164,13 +164,13 @@ class DeclarationNode(TypedNode.TypedNode):
         """
 
         attribute = self._parent_node.get_attribute(self.id)
-        ret = "\n"
+
         expression_c = f' = {self._expression_node}' if self._expression_node else ''
-        ret += self.mips_comment(f'{self._type_stack} {self.id}{expression_c}', c_comment)
+        ret = self.mips_comment(f'{self._type_stack} {self.id}{expression_c}', c_comment)
 
         if self._expression_node:
             ret += self._expression_node.mips_store_in_register('t0')
-            ret += self.code_indent_string() + f'sw $t0, {attribute.mips_stack_address}($sp)\n'
+            ret += self.code_indent_string() + f'sw $t0, {attribute.mips_stack_address}($sp)\n\n'
 
         return ret
 

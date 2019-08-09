@@ -28,6 +28,25 @@ class BranchNode(AbstractNode):
         ret += f'{self.code_indent_string()}{self.end_label()}:\n'
         return ret
 
+    def llvm_end_branch_index(self) -> int:
+        self._children: List[ElseNode]
+        return sum([child.labels_needed for child in self._children])
+
+    # Mips code generation
+    # ==================================================================================================================
+    def generate_mips(self, c_comment: bool = True):
+        ret = super().generate_mips(c_comment)
+        ret += f'{self.code_indent_string()}{self.mips_end_label()}:\n'
+        return ret
+
+    def mips_end_branch_index(self) -> int:
+        return self.llvm_end_branch_index() - 1
+
+    def mips_end_label(self) -> str:
+        return f'{self.branch_base_label}{self.mips_end_branch_index()}'
+
+    # Meta code generation
+    # ==================================================================================================================
     @property
     def branch_base_label(self):
         return f'{self._parent_node.code_function_base_label}_br'
@@ -44,8 +63,4 @@ class BranchNode(AbstractNode):
         return f'{self.branch_base_label}{self._br_index}'
 
     def end_label(self):
-        return f'{self.branch_base_label}{self.end_branch_index()}'
-
-    def end_branch_index(self) -> int:
-        self._children: List[ElseNode]
-        return sum([child.labels_needed for child in self._children])
+        return f'{self.branch_base_label}{self.llvm_end_branch_index()}'
