@@ -3,10 +3,12 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-
+from typing import TYPE_CHECKING
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
-import Nodes.FunctionNodes.FuncDefNode as FuncDefNode
 from Nodes.FunctionNodes.ReturnNode import ReturnNode
+
+if TYPE_CHECKING:
+    import Nodes.FunctionNodes.FuncDefNode as FuncDefNode
 
 
 class StatementsNode(AbstractNode.AbstractNode):

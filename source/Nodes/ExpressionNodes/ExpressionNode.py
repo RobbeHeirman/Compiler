@@ -1,10 +1,12 @@
 import abc
-from typing import List
+from typing import List, TYPE_CHECKING
 
 import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.DeclarationTypeModifierNode as TypeModifierNode
 import type_specifier
-from Nodes.FunctionNodes import ParamListNode
+
+if TYPE_CHECKING:
+    import Nodes.FunctionNodes.ParamListNode as ParamListNode
 
 
 class ExpressionNode(TypedNode.TypedNode, abc.ABC):
@@ -182,7 +184,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         """
         return ""
 
-    def _get_param_node(self) -> ParamListNode.ParamListNode:
+    def _get_param_node(self) -> "ParamListNode.ParamListNode":
         return self._type_modifier_node.get_param_node()
 
     # Mips Code
