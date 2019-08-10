@@ -122,7 +122,7 @@ class ParamListNode(AbstractNode.AbstractNode):
 
         return ret
 
-    def mips_load_arguments(self) -> str:
+    def mips_load_arguments(self, reg) -> str:
 
         extra_size_needed = sum(child.type_stack[-1].mips_stack_size for child in self._children[4:])
         ret = f'{self.code_indent_string()}subiu, $sp, $sp, {extra_size_needed}\n'
@@ -134,8 +134,8 @@ class ParamListNode(AbstractNode.AbstractNode):
         # Rest of the argument's on the stack
         tmp_stack_ptr = 0
         for index, child in enumerate(self._children[4:]):
-            ret += child.mips_store_in_register('t0')
-            ret += f'{self.code_indent_string()}sw $t0, {tmp_stack_ptr}($sp)\n'
+            ret += child.mips_store_in_register(reg)
+            ret += f'{self.code_indent_string()}sw ${reg}, {tmp_stack_ptr}($sp)\n'
             tmp_stack_ptr += child.type_stack[-1].mips_stack_size
 
         return ret

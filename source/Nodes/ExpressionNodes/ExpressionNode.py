@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     _BASE_LABEL = "expression"
+    _place_of_value: str
 
     # Built-ins
     # ==================================================================================================================
@@ -19,9 +20,9 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         self._identifier_node = None
         self.type = None
 
-        self.l_value = True
-
-        self._place_of_value = 0  # The register the current value of the identifier is placed
+        self.l_value = False
+        self.code_l_value = False
+        self._place_of_value: str = 0  # The register the current value of the identifier is placed
         self._is_global = False
 
     # AST-Visuals
@@ -68,23 +69,20 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     # LLVM-code
     # ==================================================================================================================
 
-    def llvm_load(self, reg_load_from=None, is_l_val: bool = False) -> str:
+    def llvm_load(self) -> str:
         """
         Will load this variable into a register
         :return: a string that loaded the value of the var into the register
         """
 
-        self._place_of_value = reg_load_from if reg_load_from else self._place_of_value
-
         # Modification
         stack: type_specifier.TypeStack = []
 
         # If marked as an natural l val (like identifier's) we need to dereference once in LLVM
-        if not is_l_val:
+        if self.code_l_value:
             stack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
 
         stack += self._generate_type_operator_stack()
-
         # Type of node
         type_stack = list(self._parent_node.get_attribute(self._place_of_value).operator_stack)
 
@@ -102,7 +100,6 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 # the children know where there values are loaded into in child.llv_value
                 children_their_strings = []
                 for child in child_list:
-                    ret_string += child.llvm_load(None, False)
                     child_string = ''.join([type_child.llvm_type for type_child in child.type_stack])
                     child_string += f' {child.llvm_value}'
                     children_their_strings.append(child_string)

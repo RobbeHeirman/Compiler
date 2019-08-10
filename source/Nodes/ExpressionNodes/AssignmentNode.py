@@ -47,8 +47,8 @@ class AssignmentNode(BinaryExpressionNode.BinaryExpressionNode):
     def generate_llvm(self, c_comment=True) -> str:
 
         ret = self.llvm_comment(f'{self._left_expression} = {self._right_expression} ', c_comment)
-        ret += self._left_expression.llvm_load(None, True)
-        ret += self._right_expression.llvm_load(None, False)
+        ret += self._left_expression.llvm_load()
+        ret += self._right_expression.llvm_load()
         ret += self.code_indent_string() + f'store {self.llvm_type_string()} {self._right_expression.llvm_value},'
         ret += f' {self.llvm_type_string()}* {self._left_expression.llvm_value}\n'
 

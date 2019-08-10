@@ -123,10 +123,15 @@ class LLVMAbstractExecTest(LLVMAbstractTest):
         else:
             return
 
-        si = subprocess.STARTUPINFO()
-        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        ret_code = subprocess.call([exec_name], startupinfo=si)
-        self.assertEqual(ret_code, exit_code_exec)
+        if os.name == 'nt':
+            si = subprocess.STARTUPINFO()
+            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            ret_code = subprocess.call([exec_name], startupinfo=si)
+            self.assertEqual(ret_code, exit_code_exec)
+
+        else:
+            ret_code = subprocess.call([exec_name])
+            self.assertEqual(ret_code, exit_code_exec)
 
 
 class MipsAbstractTest(unittest.TestCase):

@@ -56,7 +56,8 @@ class ReturnNode(AbstractNode.AbstractNode):
         ret_type = self._parent_node.get_return_type()
         ret_type_str = ret_type[0].llvm_type
         ret_type_str += "".join([c_type.value for c_type in ret_type[1:]])
-        child: IdentifierExpressionNode.IdentifierExpressionNode = self._children[0]
+
+        child = self._children[0]
         return_string += child.llvm_load()
         return_string += f'{self.code_indent_string()}store {ret_type_str}' \
             f' {child.llvm_value}, {ret_type_str}* %.ret\n'

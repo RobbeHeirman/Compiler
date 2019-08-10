@@ -9,6 +9,7 @@ import SymbolTable
 from Nodes.DeclarationNodes.IncludeStatementNode import IncludeStatementNode
 from Nodes.FunctionNodes.FuncDefNode import FuncDefNode
 
+
 class RootNode(ScopedNode.ScopedNode):
     """
     The root of our program. Root is a ScopedNode, the base scope of our C program.
@@ -28,6 +29,10 @@ class RootNode(ScopedNode.ScopedNode):
         self._indent_level: int = 0
 
         self._index = 0
+
+        self._register_list = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9', 's0', 's1', 's3'
+            , 's4', 's5', 's6', 's7']
+        self._register_list.reverse()
 
     # Ast-visuals
     # ==================================================================================================================
@@ -102,3 +107,9 @@ class RootNode(ScopedNode.ScopedNode):
         ret += text_ret
         ret += "#" * 72
         return ret
+
+    def mips_register_reserve(self) -> str:
+        return self._register_list.pop()
+
+    def mips_register_free(self, reg: str):
+        self._register_list.append(reg)

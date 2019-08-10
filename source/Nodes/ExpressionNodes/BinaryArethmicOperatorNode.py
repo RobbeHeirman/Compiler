@@ -56,8 +56,8 @@ class BinaryArethmicOperatorNode(BinaryExpressionNode):
     # ==================================================================================================================
 
     def llvm_load(self, reg_load_from=None, is_l_val: bool = False):
-        ret = self._left_expression.llvm_load(None, False)
-        ret += self._right_expression.llvm_load(None, False)
+        ret = self._left_expression.llvm_load()
+        ret += self._right_expression.llvm_load()
 
         self.increment_register_index()
         self._place_of_value = self.register_index
@@ -70,7 +70,14 @@ class BinaryArethmicOperatorNode(BinaryExpressionNode):
     # MIPS Code
     # ==================================================================================================================
     def mips_store_in_register(self, reg: str):
-        ret = self._left_expression.mips_store_in_register('t0')
-        ret += self._right_expression.mips_store_in_register('t1')
-        ret += f'{self.code_indent_string()}{self._operator.mips_op_code} ${reg}, $t0, $t1\n'
+        reg_1 = self.mips_register_reserve()
+        reg_2 = self.mips_register_reserve()
+
+        ret = self._left_expression.mips_store_in_register(reg_1)
+        ret += self._right_expression.mips_store_in_register(reg_2)
+        ret += f'{self.code_indent_string()}{self._operator.mips_op_code} ${reg}, ${reg_1}, ${reg_2}\n'
+
+        self.mips_register_free(reg_1)
+        self.mips_register_free(reg_2)
+
         return ret

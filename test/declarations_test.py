@@ -26,7 +26,7 @@ class STestDeclaration(SAbstractTest):
         """
         Happy day test integer init
         """
-        self._run_analysis("Happy_day_int.c")
+        self._run_analysis("happy_day_int.c")
 
     def test_char_happy_day(self):
         self._run_analysis("happy_day_char.c")

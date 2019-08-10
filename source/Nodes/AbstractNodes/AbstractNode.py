@@ -286,6 +286,12 @@ class AbstractNode(abc.ABC):
     def code_function_base_label(self) -> str:
         return self._parent_node.code_function_base_label
 
+    def mips_register_reserve(self):
+        return self._parent_node.mips_register_reserve()
+
+    def mips_register_free(self, reg: str):
+        self._parent_node.mips_register_free(reg)
+
     # Meta Code Generation
     # ==================================================================================================================
     @property

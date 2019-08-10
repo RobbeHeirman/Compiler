@@ -7,6 +7,6 @@ int a (int b){
 
 int main(){
 
-    int c = a(454);
+    int c = a(91);
     return c;
 }

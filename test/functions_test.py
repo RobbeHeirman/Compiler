@@ -59,10 +59,10 @@ class LLVMFunctionTest(LLVMAbstractExecTest):
         return self._build_and_run_llvm("return_stored_var.c", 48)
 
     def test_call_with_constant(self):
-        return self._build_and_run_llvm("call_with_constants.c", 454)
+        return self._build_and_run_llvm("call_with_constants.c", 91)
 
     def test_call_with_variables(self):
-        return self._build_and_run_llvm("call_with_variables.c", 1000)
+        return self._build_and_run_llvm("call_with_variables.c", 80)
 
     def test_mixed_calls(self):
         return self._build_and_run_llvm("call_mixed.c", 88)
@@ -90,10 +90,10 @@ class MipsFunctionTest(MipsAbstractTest):
         return self._build_and_run_mips("return_stored_var.c", 48)
 
     def test_call_with_constant(self):
-        return self._build_and_run_mips("call_with_constants.c", 454)
+        return self._build_and_run_mips("call_with_constants.c", 91)
 
     def test_call_with_variables(self):
-        return self._build_and_run_mips("call_with_variables.c", 1000)
+        return self._build_and_run_mips("call_with_variables.c", 80)
 
     def test_mixed_calls(self):
         return self._build_and_run_mips("call_mixed.c", 88)

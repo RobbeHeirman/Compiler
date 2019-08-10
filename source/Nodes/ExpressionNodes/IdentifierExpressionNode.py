@@ -8,7 +8,6 @@ from typing import Union
 import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
 
-import LlvmCode
 import messages
 import type_specifier
 
@@ -18,7 +17,7 @@ from constants import MIPS_REGISTER_SIZE
 class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
     # TypeAnnotations
     id: str
-    _l_value: bool
+    l_value: bool
 
     # Built-ins
     # ==================================================================================================================
@@ -26,7 +25,8 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         super().__init__(parent_node, ctx)
         self.id = ctx.getText()
 
-        self._l_value = True  # As it's base form an identifier is an Lvalue
+        self.l_value = True  # As it's base form an identifier is an Lvalue
+        self.code_l_value = True
         self._place_of_value: Union[int, str] = self.id  # The register the current value of the identifier is placed
 
         self._is_global = False
@@ -128,11 +128,14 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
                 # Set up the argument's in both register and on stack
                 param_node = self._get_param_node()
-                ret_str += param_node.mips_load_arguments()
+                ret_str += "# HIER IS FUNC CALLS\n"
+                ret_str += param_node.mips_load_arguments(reg)
 
                 # We need to save $ra
-                ret_str += f'{self.code_indent_string()}subiu $sp, $sp, {MIPS_REGISTER_SIZE} # Making room for link \n'
+                ret_str += f'{self.code_indent_string()}subiu $sp, $sp, {MIPS_REGISTER_SIZE * 3} # Making room for link\n'
                 ret_str += f'{self.code_indent_string()}sw $ra, ($sp) # Storing link\n'
+                ret_str += f'{self.code_indent_string()}sw $t0, {MIPS_REGISTER_SIZE}($sp) # Storing link\n'
+                ret_str += f'{self.code_indent_string()}sw $t1, {MIPS_REGISTER_SIZE * 2}($sp) # Storing link\n'
 
                 ret_str += f'{self.code_indent_string()}jal .{self.id}\n'
 
@@ -140,7 +143,10 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 ret_str += param_node.mips_free_stack_of_arguments()
                 # Restore link
                 ret_str += f'{self.code_indent_string()}lw $ra, ($sp) # Restoring link\n'
-                ret_str += f'{self.code_indent_string()}addiu $sp, $sp, {MIPS_REGISTER_SIZE}\n'
+                ret_str += f'{self.code_indent_string()}lw $t0, {MIPS_REGISTER_SIZE}($sp) # Restoring link\n'
+                ret_str += f'{self.code_indent_string()}lw $t1, {MIPS_REGISTER_SIZE * 2}($sp) # Restoring link\n'
+
+                ret_str += f'{self.code_indent_string()}addiu $sp, $sp, {MIPS_REGISTER_SIZE * 3}\n'
                 # move the return value in to assigned register
                 ret_str += f'{self.code_indent_string()}move ${reg}, $v0\n'
         return ret_str

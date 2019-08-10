@@ -1,5 +1,3 @@
-// Regressive test all previous implemented features
-
 int fibb(int n){
 
     if (n < 0){

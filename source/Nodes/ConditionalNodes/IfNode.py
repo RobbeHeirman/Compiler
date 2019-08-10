@@ -38,7 +38,7 @@ class IfNode(ElseNode.ElseNode):
 
         # Check condition
         ret = self.llvm_comment(f'if {self._condition_node}', c_comment)
-        ret += self._condition_node.llvm_load(None, False)
+        ret += self._condition_node.llvm_load()
         ret += f'{self.code_indent_string()}br i1 {self._condition_node.llvm_value}, label %{branch_to_true}'
         ret += f', label %{branch_to_false}\n\n'
 

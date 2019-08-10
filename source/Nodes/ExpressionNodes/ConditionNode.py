@@ -70,8 +70,8 @@ class ConditionNode(BinaryExpressionNode):
         return self.llvm_load(None, False)
 
     def llvm_load(self, reg_load_from=None, is_l_val: bool = False):
-        ret = self._left_expression.llvm_load(None, False)
-        ret += self._right_expression.llvm_load(None, False)
+        ret = self._left_expression.llvm_load()
+        ret += self._right_expression.llvm_load()
         self.increment_register_index()
         self._place_of_value = self.register_index
 
