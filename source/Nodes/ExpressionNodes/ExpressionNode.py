@@ -69,7 +69,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     # LLVM-code
     # ==================================================================================================================
 
-    def llvm_load(self) -> str:
+    def llvm_load(self, get_l_val: bool = False) -> str:
         """
         Will load this variable into a register
         :return: a string that loaded the value of the var into the register
@@ -79,7 +79,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         stack: type_specifier.TypeStack = []
 
         # If marked as an natural l val (like identifier's) we need to dereference once in LLVM
-        if self.code_l_value:
+        if self.code_l_value and not get_l_val:
             stack = [type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER)]
 
         stack += self._generate_type_operator_stack()

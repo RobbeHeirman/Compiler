@@ -69,7 +69,7 @@ class ConditionNode(BinaryExpressionNode):
     def generate_llvm(self, c_comment: bool = True):
         return self.llvm_load(None, False)
 
-    def llvm_load(self, reg_load_from=None, is_l_val: bool = False):
+    def llvm_load(self, is_l_val: bool = False):
         ret = self._left_expression.llvm_load()
         ret += self._right_expression.llvm_load()
         self.increment_register_index()

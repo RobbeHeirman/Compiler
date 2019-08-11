@@ -3,14 +3,12 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from typing import List, Union, TYPE_CHECKING
+from typing import List, Union
 
 import LlvmCode
 import Nodes.AbstractNodes.AbstractNode as AbstractNode
 import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
-
-if TYPE_CHECKING:
-    import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
+import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
 
 class ParamListNode(AbstractNode.AbstractNode):
@@ -49,11 +47,11 @@ class ParamListNode(AbstractNode.AbstractNode):
         Will load all parameters that are variables to temporal registers
         :return:
         """
-        import Nodes.ExpressionNodes.IdentifierExpressionNode as IdentifierExpressionNode
 
         ret = ""
         for child in self._children:
-            if isinstance(child, IdentifierExpressionNode.IdentifierExpressionNode):
+            if isinstance(child, ExpressionNode.ExpressionNode):
+
                 ret += child.llvm_load()
 
             elif isinstance(child, DeclarationNode.DeclarationNode):
@@ -129,6 +127,7 @@ class ParamListNode(AbstractNode.AbstractNode):
 
         # First 4 into registers $a0 - $a3
         for index, child in enumerate(self._children[:4]):
+            child: ExpressionNode.ExpressionNode
             ret += child.mips_store_in_register(f'a{index}')
 
         # Rest of the argument's on the stack
