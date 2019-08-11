@@ -26,8 +26,9 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         super().__init__(parent_node, ctx)
         self._symbol_table = SymbolTable.SymbolTable()
 
-
         self._mips_stack_pointer: int = 0
+
+        self._while_index = 0
 
     # Semantic analysis
     # ==================================================================================================================
@@ -73,7 +74,6 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
 
         return self._parent_node.is_in_global_table(lexeme)
 
-
     def is_global(self) -> bool:
         """
         Nodes can ask their parent's if they are global.
@@ -101,3 +101,12 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         """
         self._mips_stack_pointer += amount
         return self._mips_stack_pointer
+
+    # Meta Code Generation
+    # ==================================================================================================================
+    def get_while_label(self):
+
+        func_l = self.code_function_base_label
+        ret = f'while_{func_l}{self._while_index}'
+        self._while_index += 1
+        return ret
