@@ -100,7 +100,7 @@ class DeclarationNode(TypedNode.TypedNode):
         # Special action's required if we initialize array's
         if self._type_stack[-1] == type_specifier.TypeSpecifier.ARRAY:
             self._array_size = self.type_modifier_node.get_static_size()
-
+            attr.array_size = self._array_size
 
         # Check of the expression is semantically correct
         elif self._expression_node:

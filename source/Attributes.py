@@ -27,6 +27,8 @@ class Attributes:
         self._line = line
         self._column = column
 
+        self.array_size = 0
+
         # Mips info
         self._mips_stack_address: int = 0
 

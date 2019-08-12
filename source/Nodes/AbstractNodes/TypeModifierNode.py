@@ -140,6 +140,10 @@ class TypeModifierNode(AbstractNode.AbstractNode, abc.ABC):
     # LLVM Code generations
     # ==================================================================================================================
 
+    @property
+    def expression_node(self):
+        return self._param_list_node
+
     def is_function_call(self):
         if self._type_modifier_node:
             return self._type_modifier_node.is_function_call()

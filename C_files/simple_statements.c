@@ -6,8 +6,8 @@ int main(){
 
 int a[44];
 
- a[] = 18;
+ a[12] = 8;
 
- return 12;
+ return a[12];
 
 }

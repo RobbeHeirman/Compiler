@@ -16,10 +16,17 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
     Handles TypeModifiers like & () * .... In an expressionNode.
     Augment's the type of an expression.
     """
+    _type_modifier_node: "ExpressionTypeModifierNode"
 
+    # Built-in
+    # ==================================================================================================================
     def __init__(self, parent_node, ctx, modifier=None):
         super().__init__(parent_node, ctx, modifier)
 
+        self._llvm_used = False
+
+    # Semantic analysis
+    # ==================================================================================================================
     def generate_secondary_type(self, node: ExpressionNode.ExpressionNode, messenger: messages.MessageGenerator):
         """
         Function requires an expressionNode and adjust this node's type trough it's type stack.
@@ -120,3 +127,19 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
             return True
 
         return False
+
+    # LLVM Code
+    # ==================================================================================================================
+    def get_bottom_arr(self):
+
+        if self._type_modifier_node:
+
+            ret_val = self._type_modifier_node.get_bottom_arr()
+            if ret_val != -1:
+                return ret_val
+
+        if self.modifier_type == type_specifier.TypeSpecifier.ARRAY and not self._llvm_used:
+            self._llvm_used = True
+            return self
+
+        return -1

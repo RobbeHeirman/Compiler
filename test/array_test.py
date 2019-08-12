@@ -25,6 +25,9 @@ class SArrayTest(AbstractTest.SAbstractTest):
     def test_subscript_no_expression(self):
         return self._run_analysis("subs_n_expr.c", 1)
 
+    def test_expr_sub_not_int(self):
+        return self._run_analysis('expr_sub_not_int.c', 2)
+
 # class LLVMWhileTest(AbstractTest.LLVMAbstractExecTest):
 #
 #     def __init__(self, *args, **kwargs):

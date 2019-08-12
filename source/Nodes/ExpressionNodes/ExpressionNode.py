@@ -5,14 +5,15 @@ import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.DeclarationNodes.DeclarationTypeModifierNode as TypeModifierNode
 import type_specifier
 
+
 if TYPE_CHECKING:
     import Nodes.FunctionNodes.ParamListNode as ParamListNode
-
+    from Nodes.ExpressionNodes import ExpressionTypeModifierNode
 
 class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     _BASE_LABEL = "expression"
     _place_of_value: str
-
+    _type_modifier_node: "ExpressionTypeModifierNode.ExpressionTypeModifierNode"
     # Built-ins
     # ==================================================================================================================
     def __init__(self, parent_node, ctx):
@@ -84,7 +85,8 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
         stack += self._generate_type_operator_stack()
         # Type of node
-        type_stack = list(self._parent_node.get_attribute(self._place_of_value).operator_stack)
+        attr = self._parent_node.get_attribute(self._place_of_value)
+        type_stack = list(attr.operator_stack)
 
         ret_string = ''
         while stack:
@@ -140,7 +142,16 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                     f"type This: {item} "
 
             elif element == type_specifier.TypeSpecifier.ARRAY:
-                pass
+                arr_node = self._type_modifier_node.get_bottom_arr()
+                ret_string += arr_node.expression_node.llvm_load()
+                self.increment_register_index()
+
+                inbound_type = "".join([child.llvm_type for child in self._type_stack])
+                arr_type = f'[{attr.array_size} x {inbound_type}]'
+                ret_string += f'{self.code_indent_string()}%{self.register_index} = getelementptr {arr_type},'
+                ret_string += f' {arr_type}* %{self._place_of_value}, i32 0, i32 {arr_node.expression_node.llvm_value}\n'
+                self._place_of_value = self.register_index
+                # stack.append(type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER))
 
         return ret_string
 
