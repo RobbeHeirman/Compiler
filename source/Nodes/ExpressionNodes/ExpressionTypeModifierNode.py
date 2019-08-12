@@ -29,6 +29,12 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
         :param MessageGenerator messenger: A messageGenerator that we use to generate error messages
         :return: bool: True if the modification's are legal, False if they are not.
         """
+        if not self._type_modifier_node:
+            if len(self._children) < 1:
+                self._param_list_node = None
+        else:
+            if len(self._children) < 2:
+                self._param_list_node = None
 
         # Check the type_modifier subtree. Children of this type modifier node get to modify the type stack first.
         if self._type_modifier_node:
@@ -85,7 +91,6 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
 
         # Array's
         elif self._modifier_type == type_specifier.TypeSpecifier.ARRAY:
-
             # First check if we can subscript.
             if not node.type_stack_ref()[-1] == type_specifier.TypeSpecifier.ARRAY:
                 messenger.error_subscript_not_array(self.line, self.column)

@@ -81,6 +81,9 @@ class TypeModifierNode(AbstractNode.AbstractNode, abc.ABC):
         if isinstance(child, TypeModifierNode):
             self._type_modifier_node = None
 
+        elif isinstance(child, ExpressionNode.ExpressionNode):
+            self._param_list_node = None
+
     def add_child(self, child, index=None):
 
         if isinstance(child, TypeModifierNode):

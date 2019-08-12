@@ -312,7 +312,9 @@ class CListenerExtend(CListener):
         self._parent_node.modifier_type = type_specifier.TypeSpecifier(val)
 
     def enterExpression_postfix(self, ctx: CParser.Expression_postfixContext):
-        val = ctx.getChild(0).getChild(0).getText() + ctx.getChild(0).getChild(2).getText()
+        val = ctx.getChild(0).getChild(0).getText()
+
+        val = '[]' if val == '[' else '()'
         self._parent_node.modifier_type = type_specifier.TypeSpecifier(val)
 
     def enterExpression_param_list(self, ctx: CParser.Expression_param_listContext):

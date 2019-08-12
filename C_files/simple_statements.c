@@ -3,9 +3,11 @@
 
 int main(){
 
- int i[7];
 
- i[4] = 12;
+int a[44];
 
- return 55;
+ a[] = 18;
+
+ return 12;
+
 }

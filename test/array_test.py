@@ -19,6 +19,12 @@ class SArrayTest(AbstractTest.SAbstractTest):
     def test_non_integer(self):
         return self._run_analysis('non_integer_init.c', 3)
 
+    def test_subscript_non_array(self):
+        return self._run_analysis("subscript_non_array.c", 2)
+
+    def test_subscript_no_expression(self):
+        return self._run_analysis("subs_n_expr.c", 1)
+
 # class LLVMWhileTest(AbstractTest.LLVMAbstractExecTest):
 #
 #     def __init__(self, *args, **kwargs):
