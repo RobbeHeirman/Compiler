@@ -88,7 +88,6 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
     @property
     def mips_stack_pointer(self) -> int:
         """
-
         :return int: The relative address of the stack pointer. Front end book keeping
         """
         return self._mips_stack_pointer
