@@ -11,6 +11,7 @@ import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 import LlvmCode
 import Attributes as Attributes
 import messages
+import type_specifier
 from Nodes.AbstractNodes.AbstractNode import AbstractNode
 from Nodes.ExpressionNodes.ExpressionTypeModifierNode import ExpressionTypeModifierNode
 
@@ -35,7 +36,8 @@ class DeclarationNode(TypedNode.TypedNode):
 
         self.id = None
         self._expression_node: ExpressionNode.ExpressionNode = None
-        # Error message info
+
+        self._array_size = 0
 
     # AST Visuals
     # ==================================================================================================================
@@ -94,8 +96,14 @@ class DeclarationNode(TypedNode.TypedNode):
         self._generate_secondary_types(messenger)
         # We have all the info for the corresponding attribute object
         attr = self._make_attribute()
+
+        # Special action's required if we initialize array's
+        if self._type_stack == type_specifier.TypeSpecifier.ARRAY:
+            self._array_size = self.type_modifier_node.get_static_size()
+
+
         # Check of the expression is semantically correct
-        if self._expression_node:
+        elif self._expression_node:
             if not self._expression_node.semantic_analysis(messenger):
                 return False
             self.analyze_initializer(messenger)
@@ -173,27 +181,6 @@ class DeclarationNode(TypedNode.TypedNode):
             ret += self.code_indent_string() + f'sw $t0, {attribute.mips_stack_address}($sp)\n\n'
 
         return ret
-
-    # def mips_assign_register(self):
-    #     """
-    #     Tells the front end where to store the different variable's.
-    #
-    #     """
-    #     # PreProcessing
-    #     # Get the attribute from the symbol table. We will use the symbol table to keep track of where we find
-    #     # variables
-    #     attribute = self._parent_node.get_attribute(self.id)
-    #     # The return string
-    #     return_string = ""
-    #
-    #     # Step 1:
-    #     # Check if we can use a register
-    #     if self._parent_node.mips_register_available():
-    #         attribute.mips_is_register = True
-    #         attribute.mips_register = self._parent_node.mips_get_available_register()
-    #
-    #     else:
-    #         attribute.mips_is_register = False
 
     def mips_assign_address(self):
         attribute = self._parent_node.get_attribute(self.id)

@@ -155,6 +155,8 @@ class MessageGenerator:
 
     # Array's
     # ==================================================================================================================
+    def error_size_not_integer(self, lexeme, line, column):
+        self._writer(f'{self._error(line, column)}size of array \'{lexeme}\' has non-integer type')
 
     def error_array_size_missing(self, lexeme, line, column):
         self._writer("{0}array size missing in '{1}' ".format(self._error(line, column), lexeme))
