@@ -3,5 +3,9 @@
 
 int main(){
 
- int i['d'];
+ int i[7];
+
+ i[4] = 12;
+
+ return 55;
 }

@@ -98,7 +98,7 @@ class DeclarationNode(TypedNode.TypedNode):
         attr = self._make_attribute()
 
         # Special action's required if we initialize array's
-        if self._type_stack == type_specifier.TypeSpecifier.ARRAY:
+        if self._type_stack[-1] == type_specifier.TypeSpecifier.ARRAY:
             self._array_size = self.type_modifier_node.get_static_size()
 
 
@@ -149,7 +149,11 @@ class DeclarationNode(TypedNode.TypedNode):
         ret = self.llvm_comment(f'{self._type_stack[0].value} {self.id}{expression_c}', c_comment)
 
         # Allocate at id
-        ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())
+        if self._type_stack[-1] == type_specifier.TypeSpecifier.ARRAY:
+            ret += f'{self.code_indent_string()}%{self.id} = alloca'
+            ret += f' [{self._array_size} x {"".join([child.llvm_type for child in self._type_stack[:-1]])}]\n'
+        else:
+            ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())
 
         # handle expression node and store it in address of declaration id
         if self._expression_node:

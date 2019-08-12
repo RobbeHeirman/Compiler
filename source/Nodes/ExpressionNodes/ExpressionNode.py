@@ -139,6 +139,9 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 assert (item == type_specifier.TypeSpecifier.POINTER), f"We dereference something else then addr " \
                     f"type This: {item} "
 
+            elif element == type_specifier.TypeSpecifier.ARRAY:
+                pass
+
         return ret_string
 
     @property

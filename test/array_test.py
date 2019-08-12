@@ -17,7 +17,7 @@ class SArrayTest(AbstractTest.SAbstractTest):
         return self._run_analysis("happy_day.c")
 
     def test_non_integer(self):
-        return self._run_analysis('non_integer.c', 3)
+        return self._run_analysis('non_integer_init.c', 3)
 
 # class LLVMWhileTest(AbstractTest.LLVMAbstractExecTest):
 #

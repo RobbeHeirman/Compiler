@@ -57,6 +57,8 @@ class BinaryExpressionNode(ExpressionNode.ExpressionNode, ABC):
 
         if self._left_expression.type_stack != self._right_expression.type_stack:
             # print(f'{self._left_expression.type_stack} :}')
+            print(self._left_expression.type_stack)
+            print(self._right_expression.type_stack)
             messenger.error_no_conversion_base_types(self._left_expression.type_stack[0],
                                                      self._right_expression.type_stack[0],
                                                      self.line,

@@ -63,7 +63,6 @@ class TypeModifierNode(TypeModifierNode.TypeModifierNode):
         return True
 
     def get_static_size(self) -> int:
-
         if not self._type_modifier_node:
             if self.modifier_type == type_specifier.TypeSpecifier.ARRAY and self._param_list_node:
                 return int(self._param_list_node.constant)

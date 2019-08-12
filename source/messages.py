@@ -158,11 +158,17 @@ class MessageGenerator:
     def error_size_not_integer(self, lexeme, line, column):
         self._writer(f'{self._error(line, column)}size of array \'{lexeme}\' has non-integer type')
 
+    def error_subscript_not_integer(self, line, column):
+        self._writer(f'{self._error(line, column)}subscript is not an integer')
+
     def error_array_size_missing(self, lexeme, line, column):
         self._writer("{0}array size missing in '{1}' ".format(self._error(line, column), lexeme))
 
     def error_subscript_not_array(self, line, column):
         self._writer("{0}subscripted value isn't an array".format(self._error(line, column)))
+
+    def error_expected_expression(self, line, column):
+        self._writer(f'{self._error(line, column)} expected expression')
 
     # Warnings
     # ==================================================================================================================

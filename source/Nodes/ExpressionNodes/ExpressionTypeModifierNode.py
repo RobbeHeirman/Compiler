@@ -82,6 +82,24 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
             else:
                 messenger.error_object_not_function(self._line, self._column)
                 return False
+
+        # Array's
+        elif self._modifier_type == type_specifier.TypeSpecifier.ARRAY:
+
+            # First check if we can subscript.
+            if not node.type_stack_ref()[-1] == type_specifier.TypeSpecifier.ARRAY:
+                messenger.error_subscript_not_array(self.line, self.column)
+                return False
+
+            if not self._param_list_node:
+                messenger.error_expected_expression(self.line, self.column)
+                return False
+
+            if not self._param_list_node.type_stack[-1] == type_specifier.TypeSpecifier.INT:
+                messenger.error_subscript_not_integer(self.line, self.column)
+                return False
+            node.type_stack_ref().pop()
+
         return True
 
     def _check_any_consistent(self, signature: List):
