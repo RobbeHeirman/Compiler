@@ -143,3 +143,12 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
             return self
 
         return -1
+
+    # reset_used_switches
+    # ==================================================================================================================
+    def reset_used_switches(self):
+
+        if self._type_modifier_node:
+            self._type_modifier_node.reset_used_switches()
+
+        self._llvm_used = False

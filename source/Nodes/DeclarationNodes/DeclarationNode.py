@@ -189,11 +189,18 @@ class DeclarationNode(TypedNode.TypedNode):
     def mips_assign_address(self):
         attribute = self._parent_node.get_attribute(self.id)
         attribute.mips_stack_address = self.mips_stack_pointer
-        self._parent_node.mips_increase_stack_pointer(self._type_stack[-1].mips_stack_size)
+
+        if self._type_stack[-1] == type_specifier.TypeSpecifier.ARRAY:
+            self._parent_node.mips_increase_stack_pointer(self._type_stack[-2].mips_stack_size * self._array_size)
+        else:
+            self._parent_node.mips_increase_stack_pointer(self._type_stack[-1].mips_stack_size)
 
     def mips_stack_space_needed(self) -> int:
         """
         Return's the value of how much stack space this variable needs.
         :return: The stack space size.
         """
+        if self._type_stack[-1] == type_specifier.TypeSpecifier.ARRAY:
+            return self._type_stack[-2].mips_stack_size * self._array_size
+
         return self._type_stack[-1].mips_stack_size

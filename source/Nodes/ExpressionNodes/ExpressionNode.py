@@ -89,6 +89,8 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         type_stack = list(attr.operator_stack)
 
         ret_string = ''
+        if stack:
+            self._type_modifier_node.reset_used_switches()
         while stack:
             element: type_specifier.TypeSpecifier = stack.pop()
             if element == type_specifier.TypeSpecifier.FUNCTION:
@@ -143,6 +145,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
             elif element == type_specifier.TypeSpecifier.ARRAY:
                 arr_node = self._type_modifier_node.get_bottom_arr()
+
                 ret_string += arr_node.expression_node.llvm_load()
                 self.increment_register_index()
 

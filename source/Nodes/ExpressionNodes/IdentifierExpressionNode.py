@@ -110,8 +110,12 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
         ret_str = ""
         stack = self._generate_type_operator_stack()
 
-        if not stack or stack[-1] != type_specifier.TypeSpecifier.FUNCTION:
+        if not stack or stack[-1] != type_specifier.TypeSpecifier.FUNCTION \
+                or stack[-1] != type_specifier.TypeSpecifier.ARRAY:
             ret_str += f'{self.code_indent_string()}lw ${reg}, {attribute.mips_stack_address}($sp)\n'
+
+        if stack:
+            self._type_modifier_node.reset_used_switches()
 
         while stack:
             element = stack.pop()
@@ -149,18 +153,53 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 ret_str += f'{self.code_indent_string()}addiu $sp, $sp, {MIPS_REGISTER_SIZE * 3}\n'
                 # move the return value in to assigned register
                 ret_str += f'{self.code_indent_string()}move ${reg}, $v0\n'
+
+            elif element == type_specifier.TypeSpecifier.ARRAY:
+                arr_node = self._type_modifier_node.get_bottom_arr()
+
+                # Calculate address
+                extr_addr = self._parent_node.mips_register_reserve()
+                muli_addr = self._parent_node.mips_register_reserve()
+
+                ret_str += arr_node.expression_node.mips_store_in_register(extr_addr)
+                ret_str += f'{self.code_indent_string()}li ${muli_addr}, {MIPS_REGISTER_SIZE}\n'
+                ret_str += f'{self.code_indent_string()}mul ${extr_addr}, ${extr_addr}, ${muli_addr}\n'
+                ret_str += f'{self.code_indent_string()}addu ${reg}, $sp, ${extr_addr}\n'
+                ret_str += f'{self.code_indent_string()}lw ${reg}, {attribute.mips_stack_address}(${reg})\n'
+
+                self._parent_node.mips_register_free(extr_addr)
+                self._parent_node.mips_register_free(muli_addr)
+
+
+
         return ret_str
 
     def mips_store_address_in_reg(self, target_reg):
 
-        number_on_stack = self._parent_node.get_attribute(self.id).mips_stack_address
+        attr = self._parent_node.get_attribute(self.id)
+        number_on_stack = attr.mips_stack_address
         stack = self._generate_type_operator_stack()
-        ret = f'{self.code_indent_string()}addu  ${target_reg}, $sp, {number_on_stack}\n'
+        ret = f'{self.code_indent_string()}addu  ${target_reg}, $sp, {number_on_stack} \n'
         while stack:
 
             element = stack.pop()
 
             if element == type_specifier.TypeSpecifier.POINTER:
                 ret += f'{self.code_indent_string()}lw ${target_reg}, (${target_reg})\n'
+
+            elif element == type_specifier.TypeSpecifier.ARRAY:
+                arr_node = self._type_modifier_node.get_bottom_arr()
+
+                extr_addr = self._parent_node.mips_register_reserve()
+                muli_addr = self._parent_node.mips_register_reserve()
+
+                ret += arr_node.expression_node.mips_store_in_register(extr_addr)
+                ret += f'{self.code_indent_string()}li ${muli_addr}, {MIPS_REGISTER_SIZE}\n'
+                ret += f'{self.code_indent_string()}mul ${extr_addr}, ${extr_addr}, ${muli_addr}\n'
+                ret += f'{self.code_indent_string()}addu ${target_reg}, $sp, ${extr_addr}\n'
+                ret += f'{self.code_indent_string()}addu ${target_reg}, ${target_reg}, {number_on_stack}\n'
+
+                self._parent_node.mips_register_free(extr_addr)
+                self._parent_node.mips_register_free(muli_addr)
 
         return ret
