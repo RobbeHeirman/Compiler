@@ -23,6 +23,7 @@ statement
     | ret_statement SEMICOLON
     | expression SEMICOLON
     | branch
+    | while_loop
     ;
 
 decl_list
@@ -197,6 +198,8 @@ branch: c_if (c_elif)* (c_else)?;
 c_if : IF LPARANT expression RPARANT LBRACES statements RBRACES;
 c_elif: ELSE IF LPARANT expression RPARANT LBRACES statements RBRACES;
 c_else: ELSE LBRACES statements RBRACES;
+
+while_loop: WHILE LPARANT expression RPARANT LBRACES statements RBRACES;
 
 // =====================================================================================================================
 /** Tokens */

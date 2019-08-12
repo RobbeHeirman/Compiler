@@ -339,3 +339,6 @@ class AbstractNode(abc.ABC):
 
     def get_while_label(self) -> str:
         return self._parent_node.get_while_label()
+    #
+    # def next_label(self):
+    #     return self._parent_node.next_label()

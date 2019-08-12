@@ -28,6 +28,7 @@ import Nodes.AbstractNodes.TypedNode as TypedNode
 import Nodes.ExpressionNodes.ExpressionTypeModifierNode as ExpressionTypeModifierNode
 from Nodes.ConditionalNodes import BranchNode, IfNode, ElseNode
 from Nodes.ConditionalNodes.ElifNode import ElseIfNode
+from Nodes.ConditionalNodes.WhileNode import WhileNode
 from Nodes.ExpressionNodes import AssignmentNode, BinaryArethmicOperatorNode
 
 from gen.CListener import CListener
@@ -406,4 +407,13 @@ class CListenerExtend(CListener):
         self._parent_node = node
 
     def exitC_else(self, ctx: CParser.C_elseContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def enterWhile_loop(self, ctx: CParser.While_loopContext):
+        node = WhileNode(self._parent_node, ctx)
+        node.parent_node = self._parent_node
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitWhile_loop(self, ctx: CParser.While_loopContext):
         self._parent_node = self._parent_node.parent_node
