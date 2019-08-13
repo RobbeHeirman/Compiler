@@ -77,9 +77,25 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
         # Start with a label
         ret = '.printf:\n'
         self.increase_code_indent()
-        ret += f'{self.code_indent_string()}lw $a0, ($a0)\n'
+
+        # We need to save our base address as prep
+        ret += f'{self.code_indent_string()}move $t0, $a0 # Saving the base address\n'
+        ret += f'{self.code_indent_string()}move $t1, $zero # Setting up counter for ret val\n'
+
+        ret += f'{self.code_indent_string()}.start_printf:\n'
+        self.increase_code_indent()
+        ret += f'{self.code_indent_string()}lw $a0, ($t0)\n # Load char at address\n'
+        ret += f'{self.code_indent_string()}beqz $a0 .end_printf # 0 is the null terminator char\n'
         ret += f'{self.code_indent_string()}li $v0, 11 # Code for printing chars\n'
         ret += f'{self.code_indent_string()}syscall\n'
+
+        ret += f'{self.code_indent_string()}addiu $t1, $t1, 1\n'
+        ret += f'{self.code_indent_string()}addiu $t0, $t0, 4 # next word\n'
+        ret += f'{self.code_indent_string()}b .start_printf\n'
+
+        self.decrease_code_indent()
+        ret += f'{self.code_indent_string()}.end_printf:\n'
+        ret += f'{self.code_indent_string()}move $v0, $t1\n'
         ret += f'{self.code_indent_string()}jr $ra\n'
 
         # scanf

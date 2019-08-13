@@ -3,13 +3,14 @@ Author: Robbe Heirman
 Project: Simple C Compiler
 Academic Year: 2018-2019
 """
-from typing import List
+from typing import List, TYPE_CHECKING
 
 import Nodes.AbstractNodes.TypeModifierNode as TypeModifierNode
 import messages
 import type_specifier
-import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
+if TYPE_CHECKING:
+    import Nodes.ExpressionNodes.ExpressionNode as ExpressionNode
 
 class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
     """
@@ -27,7 +28,7 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
 
     # Semantic analysis
     # ==================================================================================================================
-    def generate_secondary_type(self, node: ExpressionNode.ExpressionNode, messenger: messages.MessageGenerator):
+    def generate_secondary_type(self, node: "ExpressionNode.ExpressionNode", messenger: messages.MessageGenerator):
         """
         Function requires an expressionNode and adjust this node's type trough it's type stack.
         This node modifies the ExpressionNode state in type_stack and l_value(bool that tell's if l or r val)
@@ -119,10 +120,11 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
         signature = list(signature)
 
         if signature and signature[-1] == [type_specifier.TypeSpecifier.ANY]:
-
             signature.pop()
             for i in range(len(signature)):
                 if signature[i] != func_sign[i]:
+                    print(signature[i])
+                    print(func_sign[i])
                     return False
             return True
 

@@ -2,13 +2,14 @@ import abc
 from typing import List, TYPE_CHECKING
 
 import Nodes.AbstractNodes.TypedNode as TypedNode
-import Nodes.DeclarationNodes.DeclarationTypeModifierNode as TypeModifierNode
+from Nodes.ExpressionNodes import ExpressionTypeModifierNode
+
 import type_specifier
 
 
 if TYPE_CHECKING:
     import Nodes.FunctionNodes.ParamListNode as ParamListNode
-    from Nodes.ExpressionNodes import ExpressionTypeModifierNode
+
 
 class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     _BASE_LABEL = "expression"
@@ -16,6 +17,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     _type_modifier_node: "ExpressionTypeModifierNode.ExpressionTypeModifierNode"
     # Built-ins
     # ==================================================================================================================
+
     def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
         self._identifier_node = None
@@ -40,7 +42,11 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     # ==================================================================================================================
     def add_child(self, child, index=None):
 
-        if isinstance(child, TypeModifierNode.TypeModifierNode):
+        if isinstance(child, ExpressionTypeModifierNode.ExpressionTypeModifierNode):
+            if self._type_modifier_node:
+                self._children.remove(self._type_modifier_node)
+                child.add_child(self._type_modifier_node)
+
             self._type_modifier_node = child
 
         super().add_child(child)
@@ -89,7 +95,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         type_stack = list(attr.operator_stack)
 
         ret_string = ''
-        if stack:
+        if self._type_modifier_node:
             self._type_modifier_node.reset_used_switches()
         while stack:
             element: type_specifier.TypeSpecifier = stack.pop()
@@ -149,7 +155,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 ret_string += arr_node.expression_node.llvm_load()
                 self.increment_register_index()
 
-                inbound_type = "".join([child.llvm_type for child in self._type_stack])
+                inbound_type = "".join([child.llvm_type for child in type_stack])
                 arr_type = f'[{attr.array_size} x {inbound_type}]'
                 ret_string += f'{self.code_indent_string()}%{self.register_index} = getelementptr {arr_type},'
                 ret_string += f' {arr_type}* %{self._place_of_value}, i32 0, i32 {arr_node.expression_node.llvm_value}\n'

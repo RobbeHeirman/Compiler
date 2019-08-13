@@ -43,7 +43,17 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
     @property
     def llvm_value(self) -> str:
         if self._type_stack[0] == type_specifier.TypeSpecifier.CHAR:
-            return str(ord(str(self.constant)[1]))
+            stripped = self.constant[1:-1]
+            if len(stripped) > 1:
+                stripped = stripped[1:]
+                if stripped == '0':
+                    return str(0)
+                elif stripped == 'n':
+                    return str(10)
+                elif stripped == 'r':
+                    return str(13)
+
+            return str(ord(stripped))
 
         elif self._type_stack[0] == type_specifier.TypeSpecifier.FLOAT:
             constant = float(self.constant)
@@ -67,7 +77,7 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
     @property
     def mips_value(self) -> str:
         if self._type_stack[0] == type_specifier.TypeSpecifier.CHAR:
-            return str(ord(str(self.constant)[1]))
+            return self.llvm_value
 
         elif self._type_stack[0] == type_specifier.TypeSpecifier.FLOAT:
             return hex(struct.unpack('<I', struct.pack('<f', float(self.constant)))[0])

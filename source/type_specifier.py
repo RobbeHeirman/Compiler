@@ -36,14 +36,15 @@ class TypeSpecifier:
         self._function_signature = func_signature if func_signature else []
 
     def __eq__(self, o):
-
+        val = None
         if isinstance(o, TypeSpecifier):
-            if self._type_spec == o.value:
-                return True
-
+            val = o.value
         else:
-            if self._type_spec == o:
-                return True
+            val = o
+
+        if self._type_spec == val:
+            return True
+
         return False
 
     def __repr__(self):
