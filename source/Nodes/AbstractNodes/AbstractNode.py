@@ -322,7 +322,7 @@ class AbstractNode(abc.ABC):
         Used to manage indentation in LLVM Code generation
         :return: string A string of whitespaces matching the indent level
         """
-        return "  " * self._parent_node.code_indent_level
+        return "    " * self._parent_node.code_indent_level
 
     def increase_code_indent(self) -> None:
         """

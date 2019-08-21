@@ -24,8 +24,8 @@ class BranchNode(AbstractNode):
     # LLVM Code
     # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
-
-        ret = super().generate_llvm(c_comment)
+        ret = self.llvm_comment("If, else if, ..., Else", c_comment)
+        ret += super().generate_llvm(c_comment)
         ret += f'{self.code_indent_string()}{self.end_label()}:\n'
         self._br_index = 0
         return ret
@@ -37,8 +37,12 @@ class BranchNode(AbstractNode):
     # Mips code generation
     # ==================================================================================================================
     def generate_mips(self, c_comment: bool = True):
-        ret = super().generate_mips(c_comment)
+        ret = self.mips_comment("Start if then else branch", c_comment)
+        ret += super().generate_mips(c_comment)
+        self.decrease_code_indent()
+        ret += self.mips_comment("End if then else branch", c_comment)
         ret += f'{self.code_indent_string()}{self.mips_end_label()}:\n'
+        self.increase_code_indent()
         self._br_index = 0
         return ret
 

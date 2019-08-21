@@ -173,12 +173,13 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         :return string: A string of MipsCode. Generated of this function definition.
         """
         # 0 Starting comment's. = A pseudo code (a bit like C) that shows witch statement we are generating
-        ret = '\n\n' + self.comment_code(c_comment)
+        ret = '\n' + self.comment_code(c_comment)
 
         # 1 Label the start of the function. We add a . to prevent name clashes with compiler defined labels.
-        ret += f'.{self.id}:\n'
+        ret += f'{self.code_indent_string()}.{self.id}:\n'
         self.increase_code_indent()
 
+        ret += self.mips_comment("Preparation, includes making room on stack save important regs...", c_comment)
         # 2 Make room on the stack for local variable's
         frame_size = self._expression_node.mips_stack_space_needed()
 

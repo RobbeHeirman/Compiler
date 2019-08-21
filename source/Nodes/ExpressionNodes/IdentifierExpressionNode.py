@@ -130,7 +130,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
                 # Set up the argument's in both register and on stack
                 param_node = self._get_param_node()
-                ret_str += "# HIER IS FUNC CALLS\n"
                 ret_str += param_node.mips_load_arguments(reg)
 
                 # We need to save $ra
@@ -167,8 +166,6 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
 
                 self._parent_node.mips_register_free(extr_addr)
                 self._parent_node.mips_register_free(muli_addr)
-
-
 
         return ret_str
 

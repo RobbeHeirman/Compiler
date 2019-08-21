@@ -184,11 +184,10 @@ class DeclarationNode(TypedNode.TypedNode):
 
         expression_c = f' = {self._expression_node}' if self._expression_node else ''
         ret = self.mips_comment(f'{self._type_stack} {self.id}{expression_c}', c_comment)
-        ret += "# ....\n"
         if self._expression_node:
             addr = self.mips_register_reserve()
             ret += self._expression_node.mips_store_in_register(addr)
-            ret += self.code_indent_string() + f'sw ${addr}, {attribute.mips_stack_address}($sp) # check dit\n\n'
+            ret += self.code_indent_string() + f'sw ${addr}, {attribute.mips_stack_address}($sp)\n\n'
             self.mips_register_free(addr)
 
         return ret

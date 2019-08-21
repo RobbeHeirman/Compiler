@@ -28,6 +28,7 @@ class ElseIfNode(IfNode.IfNode):
     # ==================================================================================================================
     def generate_mips(self, c_comment: bool = True):
         nw_br_label = self._parent_node.assign_label()
-        ret = self.code_indent_string() + nw_br_label + ":\n"
+        ret = self.mips_comment("Else if", c_comment)
+        ret += self.code_indent_string() + nw_br_label + ":\n"
         ret += super().generate_mips(c_comment)
         return ret

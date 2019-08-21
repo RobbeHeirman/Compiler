@@ -34,7 +34,8 @@ class ElseNode(ScopedNode.ScopedNode):
     def generate_llvm(self, c_comment: bool = True):
         nw_br_label = self._parent_node.assign_label()
         end_branch = self._parent_node.end_label()
-        ret = self.code_indent_string() + nw_br_label + ":\n"
+        ret = self.llvm_comment("Else", c_comment)
+        ret += self.code_indent_string() + nw_br_label + ":\n"
         ret += self._statements_node.generate_llvm(c_comment)
 
         if self._statements_node.has_return_node():
@@ -48,7 +49,10 @@ class ElseNode(ScopedNode.ScopedNode):
     def generate_mips(self, c_comment: bool = True):
 
         nw_br_label = self._parent_node.assign_label()
-        ret = self.code_indent_string() + nw_br_label + ":\n"
+        ret = self.mips_comment("Else:", c_comment)
+        ret += self.code_indent_string() + nw_br_label + ":\n"
+        self.increase_code_indent()
         ret += self._statements_node.generate_mips(c_comment)
-
+        ret += "\n"
+        self.decrease_code_indent()
         return ret

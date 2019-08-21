@@ -67,7 +67,7 @@ class ConditionNode(BinaryExpressionNode):
     # LLVM code generation
     # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
-        return self.llvm_load(None, False)
+        return self.llvm_load()
 
     def llvm_load(self, is_l_val: bool = False):
         ret = self._left_expression.llvm_load()

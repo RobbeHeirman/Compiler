@@ -212,7 +212,13 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     # ==================================================================================================================
 
     def generate_mips(self, c_comment: bool = True):
-        return self.mips_store_in_register("t0")
+
+        reg = self.mips_register_reserve()
+        ret = self.mips_comment(str(self), c_comment)
+        ret += self.mips_store_in_register(reg)
+        self.mips_register_free(reg)
+        return ret
+
 
     def mips_store_in_register(self, reg: str) -> str:
         """

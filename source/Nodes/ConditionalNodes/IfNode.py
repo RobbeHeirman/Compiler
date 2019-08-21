@@ -65,8 +65,10 @@ class IfNode(ElseNode.ElseNode):
         branch_to_false = self._parent_node.next_label()
         branch_to_end = self._parent_node.mips_end_label()
         ret = self.mips_comment(f'if {self._condition_node}', c_comment)
+        self.increase_code_indent()
         ret += self._condition_node.mips_store_in_register('t0')
         ret += f'{self.code_indent_string()}beqz $t0, {branch_to_false}\n\n'
+        self.decrease_code_indent()
 
         ret += self.mips_comment("if true:", c_comment)
         self.increase_code_indent()
