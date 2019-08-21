@@ -124,8 +124,9 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 ret_string += f' {"".join([child.llvm_type for child in self._type_stack])}'
 
                 if self._parent_node.is_in_table(self._place_of_value):
-                    if self._parent_node.get_attribute(self._place_of_value).operator_stack[-1].function_signature[-1] \
-                            == [type_specifier.TypeSpecifier.ANY]:
+                    attr_stack = self._parent_node.get_attribute(self._place_of_value).operator_stack
+                    if attr_stack[-1].function_signature and attr_stack[-1].function_signature[-1] == [
+                        type_specifier.TypeSpecifier.ANY]:
                         ret_string += '( i8*, ...) '
 
                 ret_string += f' @{self._place_of_value}{call_string}\n'

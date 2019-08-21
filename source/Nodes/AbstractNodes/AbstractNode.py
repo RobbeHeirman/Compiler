@@ -273,14 +273,18 @@ class AbstractNode(abc.ABC):
     def mips_increase_stack_pointer(self, amount: int) -> int:
         return self._parent_node.mips_increase_stack_pointer(amount)
 
-    def mips_stack_space_needed(self) -> int:
-        return 0
+    def mips_stack_space_needed(self):
+        """
+        Return's The total mips stack size needed
+        :return: Stack space needed by all children
+        """
+        return sum(child.mips_stack_space_needed() for child in self._children)
 
     def mips_assign_register(self):
         pass
 
     def mips_assign_address(self):
-        pass
+        [child.mips_assign_address() for child in self._children]
 
     @property
     def code_function_base_label(self) -> str:

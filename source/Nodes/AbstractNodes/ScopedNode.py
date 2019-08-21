@@ -26,8 +26,6 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         super().__init__(parent_node, ctx)
         self._symbol_table = SymbolTable.SymbolTable()
 
-        self._mips_stack_pointer: int = 0
-
         self._while_index = 0
 
     # Semantic analysis
@@ -84,23 +82,6 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
 
     # Mips-Code
     # ==================================================================================================================
-
-    @property
-    def mips_stack_pointer(self) -> int:
-        """
-        :return int: The relative address of the stack pointer. Front end book keeping
-        """
-        return self._mips_stack_pointer
-
-    def mips_increase_stack_pointer(self, amount: int) -> int:
-        """
-        Increases the amount of the stack pointer.
-        :param int amount: the amount we increase the stack pointer with
-        :return int: the new (relative value of the stack pointer)
-        """
-        self._mips_stack_pointer += amount
-        return self._mips_stack_pointer
-
     # Meta Code Generation
     # ==================================================================================================================
     def get_while_label(self):

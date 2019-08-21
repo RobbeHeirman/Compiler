@@ -66,10 +66,14 @@ class AssignmentNode(BinaryExpressionNode.BinaryExpressionNode):
         :param c_comment:
         :return:
         """
+        addr1 = self.mips_register_reserve()
 
         ret = self.mips_comment(f'{self._left_expression} = {self._right_expression} ', c_comment)
-        ret += self._left_expression.mips_store_address_in_reg("t0")
+        ret += self._left_expression.mips_store_address_in_reg(addr1)
 
-        ret += self._right_expression.mips_store_in_register("t1")
-        ret += f'{self.code_indent_string()}sw, $t1, ($t0)\n'
+        addr2 = self.mips_register_reserve()
+        ret += self._right_expression.mips_store_in_register(addr2)
+        ret += f'{self.code_indent_string()}sw, ${addr2}, (${addr1})\n'
+        self.mips_register_free(addr1)
+        self.mips_register_free(addr2)
         return ret

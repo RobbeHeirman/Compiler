@@ -107,7 +107,7 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
             if not self._param_list_node:
                 messenger.error_expected_expression(self.line, self.column)
                 return False
-
+            self._param_list_node.semantic_analysis(messenger)
             if not self._param_list_node.type_stack[-1] == type_specifier.TypeSpecifier.INT:
                 messenger.error_subscript_not_integer(self.line, self.column)
                 return False

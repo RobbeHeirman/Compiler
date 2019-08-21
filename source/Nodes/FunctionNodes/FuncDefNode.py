@@ -32,6 +32,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # We need a mechanism to keep track of the Mips Register's available
         self._lazy_mips_registers_available = list(self.__class__._LAZY_MIPS_REGISTERS)
         self._preserve_mips_registers_available = list(self.__class__._PRESERVE_MIPS_REGISTERS)
+        self._mips_stack_pointer: int = 0
 
     # AST-Visuals
     # ==================================================================================================================
@@ -262,6 +263,22 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
     @property
     def code_function_base_label(self) -> str:
         return self.id
+
+    @property
+    def mips_stack_pointer(self) -> int:
+        """
+        :return int: The relative address of the stack pointer. Front end book keeping
+        """
+        return self._mips_stack_pointer
+
+    def mips_increase_stack_pointer(self, amount: int) -> int:
+        """
+        Increases the amount of the stack pointer.
+        :param int amount: the amount we increase the stack pointer with
+        :return int: the new (relative value of the stack pointer)
+        """
+        self._mips_stack_pointer += amount
+        return self._mips_stack_pointer
 
     # Meta Code Generation
     # ==================================================================================================================
