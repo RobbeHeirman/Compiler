@@ -174,6 +174,11 @@ class MessageGenerator:
     def error_expected_expression(self, line, column):
         self._writer(f'{self._error(line, column)} expected expression')
 
+    # Branching
+    # ==================================================================================================================
+    def error_break_not_while(self, line, column):
+        self._writer(f'{self._error(line, column)} break statement not within loop or switch')
+
     # Warnings
     # ==================================================================================================================
     def warning(self, line, column):

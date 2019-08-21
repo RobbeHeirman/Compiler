@@ -38,6 +38,7 @@ class AssignmentNode(BinaryExpressionNode.BinaryExpressionNode):
 
         if not self._left_expression.l_value:
             messenger.error_expected_l_value(self.line, self.column)
+            return False
 
         if self._left_expression.is_read_only():
             messenger.error_is_read_only(self.line, self.column, self._left_expression.name())

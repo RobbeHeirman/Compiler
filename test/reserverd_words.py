@@ -14,5 +14,14 @@ class SreservedTest(AbstractTest.SAbstractTest):
         self.path += "reserved_words/"
         self.result_path += "reserved_words/"
 
-    def test_happy_day(self):
+    def test_happy_const(self):
+        return self._run_analysis("happy_const.c", 0)
+
+    def test_wrong_const(self):
         return self._run_analysis("const.c", 1)
+
+    def test_happy_break(self):
+        return self._run_analysis("happy_const.c")
+
+    def test_misplaced_break(self):
+        return self._run_analysis("misplaced_break.c", 2)
