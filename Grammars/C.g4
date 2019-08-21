@@ -21,6 +21,7 @@ statement
     : decl_list
     | func_def
     | ret_statement SEMICOLON
+    | break_statement SEMICOLON
     | expression SEMICOLON
     | branch
     | while_loop
@@ -205,6 +206,7 @@ c_elif: ELSE IF LPARANT expression RPARANT LBRACES statements RBRACES;
 c_else: ELSE LBRACES statements RBRACES;
 
 while_loop: WHILE LPARANT expression RPARANT LBRACES statements RBRACES;
+break_statement: BREAK;
 
 // =====================================================================================================================
 /** Tokens */
@@ -259,6 +261,7 @@ RETURN: 'return';
 IF: 'if';
 ELSE: 'else';
 WHILE: 'while';
+BREAK: 'break';
 
 
 // identifier(s) & literals
