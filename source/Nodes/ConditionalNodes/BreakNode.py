@@ -17,3 +17,12 @@ class BreakNode(AbstractNode):
         if not isinstance(self._parent_node.parent_node, WhileNode):
             messenger.error_break_not_while(self.line, self.column)
             return False
+
+        return True
+
+    # LLVM-Code
+    # ==================================================================================================================
+    def generate_llvm(self, c_comment: bool = True):
+        grand_parent: WhileNode = self._parent_node.parent_node
+        self.increment_register_index()
+        return f'{self.code_indent_string()}br label %{grand_parent.end_label}\n\n'

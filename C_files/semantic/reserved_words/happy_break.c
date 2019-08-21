@@ -5,6 +5,7 @@ int main(){
 
         k = k + 1;
         break;
+        k = 44;
     }
 
     return k;

@@ -4,10 +4,15 @@ from Nodes.ConditionalNodes.IfNode import IfNode
 class WhileNode(IfNode):
     label = "While"
 
+    def __init__(self, parent_node, ctx):
+        super().__init__(parent_node, ctx)
+        self.end_label = ""
+
     def generate_llvm(self, c_comment: bool = True):
         nw_label = self.get_while_label()
         st_cond = f'start_{nw_label}'
         end_lbl = f'end_{nw_label}'
+        self.end_label = end_lbl
 
         ret = self.llvm_comment(f'while({self._condition_node})', c_comment)
         ret += f'{self.code_indent_string()}br label %{st_cond}\n\n'
@@ -26,7 +31,9 @@ class WhileNode(IfNode):
         ret += f'{self.code_indent_string()}br label %{st_cond}\n\n'
 
         self.decrease_code_indent()
+        self.decrease_code_indent()
         ret += f'{self.code_indent_string()}{end_lbl}:\n'
+        self.increase_code_indent()
 
         return ret
 
@@ -34,6 +41,7 @@ class WhileNode(IfNode):
         nw_label = self.get_while_label()
         st_cond = f'start_{nw_label}'
         end_lbl = f'end_{nw_label}'
+        self.end_label = end_lbl
 
         reg = self.mips_register_reserve()
         ret = f'{self.code_indent_string()}{st_cond}:\n'

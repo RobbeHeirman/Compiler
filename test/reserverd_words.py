@@ -21,7 +21,20 @@ class SreservedTest(AbstractTest.SAbstractTest):
         return self._run_analysis("const.c", 1)
 
     def test_happy_break(self):
-        return self._run_analysis("happy_const.c")
+        return self._run_analysis("happy_break.c")
 
     def test_misplaced_break(self):
         return self._run_analysis("misplaced_break.c", 2)
+
+
+class LLVMReservedTest(AbstractTest.LLVMAbstractExecTest):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.path += "reserved_words/"
+        self.result_path += "reserved_words/"
+
+    def test_happy_const(self):
+        return self._build_and_run_llvm("happy_const.c", 44)
+
+    def test_happy_break(self):
+        return self._build_and_run_llvm("happy_break.c", 1)

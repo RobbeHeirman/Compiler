@@ -61,7 +61,7 @@ class ReturnNode(AbstractNode.AbstractNode):
         return_string += child.llvm_load()
         return_string += f'{self.code_indent_string()}store {ret_type_str}' \
             f' {child.llvm_value}, {ret_type_str}* %.ret\n'
-        return_string += f'{self.code_indent_string()}br label %{self._parent_node.return_label()}\n'
+        return_string += f'{self.code_indent_string()}br label %{self._parent_node.return_label()}\n\n'
         return return_string
 
     # Mips Code
