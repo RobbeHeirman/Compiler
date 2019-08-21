@@ -57,7 +57,7 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
         func_type.function_signature = signature
         type_stack = [ret_type, func_type]
         scanf_attr = Attributes.Attributes(type_stack, 0, 0)
-        scanf_attr.llvm_name = var_id
+        scanf_attr.llvm_name = "scanf"
         self._parent_node.add_to_scope_symbol_table(var_id, scanf_attr)
 
         return True
@@ -179,6 +179,7 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
         ret += f'{self.code_indent_string()}b .print_code\n\n'
         self.decrease_code_indent()
         self.decrease_code_indent()
+
         # Print code
         ret += f'{self.code_indent_string()}.print_code:\n'
         self.increase_code_indent()
@@ -195,11 +196,119 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
         ret += f'{self.code_indent_string()}move $v0, $t1\n'
         ret += f'{self.code_indent_string()}jr $ra\n\n'
         self.decrease_code_indent()
+
+        ret += self._scanf(c_comment)
+        return ret
+
+    def _scanf(self, c_comment):
         # scanf
-        ret += '\n'
+        ret = '\n'
         ret += '.scanf:\n'
-        ret += f'{self.code_indent_string()}li $v0, 12\n'
+        self.increase_code_indent()
+
+        # We need to save our base address as prep
+        ret += f'{self.code_indent_string()}move $t0, $a0 # Saving the base address\n'
+        ret += f'{self.code_indent_string()}move $t1, $zero # Setting up counter for ret val\n'
+        ret += f'{self.code_indent_string()}move $t2, $zero # We will use this to count arguments used.\n\n'
+
+        # Start printf
+        ret += f'{self.code_indent_string()}.start_scanf:\n'
+        self.increase_code_indent()
+        ret += f'{self.code_indent_string()}lw $a0, ($t0)# Load char at address\n'
+        ret += f'{self.code_indent_string()}beqz $a0 .end_scanf # 0 is the null terminator char\n'
+        ret += f'{self.code_indent_string()}beq $a0, 37 .argument_scan # ascii 37 = %\n\n'
+
+        # If it is not a format string
+        ret += self.mips_comment("Default not a format char", c_comment)
+        self.increase_code_indent()
+        ret += f'{self.code_indent_string()}addiu $t0, $t0, 4 # We just skip this char then\n'
+        ret += f'b .start_scanf\n'
+        self.decrease_code_indent()
+
+        # % char found
+        ret += f'{self.code_indent_string()}.argument_scan: # Handling formatted string args\n'
+        self.increase_code_indent()
+
+        # Load the correct argument in place, first 2 will be placed in registers
+        ret += f'{self.code_indent_string()} beq $t2, 0 .first_arg_scan\n'
+        ret += f'{self.code_indent_string()} beq $t2, 1 .second_arg_scan\n'
+        ret += f'{self.code_indent_string()} beq $t2, 2 .third_arg_scan\n\n'
+
+        # Load from stack
+        ret += self.mips_comment("Load from stack if past argument range", c_comment)
+        ret += f'{self.code_indent_string()}subi $t3, $t3, 3\n'
+        ret += f'{self.code_indent_string()}mul $t3, $t4, 4\n'
+        ret += f'{self.code_indent_string()}add $t3, $t4, $sp\n'
+        ret += f'{self.code_indent_string()}lw $a0 ($t4)\n'
+        ret += f'{self.code_indent_string()}b .type_control_scan\n\n'
+
+        # Load from $a1
+        ret += f'{self.code_indent_string()}.first_arg:\n'
+        self.increase_code_indent()
+        ret += f"{self.code_indent_string()}move $a0, $a1\n"
+        ret += f'{self.code_indent_string()}b .type_control_scan\n\n'
+        self.decrease_code_indent()
+
+        # load from $a2
+        ret += f'{self.code_indent_string()}.second_arg:\n'
+        self.increase_code_indent()
+        ret += f"{self.code_indent_string()}move $a0, $a2\n"
+        ret += f'{self.code_indent_string()}b .type_control_scan\n\n'
+        self.decrease_code_indent()
+
+        # load from $a3
+        ret += f'{self.code_indent_string()}.third_arg:\n'
+        self.increase_code_indent()
+        ret += f"{self.code_indent_string()}move $a0, $a3\n\n"
+        self.decrease_code_indent()
+        self.decrease_code_indent()
+
+        # type control
+        ret += self.mips_comment("Load in the code based on type", c_comment)
+        ret += f'{self.code_indent_string()}.type_control_scan:\n'
+        self.increase_code_indent()
+        ret += f'{self.code_indent_string()}addiu $t0, $t0, 4\n'
+        ret += f'{self.code_indent_string()}lw $t3, ($t0)\n'
+        ret += f'{self.code_indent_string()}beq $t3, 100 .scan_int #104 is a "d"\n'
+        ret += f'{self.code_indent_string()}beq $t3, 105, .scan_int #111 is a "i"\n'
+        ret += f'{self.code_indent_string()}beq $t3, 115, .scan_char_string #123 is a s\n'
+        ret += f'{self.code_indent_string()}beq $t3, 99 .scan_char\n\n'
+
+        # Not a valid code we just ignore the statement
+        ret += f'{self.code_indent_string()}addiu $t1, $t1, 1\n'
+        ret += f'{self.code_indent_string()}b .start_scanf\n\n'
+
+        # For integers
+        ret += f'{self.code_indent_string()}.scan_int:\n'
+        self.increase_code_indent()
+        ret += f'{self.code_indent_string()}li $v0 5\n'
+        ret += f'{self.code_indent_string()}b .scan_code\n\n'
+        self.decrease_code_indent()
+
+        # For chars
+        ret += f'{self.code_indent_string()}.scan_char:\n'
+        self.increase_code_indent()
+        ret += f'{self.code_indent_string()}li $v0 12\n'
+        ret += f'{self.code_indent_string()}b .scan_code\n\n'
+        self.decrease_code_indent()
+
+        # For strings
+        ret += f'{self.code_indent_string()}.scan_char_string:\n'
+        self.increase_code_indent()
+        ret += f'{self.code_indent_string()}li $v0 12\n'
+        ret += f'{self.code_indent_string()}b .scan_code\n\n'
+        self.decrease_code_indent()
+        self.decrease_code_indent()
+
+        # Scan code
+        ret += f'{self.code_indent_string()}.scan_code:\n'
+        self.increase_code_indent()
+        ret += f'{self.code_indent_string()}addiu $t2, $t2 1\n'
+        ret += f'{self.code_indent_string()}adidu $t0, t0, 4\n'
         ret += f'{self.code_indent_string()}syscall\n'
-        ret += f'{self.code_indent_string()}sw $v0 ($a0)\n'
+        ret += f'{self.code_indent_string()}sw $v0, ($a0)'
+        ret += f'{self.code_indent_string()}b .start_scanf\n\n'
+        self.decrease_code_indent()
+
         self.decrease_code_indent()
         return ret

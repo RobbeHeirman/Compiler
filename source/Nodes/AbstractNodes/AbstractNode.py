@@ -314,6 +314,9 @@ class AbstractNode(abc.ABC):
     def mips_registers_in_use(self):
         return self._parent_node.mips_registers_in_use()
 
+    def top_register(self):
+        return self._parent_node.top_register()
+
     # Meta Code Generation
     # ==================================================================================================================
     @property

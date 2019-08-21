@@ -128,3 +128,6 @@ class RootNode(ScopedNode.ScopedNode):
     def mips_registers_in_use(self):
         l1 = [item for item in self.__class__._REGISTER_LIST if item not in self._register_list]
         return l1
+
+    def top_register(self):
+        return self._register_list[-1]

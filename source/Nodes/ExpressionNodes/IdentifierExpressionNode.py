@@ -137,8 +137,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 ret_str += f'{self.code_indent_string()}sw $ra, ($sp) # Storing link\n'
 
                 for i, reg in enumerate(self.mips_registers_in_use()):
-                    ret_str += f'{self.code_indent_string()}sw ${reg}, {(
-                                                                                    i + 1) * MIPS_REGISTER_SIZE}($sp) # Storing link\n'
+                    ret_str += f'{self.code_indent_string()}sw ${reg}, {(i + 1) * MIPS_REGISTER_SIZE}($sp)\n'
 
                 ret_str += f'{self.code_indent_string()}jal .{self.id}\n'
 
@@ -148,8 +147,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 ret_str += f'{self.code_indent_string()}lw $ra, ($sp) # Restoring link\n'
 
                 for i, reg in enumerate(self.mips_registers_in_use()):
-                    ret_str += f'{self.code_indent_string()}lw ${reg}, {(
-                                                                                    i + 1) * MIPS_REGISTER_SIZE}($sp) # Restoring link\n'
+                    ret_str += f'{self.code_indent_string()}lw ${reg}, {(i + 1) * MIPS_REGISTER_SIZE}($sp)\n'
 
                 ret_str += f'{self.code_indent_string()}addiu $sp, $sp, {MIPS_REGISTER_SIZE * 3}\n'
                 # move the return value in to assigned register
