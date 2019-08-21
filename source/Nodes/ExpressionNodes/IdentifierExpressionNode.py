@@ -135,8 +135,10 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 # We need to save $ra
                 ret_str += f'{self.code_indent_string()}subiu $sp, $sp, {MIPS_REGISTER_SIZE * 3} # Making room for link\n'
                 ret_str += f'{self.code_indent_string()}sw $ra, ($sp) # Storing link\n'
-                ret_str += f'{self.code_indent_string()}sw $t0, {MIPS_REGISTER_SIZE}($sp) # Storing link\n'
-                ret_str += f'{self.code_indent_string()}sw $t1, {MIPS_REGISTER_SIZE * 2}($sp) # Storing link\n'
+
+                for i, reg in enumerate(self.mips_registers_in_use()):
+                    ret_str += f'{self.code_indent_string()}sw ${reg}, {(
+                                                                                    i + 1) * MIPS_REGISTER_SIZE}($sp) # Storing link\n'
 
                 ret_str += f'{self.code_indent_string()}jal .{self.id}\n'
 
@@ -144,8 +146,10 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 ret_str += param_node.mips_free_stack_of_arguments()
                 # Restore link
                 ret_str += f'{self.code_indent_string()}lw $ra, ($sp) # Restoring link\n'
-                ret_str += f'{self.code_indent_string()}lw $t0, {MIPS_REGISTER_SIZE}($sp) # Restoring link\n'
-                ret_str += f'{self.code_indent_string()}lw $t1, {MIPS_REGISTER_SIZE * 2}($sp) # Restoring link\n'
+
+                for i, reg in enumerate(self.mips_registers_in_use()):
+                    ret_str += f'{self.code_indent_string()}lw ${reg}, {(
+                                                                                    i + 1) * MIPS_REGISTER_SIZE}($sp) # Restoring link\n'
 
                 ret_str += f'{self.code_indent_string()}addiu $sp, $sp, {MIPS_REGISTER_SIZE * 3}\n'
                 # move the return value in to assigned register

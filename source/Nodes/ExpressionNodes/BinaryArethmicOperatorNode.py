@@ -71,9 +71,8 @@ class BinaryArethmicOperatorNode(BinaryExpressionNode):
     # ==================================================================================================================
     def mips_store_in_register(self, reg: str):
         reg_1 = self.mips_register_reserve()
-        reg_2 = self.mips_register_reserve()
-
         ret = self._left_expression.mips_store_in_register(reg_1)
+        reg_2 = self.mips_register_reserve()
         ret += self._right_expression.mips_store_in_register(reg_2)
         ret += f'{self.code_indent_string()}{self._operator.mips_op_code} ${reg}, ${reg_1}, ${reg_2}\n'
 

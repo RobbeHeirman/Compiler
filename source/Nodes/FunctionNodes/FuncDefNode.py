@@ -83,7 +83,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
         self._function_signature = self._param_list_node.get_function_signature()
         attribute = Attributes.AttributesGlobal(self._type_stack, self._line, self._column, True, self)
-
+        attribute.llvm_name = self.id
         attribute.function_signature = self._function_signature
         if not self._add_to_table(attribute, messenger):
             return False

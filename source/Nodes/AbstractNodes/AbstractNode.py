@@ -311,6 +311,9 @@ class AbstractNode(abc.ABC):
     def mips_register_free(self, reg: str):
         self._parent_node.mips_register_free(reg)
 
+    def mips_registers_in_use(self):
+        return self._parent_node.mips_registers_in_use()
+
     # Meta Code Generation
     # ==================================================================================================================
     @property

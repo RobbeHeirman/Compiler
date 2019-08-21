@@ -9,6 +9,7 @@ import Attributes
 import Nodes.DeclarationNodes.DeclarationNode as DeclarationNode
 import SymbolTable
 import messages
+from Nodes.ExpressionNodes.ConstantExpressionNode import ConstantExpressionNode
 
 
 class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
@@ -59,6 +60,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
             function_signature = self._type_modifier_node.get_function_signature()
 
             attribute.function_signature = function_signature
+        attribute.llvm_name = self.id
 
         self._add_to_table(attribute, messenger)
         return True
@@ -114,6 +116,7 @@ class GlobalDeclarationNode(DeclarationNode.DeclarationNode):
     # ==================================================================================================================
     def generate_mips(self, c_comment: bool = True):
 
+        self._expression_node: ConstantExpressionNode
         val = self._expression_node.mips_value if self._expression_node else 0
 
         ret = self.mips_comment(f'{[child.value for child in self._type_stack]} {self.id} = {self._expression_node}',

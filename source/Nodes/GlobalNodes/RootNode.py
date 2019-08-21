@@ -18,6 +18,8 @@ class RootNode(ScopedNode.ScopedNode):
     _index_counter = 0
     _indent_level = 0
 
+    _REGISTER_LIST = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9', 's0', 's1', 's3'
+        , 's4', 's5', 's6', 's7']
     # Built-ins
     # ==================================================================================================================
     def __init__(self, ctx):
@@ -30,8 +32,7 @@ class RootNode(ScopedNode.ScopedNode):
 
         self._index = 0
 
-        self._register_list = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9', 's0', 's1', 's3'
-            , 's4', 's5', 's6', 's7']
+        self._register_list = list(self._REGISTER_LIST)
         self._register_list.reverse()
 
     # Ast-visuals
@@ -123,3 +124,7 @@ class RootNode(ScopedNode.ScopedNode):
 
     def mips_register_free(self, reg: str):
         self._register_list.append(reg)
+
+    def mips_registers_in_use(self):
+        l1 = [item for item in self.__class__._REGISTER_LIST if item not in self._register_list]
+        return l1

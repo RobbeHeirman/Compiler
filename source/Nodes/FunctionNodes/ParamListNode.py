@@ -59,9 +59,14 @@ class ParamListNode(AbstractNode.AbstractNode):
         return ret
 
     def llvm_store_params(self):
-        return "".join([LlvmCode.llvm_store_instruction(str(index), child.type_stack, child.id, child.type_stack,
+
+        ret = ""
+        for index, child in enumerate(self._children):
+            attr = self.get_attribute(child.id)
+            ret += LlvmCode.llvm_store_instruction(str(index), child.type_stack, attr.llvm_name, child.type_stack,
                                                         self.code_indent_string())
-                        for index, child in enumerate(self._children)])
+
+        return ret
 
     def llvm_call_param_nodes(self) -> str:
         return "".join([child.generate_llvm() for child in self._children])
