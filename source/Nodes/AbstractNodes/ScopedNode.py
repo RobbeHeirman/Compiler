@@ -80,6 +80,21 @@ class ScopedNode(AbstractNode.AbstractNode, ABC):
         """
         return False
 
+    def llvm_count_declared_scopes(self, id) -> int:
+
+        if self._symbol_table.is_in_symbol_table(id):
+            return self._parent_node.llvm_count_declared_scopes(id) + 1
+        return self._parent_node.llvm_count_declared_scopes(id)
+
+    def llvm_found_in_n_scope(self, id, found_first=False) -> int:
+        if self._symbol_table.is_in_symbol_table(id):
+            if not found_first:
+                return self._parent_node.llvm_found_in_n_scope(id, True)
+
+            return 1 + self._parent_node.llvm_found_in_n_scope(id, False)
+
+        return self._parent_node.llvm_found_in_n_scope(id, found_first)
+
     # Mips-Code
     # ==================================================================================================================
     # Meta Code Generation

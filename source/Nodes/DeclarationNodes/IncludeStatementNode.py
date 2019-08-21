@@ -40,6 +40,7 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
         type_stack = [ret_type, func_type]
 
         printf_attr = Attributes.Attributes(type_stack, 0, 0)
+        printf_attr.llvm_name = var_id
 
         self._parent_node.add_to_scope_symbol_table(var_id, printf_attr)
 
@@ -56,6 +57,7 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
         func_type.function_signature = signature
         type_stack = [ret_type, func_type]
         scanf_attr = Attributes.Attributes(type_stack, 0, 0)
+        scanf_attr.llvm_name = var_id
         self._parent_node.add_to_scope_symbol_table(var_id, scanf_attr)
 
         return True

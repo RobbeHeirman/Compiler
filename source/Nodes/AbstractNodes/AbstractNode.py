@@ -214,6 +214,21 @@ class AbstractNode(abc.ABC):
 
         return ret
 
+    def llvm_count_declared_scopes(self, id) -> int:
+        """
+        Count's the amount a var is declared in a scope
+        :return:
+        """
+        return self._parent_node.llvm_count_declared_scopes(id)
+
+    def llvm_found_in_n_scope(self, id, found_first=False):
+        """
+        Returns in the 'n d scope found
+        :param id:
+        :return:
+        """
+        return self._parent_node.llvm_found_in_n_scope(id)
+
     def llvm_comment(self, comment_string: str, do_comment: bool) -> str:
         """
         Generates a comment string.

@@ -5,16 +5,23 @@ int fibb(){
 
     int fib_arr[50];
     int n = 10;
-    fib_arr[0] = 1;
-    fib_arr[1] = 1;
-
-    int k = 2;
-    int next = 0;
-
+    int k = 0;
     while(k < n){
-    fib_arr[k] = fib_arr[k - 1] + fib_arr[k - 2];
-    k = k + 1;
 
+    if (k == 0){
+        fib_arr[k] = 1;
+    }
+
+    else if (k == 1){
+
+        fib_arr[k] = 1;
+    }
+
+    else{
+       fib_arr[k] = fib_arr[k - 1] + fib_arr[k - 2];
+    }
+
+    k = k + 1;
 
     char print_arr[4];
     print_arr[0] = '%';
@@ -26,17 +33,16 @@ int fibb(){
     printf(print_ptr, fib_arr[k - 1]);
     }
 
+    char print_arr[2];
+    print_arr[0] = '\n';
+    print_arr[1] = '\0';
+    char *ptr = &print_arr[0];
+    printf(ptr);
     return fib_arr[n - 1];
 }
 
 
 int main(){
-   int test[44];
-   int k = 5;
-   test[k] = 44;
-   test[k + 1] = 4;
-   test[k - 1] = test[k] - test[k + 1];
-
    return fibb();
 
 }

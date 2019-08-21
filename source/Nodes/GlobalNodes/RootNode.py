@@ -73,6 +73,12 @@ class RootNode(ScopedNode.ScopedNode):
     def code_indent_level(self):
         return self._indent_level
 
+    def llvm_count_declared_scopes(self, id) -> int:
+        return 0
+
+    def llvm_found_in_n_scope(self, id, found_first=False):
+        return 0
+
     # Mips Code
     # ==================================================================================================================
 

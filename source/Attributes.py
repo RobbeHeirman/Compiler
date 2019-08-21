@@ -29,6 +29,9 @@ class Attributes:
 
         self.array_size = 0
 
+        # LLVM info
+        self._llvm_name = ''
+
         # Mips info
         self._mips_stack_address: int = 0
 
@@ -68,6 +71,14 @@ class Attributes:
     @property
     def decl_type(self):
         return self.base_type
+
+    @property
+    def llvm_name(self):
+        return self._llvm_name
+
+    @llvm_name.setter
+    def llvm_name(self, val):
+        self._llvm_name = val
 
     @property
     def operator_stack(self):

@@ -93,7 +93,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         # Type of node
         attr = self._parent_node.get_attribute(self._place_of_value)
         type_stack = list(attr.operator_stack)
-
+        self._place_of_value = attr.llvm_name
         ret_string = ''
         if self._type_modifier_node:
             self._type_modifier_node.reset_used_switches()

@@ -148,18 +148,23 @@ class DeclarationNode(TypedNode.TypedNode):
         expression_c = f' = {self._expression_node}' if self._expression_node else ''
         ret = self.llvm_comment(f'{self._type_stack[0].value} {self.id}{expression_c}', c_comment)
 
+        name = f'{self.id}{self.llvm_count_declared_scopes(self.id) - 1}'
+        attr = self.get_attribute(self.id)
+        attr.llvm_name = name
+
         # Allocate at id
         if self._type_stack[-1] == type_specifier.TypeSpecifier.ARRAY:
-            ret += f'{self.code_indent_string()}%{self.id} = alloca'
+            ret += f'{self.code_indent_string()}%{name} = alloca'
             ret += f' [{self._array_size} x {"".join([child.llvm_type for child in self._type_stack[:-1]])}]\n'
         else:
-            ret += LlvmCode.llvm_allocate_instruction(self.id, self._type_stack, self.code_indent_string())
+            ret += LlvmCode.llvm_allocate_instruction(f'{self.id}{self.llvm_count_declared_scopes(self.id) - 1}',
+                                                      self._type_stack, self.code_indent_string())
 
         # handle expression node and store it in address of declaration id
         if self._expression_node:
             ret += self._expression_node.llvm_load()
             ret += f'{self.code_indent_string()}store {self.llvm_type_string()} {self._expression_node.llvm_value},'
-            ret += f' {self.llvm_type_string()}* %{self.id}\n'
+            ret += f' {self.llvm_type_string()}* %{self.id}{self.llvm_count_declared_scopes(self.id) - 1}\n'
         return ret
 
     # MIPS Generation

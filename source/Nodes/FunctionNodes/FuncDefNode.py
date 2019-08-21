@@ -101,6 +101,8 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
     # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
 
+        attr = self.get_attribute(self.id)
+        attr.llvm_name = self.id
         function_signature = self._param_list_node.generate_llvm_function_signature()
         return_type = f'{"".join([child.llvm_type for child in self._type_stack[:-1]])} '
         ret = self.comment_code(c_comment, False)
