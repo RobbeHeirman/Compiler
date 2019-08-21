@@ -106,7 +106,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         function_signature = self._param_list_node.generate_llvm_function_signature()
         return_type = f'{"".join([child.llvm_type for child in self._type_stack[:-1]])} '
         ret = self.comment_code(c_comment, False)
-        ret += f'{self.code_indent_string()} define {return_type} @{self.id}'
+        ret += f'{self.code_indent_string()}define {return_type} @{self.id}'
         ret += f'({function_signature}){{\n'
         self.increase_code_indent()
 

@@ -63,6 +63,10 @@ class RootNode(ScopedNode.ScopedNode):
     # LLVM Code
     # ==================================================================================================================
 
+    def generate_llvm(self, c_comment: bool = True):
+        self._indent_level = 0
+        return super().generate_llvm(c_comment)
+
     def increase_code_indent(self):
         self._indent_level += 1
 
