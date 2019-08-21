@@ -65,10 +65,12 @@ if __name__ == "__main__":
     # Creating AST
     ast = main.create_ast(args.input_file)
 
+    ast.constant_folding()
     # Visuals
     if args.visual_ast:
         main.generate_ast_visuals(ast, path + slug)
         main.generate_ast_visuals(ast, path + slug + "2")
+
 
     # If the semantic analysis fails
     if not ast.semantic_analysis():
@@ -85,16 +87,16 @@ if __name__ == "__main__":
         subprocess.call(["clang", args.input_file, "-S", "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion", "-ansi",
                          "-o", name_reference])  # Test compiler errors
 
-        # subprocess.call(["clang", "-cc1", args.input_file, "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion",
-        #                  "-o", name_reference])  # Test compiler errors
+        subprocess.call(["clang", "-cc1", args.input_file, "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion",
+                         "-o", name_reference])  # Test compiler errors
 
     if args.executable_test:
         ll_file = path + slug + ".ll"
         # Test llvm generated language
         runner = subprocess.run(["clang", "-Wno-override-module", ll_file, "-o", path + slug + ".exe"])
-        if runner.returncode is 0:
-            code = subprocess.call(["./" + path + slug + ".exe"])
-            print(code)
-            code = subprocess.call(["java", "-jar", "Mars.jar", "nc", path + slug + ".asm"])
-            print(code)
+
+        code = subprocess.call(["./" + path + slug + ".exe"])
+        print(code)
+        code = subprocess.call(["java", "-jar", "Mars.jar", "nc", path + slug + ".asm"])
+        print(code)
     sys.exit(0)

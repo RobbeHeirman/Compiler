@@ -9,7 +9,11 @@ class TypedNode(AbstractNode.AbstractNode, abc.ABC):
     """
     Superclass for all classes who have knowledge about their type. (Declarations right side id's expressions...)
     """
-
+    _TYPE_HIERARCHY = [type_specifier.TypeSpecifier.BOOL,
+                       type_specifier.TypeSpecifier.CHAR,
+                       type_specifier.TypeSpecifier.INT,
+                       type_specifier.TypeSpecifier.POINTER,
+                       type_specifier.TypeSpecifier.FLOAT]
     # Built-ins
     # ==================================================================================================================
     def __init__(self, parent_node, ctx):

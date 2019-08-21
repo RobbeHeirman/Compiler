@@ -70,6 +70,9 @@ class AST:
     def warning_count(self) -> int:
         return self._messenger.warning_counter
 
+    def constant_folding(self):
+        self._root.constant_folding()
+
     # Generate LLVM
     # ==================================================================================================================
     def generate_llvm(self) -> str:

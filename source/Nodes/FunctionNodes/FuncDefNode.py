@@ -115,7 +115,8 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         ret += self._param_list_node.llvm_store_params()
 
         # get a return reg up
-        ret += f'{self.code_indent_string()}%.ret = alloca {return_type}\n'
+        if not self.type_stack[0] == type_specifier.TypeSpecifier.VOID:
+            ret += f'{self.code_indent_string()}%.ret = alloca {return_type}\n'
         # We need to increment our register for each param
         self.increment_register_index(self._param_list_node.child_count())
 
@@ -128,13 +129,18 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # ret_type_str = "".join([c_type.llvm_type for c_type in self.get_return_type()])
         # ret += self.code_indent_string() + "ret {0} %{1}\n".format(ret_type_str, '0')
 
-        # Return
-        ret += f'{self.code_indent_string()}{self.return_label()}:\n'
-        self.increase_code_indent()
-        self.increment_register_index()
-        ret += f'{self.code_indent_string()}%{self.register_index} = load {return_type}, {return_type}* %.ret\n'
-        ret += f'{self.code_indent_string()} ret {return_type} %{self.register_index}\n'
-        self.decrease_code_indent()
+        if not self._type_stack[0] == type_specifier.TypeSpecifier.VOID:
+            # Return
+            ret += f'{self.code_indent_string()}{self.return_label()}:\n'
+            self.increase_code_indent()
+            self.increment_register_index()
+            ret += f'{self.code_indent_string()}%{self.register_index} = load {return_type}, {return_type}* %.ret\n'
+            ret += f'{self.code_indent_string()}ret {return_type} %{self.register_index}\n'
+            self.decrease_code_indent()
+
+        else:
+            ret += f'{self.code_indent_string()}ret void\n'
+
         ret += "}\n"
         self.decrease_code_indent()
         return ret
@@ -197,10 +203,11 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # Now we know the frame size so we can make room on the stack
         # (subiu = subtract immediate unsigned = supported by Mars MIPS)
         increase_stack_with = frame_size + self.mips_stack_pointer
-        ret += f'{self.code_indent_string()}subiu $sp, $sp, {increase_stack_with}\n'
+        if increase_stack_with:
+            ret += f'{self.code_indent_string()}subiu $sp, $sp, {increase_stack_with}\n'
         ret += self._param_list_node.mips_store_arguments()
         ret += temp_ret
-        # Give them some addresses aswell
+        # Give them some addresses as well
         self._expression_node.mips_assign_address()
 
         # 4 Fill in the function body
@@ -208,10 +215,11 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
         # Some awesome code here
 
         # 5 Make a Return label, free up the stack, set s register's back in place and jump back to caller
-        ret += f'\n{self.code_indent_string()}{self.code_function_base_label}_return:'
+        ret += f'{self.code_indent_string()}{self.code_function_base_label}_return:'
         self.increase_code_indent()
         ret += self.mips_load_preserved_registers(load_preserved_regs_from)
-        ret += f'{self.code_indent_string()}addiu $sp, $sp, {increase_stack_with}\n'
+        if increase_stack_with:
+            ret += f'{self.code_indent_string()}addiu $sp, $sp, {increase_stack_with}\n'
         ret += f"{self.code_indent_string()}jr $ra\n"
         self.decrease_code_indent()
         self.decrease_code_indent()

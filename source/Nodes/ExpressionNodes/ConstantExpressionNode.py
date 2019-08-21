@@ -22,7 +22,7 @@ class ConstantExpressionNode(ExpressionNode.ExpressionNode):
         self.l_value: bool = False  # Constant's are always r value's
 
     def __str__(self):
-        return self.constant
+        return str(self.constant)
 
     # AST-visuals
     # ==================================================================================================================

@@ -243,21 +243,21 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
         ret += f'{self.code_indent_string()}b .type_control_scan\n\n'
 
         # Load from $a1
-        ret += f'{self.code_indent_string()}.first_arg:\n'
+        ret += f'{self.code_indent_string()}.first_arg_scan:\n'
         self.increase_code_indent()
         ret += f"{self.code_indent_string()}move $a0, $a1\n"
         ret += f'{self.code_indent_string()}b .type_control_scan\n\n'
         self.decrease_code_indent()
 
         # load from $a2
-        ret += f'{self.code_indent_string()}.second_arg:\n'
+        ret += f'{self.code_indent_string()}.second_arg_scan:\n'
         self.increase_code_indent()
         ret += f"{self.code_indent_string()}move $a0, $a2\n"
         ret += f'{self.code_indent_string()}b .type_control_scan\n\n'
         self.decrease_code_indent()
 
         # load from $a3
-        ret += f'{self.code_indent_string()}.third_arg:\n'
+        ret += f'{self.code_indent_string()}.third_arg_scan:\n'
         self.increase_code_indent()
         ret += f"{self.code_indent_string()}move $a0, $a3\n\n"
         self.decrease_code_indent()
@@ -304,10 +304,18 @@ class IncludeStatementNode(AbstractNode.AbstractNode):
         ret += f'{self.code_indent_string()}.scan_code:\n'
         self.increase_code_indent()
         ret += f'{self.code_indent_string()}addiu $t2, $t2 1\n'
-        ret += f'{self.code_indent_string()}adidu $t0, t0, 4\n'
+        ret += f'{self.code_indent_string()}addiu $t0, $t0, 4\n'
         ret += f'{self.code_indent_string()}syscall\n'
-        ret += f'{self.code_indent_string()}sw $v0, ($a0)'
+        ret += f'{self.code_indent_string()}sw $v0, ($a0)\n'
         ret += f'{self.code_indent_string()}b .start_scanf\n\n'
+        self.decrease_code_indent()
+
+        # End of code
+        self.decrease_code_indent()
+        ret += f'{self.code_indent_string()}.end_scanf:'
+        self.increase_code_indent()
+        ret += f'{self.code_indent_string()}move $v0, $t1\n'
+        ret += f'{self.code_indent_string()}jr $ra\n\n'
         self.decrease_code_indent()
 
         self.decrease_code_indent()

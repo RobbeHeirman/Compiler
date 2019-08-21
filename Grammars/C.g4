@@ -27,7 +27,7 @@ statement
     ;
 
 decl_list
-    : base_type simple_declaration (COMMA simple_declaration)* SEMICOLON
+    : type_qualifier? base_type simple_declaration (COMMA simple_declaration)* SEMICOLON
     ;
 
 simple_declaration // int a, char foo....
@@ -38,10 +38,15 @@ array_init
     : LBRACES expression (COMMA expression)* RBRACES
     ;
 
+type_qualifier
+    : 'const'
+    ;
+
 base_type
     : CHAR
     | FLOAT
     | INT
+    | VOID
     ;
 
 declarator // optional prefix operator sequence + optional postfix operator
@@ -244,6 +249,7 @@ RIGHT_BRACKET: ']';
 CHAR: 'char';
 FLOAT: 'float';
 INT: 'int';
+VOID: 'void';
 
 // =====================================================================================================================
 

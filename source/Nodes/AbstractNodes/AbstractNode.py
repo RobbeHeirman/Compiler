@@ -159,6 +159,14 @@ class AbstractNode(abc.ABC):
         ret = all([child.semantic_analysis(messenger) for child in list(self._children)])
         return ret
 
+    def constant_folding(self):
+        """
+        Folds constant expressions into one expression
+        :return:
+        """
+
+        [child.constant_folding() for child in self._children]
+
     @property
     def line(self) -> int:
         """

@@ -15,6 +15,7 @@ class TypeSpecifier:
     CHAR = 'char'
     FLOAT = 'float'
     BOOL = 'bool'
+    VOID = 'void'
 
     POINTER = '*'
     ADDRESS = '&'
@@ -72,6 +73,7 @@ class TypeSpecifier:
             'char': 'i8',
             'int': 'i32',
             'float': 'float',
+            'void': 'void',
             '*': '*'
         }
 
