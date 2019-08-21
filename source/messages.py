@@ -130,6 +130,10 @@ class MessageGenerator:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def error_expected_l_value(self, line, column):
         self._writer(self._error(line, column) + 'lvalue required as left operand of assignment')
+
+    def error_is_read_only(self, line, column, name):
+        self._writer(self._error(line, column) + "assignment of read-only variable '" + name + "'")
+
     # Function declaration, definition and call error's
     # ==================================================================================================================
     def error_func_initialized_like_var(self, lexeme, line, column):

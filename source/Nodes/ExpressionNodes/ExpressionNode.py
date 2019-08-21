@@ -6,7 +6,6 @@ from Nodes.ExpressionNodes import ExpressionTypeModifierNode
 
 import type_specifier
 
-
 if TYPE_CHECKING:
     import Nodes.FunctionNodes.ParamListNode as ParamListNode
 
@@ -15,6 +14,7 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
     _BASE_LABEL = "expression"
     _place_of_value: str
     _type_modifier_node: "ExpressionTypeModifierNode.ExpressionTypeModifierNode"
+
     # Built-ins
     # ==================================================================================================================
 
@@ -72,6 +72,12 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
 
     def is_constant(self):
         return False
+
+    def is_read_only(self):
+        return False
+
+    def name(self):
+        return self._place_of_value
 
     # LLVM-code
     # ==================================================================================================================
@@ -159,7 +165,8 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
                 inbound_type = "".join([child.llvm_type for child in type_stack])
                 arr_type = f'[{attr.array_size} x {inbound_type}]'
                 ret_string += f'{self.code_indent_string()}%{self.register_index} = getelementptr {arr_type},'
-                ret_string += f' {arr_type}* %{self._place_of_value}, i32 0, i32 {arr_node.expression_node.llvm_value}\n'
+                ret_string += f' {arr_type}* %{self._place_of_value}, i32 0, '
+                ret_string += f'i32 {arr_node.expression_node.llvm_value}\n'
                 self._place_of_value = self.register_index
                 # stack.append(type_specifier.TypeSpecifier(type_specifier.TypeSpecifier.POINTER))
 
@@ -218,7 +225,6 @@ class ExpressionNode(TypedNode.TypedNode, abc.ABC):
         ret += self.mips_store_in_register(reg)
         self.mips_register_free(reg)
         return ret
-
 
     def mips_store_in_register(self, reg: str) -> str:
         """

@@ -24,6 +24,7 @@ class DeclListNode(AbstractNode.AbstractNode):
 
         self.base_type = None
         self._declaration_nodes = list()
+        self.is_const = False
 
     @property
     def label(self):
@@ -51,6 +52,7 @@ class DeclListNode(AbstractNode.AbstractNode):
         for decl_node in self._declaration_nodes:
             decl_node.set_base_type(self.base_type)
             decl_node.parent_node = self._parent_node
+            decl_node.is_const = self.is_const
             self._parent_node.add_child(decl_node, index)
             index += 1
 

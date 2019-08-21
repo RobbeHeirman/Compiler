@@ -27,6 +27,8 @@ class Attributes:
         self._line = line
         self._column = column
 
+        self.is_const = False
+
         self.array_size = 0
 
         # LLVM info

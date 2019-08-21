@@ -37,6 +37,8 @@ class DeclarationNode(TypedNode.TypedNode):
         self.id = None
         self._expression_node: ExpressionNode.ExpressionNode = None
 
+        self.is_const = False
+
         self._array_size = 0
 
     # AST Visuals
@@ -96,6 +98,7 @@ class DeclarationNode(TypedNode.TypedNode):
         self._generate_secondary_types(messenger)
         # We have all the info for the corresponding attribute object
         attr = self._make_attribute()
+        attr.is_const = self.is_const
 
         # Special action's required if we initialize array's
         if self._type_stack[-1] == type_specifier.TypeSpecifier.ARRAY:

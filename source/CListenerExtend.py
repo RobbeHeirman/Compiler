@@ -153,6 +153,11 @@ class CListenerExtend(CListener):
         self._parent_node.cleanup()
         self._parent_node = self._parent_node.parent_node
 
+    def enterType_qualifier(self, ctx: CParser.Type_qualifierContext):
+
+        self._parent_node: DeclListNode
+        self._parent_node.is_const = True
+
     def enterSimple_declaration(self, ctx: CParser.Simple_declarationContext):
         """
         Handles a declaration statement. Creates a declaration node. Set it as last parent node so that children can

@@ -60,6 +60,10 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
             return False
         return True
 
+    def is_read_only(self):
+        attr = self.get_attribute(self.id)
+        return attr.is_const
+
     # LLVM Code generation
     # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
