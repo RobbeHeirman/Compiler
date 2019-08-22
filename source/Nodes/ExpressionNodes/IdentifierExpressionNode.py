@@ -189,6 +189,7 @@ class IdentifierExpressionNode(ExpressionNode.ExpressionNode):
                 ret += f'{self.code_indent_string()}lw ${target_reg}, (${target_reg})\n'
 
             elif element == type_specifier.TypeSpecifier.ARRAY:
+                self._type_modifier_node.reset_used_switches()
                 arr_node = self._type_modifier_node.get_bottom_arr()
 
                 extr_addr = self._parent_node.mips_register_reserve()

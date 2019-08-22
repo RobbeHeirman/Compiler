@@ -133,14 +133,12 @@ class ExpressionTypeModifierNode(TypeModifierNode.TypeModifierNode):
     # LLVM Code
     # ==================================================================================================================
     def get_bottom_arr(self):
-
         if self._type_modifier_node:
-
             ret_val = self._type_modifier_node.get_bottom_arr()
             if ret_val != -1:
                 return ret_val
 
-        if self.modifier_type == type_specifier.TypeSpecifier.ARRAY and not self._llvm_used:
+        elif self.modifier_type == type_specifier.TypeSpecifier.ARRAY and not self._llvm_used:
             self._llvm_used = True
             return self
 
