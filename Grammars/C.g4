@@ -7,7 +7,7 @@ grammar C;
     ;
 
     global_statement
-    : decl_list
+    : decl_list SEMICOLON
     | func_def
     | include_statement
     ;
