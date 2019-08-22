@@ -26,6 +26,12 @@ class SreservedTest(AbstractTest.SAbstractTest):
     def test_misplaced_break(self):
         return self._run_analysis("misplaced_break.c", 2)
 
+    def test_happy_continue(self):
+        return self._run_analysis("happy_continue.c", 0)
+
+    def test_wrong_continue(self):
+        return self._run_analysis("wrong_continue.c", 2)
+
 
 class LLVMReservedTest(AbstractTest.LLVMAbstractExecTest):
     def __init__(self, *args, **kwargs):
@@ -39,8 +45,11 @@ class LLVMReservedTest(AbstractTest.LLVMAbstractExecTest):
     def test_happy_break(self):
         return self._build_and_run_llvm("happy_break.c", 1)
 
+    def test_happy_continue(self):
+        return self._build_and_run_llvm("happy_continue.c", 5)
 
-class MipsConditionalTest(AbstractTest.MipsAbstractTest):
+
+class MipsReservedTest(AbstractTest.MipsAbstractTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.path += "reserved_words/"
@@ -51,3 +60,6 @@ class MipsConditionalTest(AbstractTest.MipsAbstractTest):
 
     def test_happy_break(self):
         return self._build_and_run_mips("happy_break.c", 1)
+
+    def test_happy_continue(self):
+        return self._build_and_run_mips("happy_continue.c", 5)
