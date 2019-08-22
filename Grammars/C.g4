@@ -18,7 +18,7 @@ grammar C;
 
 statement
 
-    : decl_list
+    : decl_list SEMICOLON
     | func_def
     | ret_statement SEMICOLON
     | break_statement SEMICOLON
@@ -26,10 +26,11 @@ statement
     | expression SEMICOLON
     | branch
     | while_loop
+    | for_loop
     ;
 
 decl_list
-    : type_qualifier? base_type simple_declaration (COMMA simple_declaration)* SEMICOLON
+    : type_qualifier? base_type simple_declaration (COMMA simple_declaration)*
     ;
 
 simple_declaration // int a, char foo....
@@ -206,9 +207,19 @@ c_if : IF LPARANT expression RPARANT LBRACES statements RBRACES;
 c_elif: ELSE IF LPARANT expression RPARANT LBRACES statements RBRACES;
 c_else: ELSE LBRACES statements RBRACES;
 
-while_loop: WHILE LPARANT expression RPARANT LBRACES statements RBRACES;
 break_statement: BREAK;
 continue_statement: CONTINUE;
+
+while_loop: WHILE LPARANT expression RPARANT LBRACES statements RBRACES;
+// For loop
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+for_loop: FOR LPARANT (init_clause)? SEMICOLON (for_cond_expression)? SEMICOLON (for_iteration_expression)?
+          RPARANT LBRACES statements RBRACES;
+
+init_clause: decl_list | expression;
+for_cond_expression: expression;
+for_iteration_expression: expression;
+
 
 // =====================================================================================================================
 /** Tokens */
@@ -263,6 +274,7 @@ RETURN: 'return';
 IF: 'if';
 ELSE: 'else';
 WHILE: 'while';
+FOR: 'for';
 BREAK: 'break';
 CONTINUE: 'continue';
 

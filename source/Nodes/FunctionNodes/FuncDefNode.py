@@ -131,6 +131,7 @@ class FuncDefNode(GlobalDeclarationNode.GlobalDeclarationNode, ScopedNode.Scoped
 
         if not self._type_stack[0] == type_specifier.TypeSpecifier.VOID:
             # Return
+            self.decrease_code_indent()
             ret += f'{self.code_indent_string()}{self.return_label()}:\n'
             self.increase_code_indent()
             self.increment_register_index()

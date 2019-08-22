@@ -32,6 +32,7 @@ from Nodes.ConditionalNodes.ContinueNode import ContinueNode
 from Nodes.ConditionalNodes.ElifNode import ElseIfNode
 from Nodes.ConditionalNodes.WhileNode import WhileNode
 from Nodes.ExpressionNodes import AssignmentNode, BinaryArethmicOperatorNode
+from Nodes.ConditionalNodes.ForLoopNode import ForLoopNode
 
 from gen.CListener import CListener
 from gen.CParser import CParser
@@ -432,3 +433,26 @@ class CListenerExtend(CListener):
 
     def enterContinue_statement(self, ctx: CParser.Continue_statementContext):
         self._parent_node.add_child(ContinueNode(self._parent_node, ctx))
+
+    # For loop
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    def enterFor_loop(self, ctx: CParser.For_loopContext):
+        node = ForLoopNode(self._parent_node, ctx)
+        node.parent_node = self._parent_node
+        self._parent_node.add_child(node)
+        self._parent_node = node
+
+    def exitFor_loop(self, ctx: CParser.For_loopContext):
+        self._parent_node = self._parent_node.parent_node
+
+    def exitInit_clause(self, ctx: CParser.Init_clauseContext):
+        self._parent_node: ForLoopNode
+        self._parent_node.add_init_clause()
+
+    def exitFor_cond_expression(self, ctx: CParser.For_cond_expressionContext):
+        self._parent_node: ForLoopNode
+        self._parent_node.add_cond_expression()
+
+    def exitFor_iteration_expression(self, ctx: CParser.For_iteration_expressionContext):
+        self._parent_node: ForLoopNode
+        self._parent_node.add_it_expression()

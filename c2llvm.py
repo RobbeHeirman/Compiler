@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse
 import subprocess
 import sys
@@ -26,19 +25,26 @@ sys.stdout = TracePrints()
 
 if __name__ == "__main__":
 
+    # Set-up
+    # ==================================================================================================================
     # Cleaning up previous run
     if os.path.exists("result/"):
         shutil.rmtree("result/")
 
-    # Argument parsing
     cmd_parser = argparse.ArgumentParser(description="Compiles C file to LLVM intermediate language")
-    cmd_parser.add_argument("input_file", nargs="?", default=-1, help="The required C file to compile")
+
     cmd_parser.add_argument("-visual_ast", help="Generate a png that visualizes the ast. DOT required",
                             action="store_true")
-    cmd_parser.add_argument("-no_code", help="If flag is specified there will be no code generation",
+
+    # Argument parsing
+    cmd_parser.add_argument("input_file", nargs="?", default=-1, help="The required C file to compile")
+    cmd_parser.add_argument("-no_llvm", help="If flag is specified there will be no llvm code generation",
+                            action="store_true")
+    cmd_parser.add_argument("-no_mips", help="If flag is specified there will be no mips code generation",
                             action="store_true")
     cmd_parser.add_argument("-ref_test", action="store_true")
-    cmd_parser.add_argument("-executable_test", action="store_true")
+    cmd_parser.add_argument("-executable_test_llvm", action="store_true")
+    cmd_parser.add_argument("-executable_test_mips", action="store_true")
     cmd_parser.add_argument("-test", action="store_true")
 
     args = cmd_parser.parse_args()
@@ -62,41 +68,55 @@ if __name__ == "__main__":
     if not os.path.exists(path):
         os.makedirs(path)
 
+    # AST generation
+    # ==================================================================================================================
     # Creating AST
     ast = main.create_ast(args.input_file)
 
-    ast.constant_folding()
-    # Visuals
     if args.visual_ast:
-        main.generate_ast_visuals(ast, path + slug)
-        main.generate_ast_visuals(ast, path + slug + "2")
+        os.makedirs(path + "AST")
+        main.generate_ast_visuals(ast, path + "AST/" + slug + "_pre_folding")
 
+    ast.constant_folding()
+
+    if args.visual_ast:
+        main.generate_ast_visuals(ast, path + "AST/" + slug + "_pre_analysis")
 
     # If the semantic analysis fails
     if not ast.semantic_analysis():
-        # sys.exit(1)
         print("incorrect analysis")
-    main.generate_ast_visuals(ast, path + slug + "2")
+        sys.exit(1)
+
+    if args.visual_ast:
+        main.generate_ast_visuals(ast, path + "AST/" + slug + "_post_analysis")
+
+    # Code generation
+    # ==================================================================================================================
     # generate the ll code
-    if not args.no_code:
-        main.generate_mips(ast, path + slug)
+    if not args.no_llvm:
         main.generate_llvm(ast, path + slug)
 
+    if not args.no_mips:
+        main.generate_mips(ast, path + slug)
+
+    # Ref tests
+    # ==================================================================================================================
     if args.ref_test:
         name_reference = path + slug + "_ref.ll"
-        subprocess.call(["clang", args.input_file, "-S", "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion", "-ansi",
-                         "-o", name_reference])  # Test compiler errors
-
         subprocess.call(["clang", "-cc1", args.input_file, "-emit-llvm", "-Wall", "-Wpedantic", "-Wconversion",
                          "-o", name_reference])  # Test compiler errors
 
-    if args.executable_test:
+    # Run executables
+    # ==================================================================================================================
+    if args.executable_test_llvm:
         ll_file = path + slug + ".ll"
         # Test llvm generated language
         runner = subprocess.run(["clang", "-Wno-override-module", ll_file, "-o", path + slug + ".exe"])
 
         code = subprocess.call(["./" + path + slug + ".exe"])
-        print(code)
+        print(f'Return code of tested llvm = {code}')
+
+    if args.executable_test_mips:
         code = subprocess.call(["java", "-jar", "Mars.jar", "nc", path + slug + ".asm"])
-        print(code)
+        print(f'Return code of tested MIPS = {code}')
     sys.exit(0)

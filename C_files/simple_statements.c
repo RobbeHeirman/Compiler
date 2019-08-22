@@ -1,11 +1,11 @@
 
-int main(){
+void main(){
+
+   int k = 1;
+   for(int i = 0; i < 5; i = i + 1){
+        k = k * 2;
+   }
 
 
-    while(4 < 5){
-
-        break;
-    }
-
-    return 55;
+   int i = 5;
 }

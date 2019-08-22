@@ -31,7 +31,7 @@ class Operator(Enum):
         _mips_op_code = {
             self.PLUS: "add",
             self.MINUS: "sub",
-            self.MULTIPLY: "mult",
+            self.MULTIPLY: "mul",
             self.DIVIDE: "div"
         }
         return _mips_op_code.get(self)

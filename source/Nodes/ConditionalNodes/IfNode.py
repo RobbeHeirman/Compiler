@@ -28,6 +28,15 @@ class IfNode(ElseNode.ElseNode):
 
         super().add_child(child, index)
 
+    @property
+    def condition_node(self):
+        return self._condition_node
+
+    @condition_node.setter
+    def condition_node(self, val):
+        self._condition_node = val
+
+
     # LLVM Generation
     # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):

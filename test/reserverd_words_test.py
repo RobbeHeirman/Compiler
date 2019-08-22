@@ -32,6 +32,9 @@ class SreservedTest(AbstractTest.SAbstractTest):
     def test_wrong_continue(self):
         return self._run_analysis("wrong_continue.c", 2)
 
+    def test_happy_for(self):
+        return self._run_analysis("happy_for.c")
+
 
 class LLVMReservedTest(AbstractTest.LLVMAbstractExecTest):
     def __init__(self, *args, **kwargs):
@@ -48,6 +51,9 @@ class LLVMReservedTest(AbstractTest.LLVMAbstractExecTest):
     def test_happy_continue(self):
         return self._build_and_run_llvm("happy_continue.c", 5)
 
+    def test_happy_for(self):
+        return self._build_and_run_llvm("happy_for.c", 32)
+
 
 class MipsReservedTest(AbstractTest.MipsAbstractTest):
     def __init__(self, *args, **kwargs):
@@ -63,3 +69,6 @@ class MipsReservedTest(AbstractTest.MipsAbstractTest):
 
     def test_happy_continue(self):
         return self._build_and_run_mips("happy_continue.c", 5)
+
+    def test_happy_for(self):
+        return self._build_and_run_mips("happy_for.c", 32)
