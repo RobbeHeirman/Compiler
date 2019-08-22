@@ -38,3 +38,16 @@ class LLVMReservedTest(AbstractTest.LLVMAbstractExecTest):
 
     def test_happy_break(self):
         return self._build_and_run_llvm("happy_break.c", 1)
+
+
+class MipsConditionalTest(AbstractTest.MipsAbstractTest):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.path += "reserved_words/"
+        self.result_path += "reserved_words/"
+
+    def test_happy_const(self):
+        self._build_and_run_mips("happy_const.c", 44)
+
+    def test_happy_break(self):
+        return self._build_and_run_mips("happy_break.c", 1)

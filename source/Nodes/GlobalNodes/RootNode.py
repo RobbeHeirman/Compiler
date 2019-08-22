@@ -61,6 +61,9 @@ class RootNode(ScopedNode.ScopedNode):
     def is_global(self):
         return True
 
+    def find_while_sw_node(self):
+        return 0
+
     # LLVM Code
     # ==================================================================================================================
 

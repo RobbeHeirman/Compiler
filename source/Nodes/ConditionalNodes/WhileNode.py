@@ -4,10 +4,19 @@ from Nodes.ConditionalNodes.IfNode import IfNode
 class WhileNode(IfNode):
     label = "While"
 
+    # Built-ins
+    # ==================================================================================================================
     def __init__(self, parent_node, ctx):
         super().__init__(parent_node, ctx)
         self.end_label = ""
 
+    # Semantic Analysis
+    # ==================================================================================================================
+    def find_while_sw_node(self):
+        return self
+
+    # LLVM-Code
+    # ==================================================================================================================
     def generate_llvm(self, c_comment: bool = True):
         nw_label = self.get_while_label()
         st_cond = f'start_{nw_label}'
@@ -37,6 +46,8 @@ class WhileNode(IfNode):
 
         return ret
 
+    # Mips-Code
+    # ==================================================================================================================
     def generate_mips(self, c_comment: bool = True):
         nw_label = self.get_while_label()
         st_cond = f'start_{nw_label}'

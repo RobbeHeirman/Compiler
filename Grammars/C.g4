@@ -22,6 +22,7 @@ statement
     | func_def
     | ret_statement SEMICOLON
     | break_statement SEMICOLON
+    | continue_statement SEMICOLON
     | expression SEMICOLON
     | branch
     | while_loop
@@ -207,6 +208,7 @@ c_else: ELSE LBRACES statements RBRACES;
 
 while_loop: WHILE LPARANT expression RPARANT LBRACES statements RBRACES;
 break_statement: BREAK;
+continue_statement: CONTINUE;
 
 // =====================================================================================================================
 /** Tokens */
@@ -262,6 +264,7 @@ IF: 'if';
 ELSE: 'else';
 WHILE: 'while';
 BREAK: 'break';
+CONTINUE: 'continue';
 
 
 // identifier(s) & literals

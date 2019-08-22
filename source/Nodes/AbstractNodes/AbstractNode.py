@@ -207,6 +207,9 @@ class AbstractNode(abc.ABC):
         """
         return self._parent_node.is_global()
 
+    def find_while_sw_node(self):
+        return self._parent_node.find_while_sw_node()
+
     # LLVM Code Generation
     # ==================================================================================================================
 

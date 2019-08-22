@@ -17,7 +17,7 @@ class LLVMWhileTest(AbstractTest.LLVMAbstractExecTest):
         return self._build_and_run_llvm("happy_day.c", 5)
 
 
-class MipsConditionalTest(AbstractTest.MipsAbstractTest):
+class MipsWhileTest(AbstractTest.MipsAbstractTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.path += "while/"
