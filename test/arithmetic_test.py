@@ -33,7 +33,7 @@ class LLVMArithmeticTest(AbstractTest.LLVMAbstractExecTest):
         self.result_path += "arithmetic/"
 
     def test_happy_day(self):
-        return self._build_and_run_llvm("happy_day.c", 532)
+        return self._build_and_run_llvm("happy_day.c", 40)
 
     def test_happy_day2(self):
         return self._build_and_run_llvm("happy_day2.c", 3)

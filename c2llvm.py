@@ -73,6 +73,10 @@ if __name__ == "__main__":
     # Creating AST
     ast = main.create_ast(args.input_file)
 
+    if ast == -1:
+        print("Syntax errors")
+        sys.exit(1)
+
     if args.visual_ast:
         os.makedirs(path + "AST")
         main.generate_ast_visuals(ast, path + "AST/" + slug + "_pre_folding")

@@ -28,10 +28,13 @@ def create_ast(input_file: str, string_stream=None) -> AST.AST:
     lexer = CLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = CParser(stream)
+
     tree = parser.root()
 
     listener = CListenerExtend.CListenerExtend(input_file, string_stream)
     walker = ParseTreeWalker()
+    if parser.getNumberOfSyntaxErrors() > 0:
+        return -1
     walker.walk(listener, tree)
 
     return listener.ast
