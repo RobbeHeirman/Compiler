@@ -2,7 +2,14 @@
 int pow(int a, int b){
 
 
-    for(int i = 0; i < b; i = i + 1){
+        if (b == 0){
+
+            return 1;
+        }
+
+
+    for(int i = 0; i < b - 1; i = i + 1){
+
 
         a = a + a;
 
@@ -20,7 +27,7 @@ int main(){
     read[1] = 'i';
     read[2] = '\0';
     char* r_ptr = &read[0];
-    int pw = pow(2, 4);
+    int pw = pow(2, 5);
     printf(r_ptr, pw);
     return pw;
 }
